@@ -1,0 +1,1 @@
+struct mainInfo mainMainInfo, *pMainMainInfo;

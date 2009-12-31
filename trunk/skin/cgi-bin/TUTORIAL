@@ -1,0 +1,258 @@
+# this is a comment
+
+def VARIABLE, VALUE					define new variable
+set VARIABLE, VALUE					set variable value
+dup VARIABLE, NEW_VARIABLE				duplicate variable as new variable
+unset VARIABLE						unset variable
+show VARIABLE						display variable value
+
+special variables:
+	debug		on|off|yes|no
+	delimiter	|
+	output		here|file
+
+pin CHECKPOINT						set checkpoint
+goto CHECKPOINT						goto checkpoint
+terminate STATUS	ok|okay|fail|failed		terminate expression
+
+if VARIABLE CHECK VALUE goto CHECKPOINT			if condition
+
+	CHECK:
+		equals
+		is_greater_than
+		is_greater_or_equals
+		is_smaller_than
+		is_smaller_or_equals
+
+increment VARIABLE, AMOUNT				increment variable value by AMOUNT
+subtract VARIABLE, AMOUNT				decrement variable value by AMOUNT
+multiply VARIABLE, MULTIPLIER				multiply variable by MULTIPLIER
+divide VARIABLE, DIVIDER				divide variable by DIVIDER
+modulo VARIABLE, MODULO					?
+power VARIABLE, EXP					?
+
+
+
+----- EXAMPLE, SIMPLE LOOP -----
+
+set debug, no
+def counter, 20
+
+pin startover
+	show counter
+	subtract counter, 1
+	if counter is_greater_than 10 goto startover
+
+terminate ok
+
+-----
+
+
+
+pullMachine('bifrost','goto10.fi','mem','');
+listMachine('', '', 'node_id,domain','');
+
+pullMisc				PARAM
+
+listMachine				PARAM
+					[DOMAIN]
+pullMachine				PARAM
+					[DOMAIN]
+					[ITEM]
+pushMachine				PARAM
+					[DOMAIN]
+					[ITEM]
+searchMachine				PARAM
+					ITEM
+					[DOMAIN]
+deleteMachine				[DOMAIN]
+					[ITEM]
+listDisposedMachine			PARAM
+					[DOMAIN]
+restoreDisposedMachine			[DOMAIN]
+					[ITEM]
+pullDisposedMachine			PARAM
+					[DOMAIN]
+					[ITEM]
+pushDisposedMachine			PARAM
+					[DOMAIN]
+					[ITEM]
+searchDisposedMachine			PARAM
+					ITEM
+					[DOMAIN]
+deleteDisposedMachine			[DOMAIN]
+					[ITEM]
+
+listPeripheral				[ITEM]
+pullPeripheral				ITEM
+newPeripheral				ITEM
+					PARAM
+					OPTION
+pushPeripheral				ITEM
+					PARAM
+					OPTION
+searchPeripheral			ITEM
+deletePeripheral			ITEM
+restorePeripheral			ITEM
+attachPeripheral			ITEM
+					PARAM
+attachDomainPeripheral			ITEM
+					PARAM
+attachGlobalPeripheral			ITEM
+removePeripheral			ITEM
+					PARAM
+removeDomainPeripheral			ITEM
+					PARAM
+removeGlobalPeripheral			ITEM
+attachedPeripheral			ITEM
+					PARAM
+listDisposedPeripheral			ITEM
+
+listDevice				[ITEM]
+pullDevice				ITEM
+newDevice				ITEM
+					PARAM
+					OPTION
+pushDevice				ITEM
+					PARAM
+					OPTION
+searchDevice				ITEM
+deleteDevice				ITEM
+restoreDevice				ITEM
+attachDevice				ITEM
+					PARAM
+attachDomainDevice			ITEM
+					PARAM
+attachGlobalDevice			ITEM
+removeDevice				ITEM
+					PARAM
+removeDomainDevice			ITEM
+					PARAM
+removeGlobalDevice			ITEM
+attachedDevice				ITEM
+					PARAM
+listDisposedDevice			ITEM
+
+listFile				PARAM
+listMyFile				PARAM
+pullFile				PARAM
+newFile					PARAM
+					ITEM
+					OPTION
+pushFile				PARAM
+					ITEM
+					OPTION
+searchFile				PARAM
+					ITEM
+deleteFile				ITEM
+attachFile				ITEM
+					PARAM
+attachDomainFile			ITEM
+					PARAM
+attachGlobalFile			ITEM
+removeFile				ITEM
+					PARAM
+removeDomainFile			ITEM
+					PARAM
+removeGlobalFile			ITEM
+attachedFile				ITEM
+					PARAM
+
+listPassword				PARAM
+listMyPassword				PARAM
+pullPassword				PARAM
+newPassword				PARAM
+					ITEM
+					OPTION
+pushPassword				PARAM
+					ITEM
+					OPTION
+encryptPassword				PARAM
+					ITEM
+					OPTION
+decryptPassword				PARAM
+					ITEM
+					OPTION
+searchPassword				PARAM
+					ITEM
+deletePassword				ITEM
+attachPassword				ITEM
+					PARAM
+attachDomainPassword			ITEM
+					PARAM
+attachGlobalPassword			ITEM
+removePassword				ITEM
+					PARAM
+removeDomainPassword			ITEM
+					PARAM
+removeGlobalPassword			ITEM
+attachedPassword			ITEM
+					PARAM
+
+listService				-
+listProvider				[ITEM]
+pullService				ITEM
+pullProvider				ITEM
+newService				ITEM
+newProvider				ITEM
+					PARAM
+pushService				ITEM
+					PARAM
+					OPTION
+pushProvider				ITEM
+					PARAM
+					OPTION
+searchService				ITEM
+searchProvider				ITEM
+deleteService				ITEM
+deleteProvider				ITEM
+restoreService				ITEM
+restoreProvider				ITEM
+attachProvider				ITEM
+					PARAM
+					OPTION
+attachDomainProvider			ITEM
+					PARAM
+					OPTION
+attachGlobalProvider			ITEM
+					OPTION
+removeProvider				ITEM
+					PARAM
+					OPTION
+removeDomainProvider			ITEM
+					PARAM
+					OPTION
+removeGlobalProvider			ITEM
+					OPTION
+attachedProvider			ITEM
+					PARAM
+					OPTION
+listDisposedService			-
+listDisposedProvider			ITEM
+
+listHelp				-
+pullHelp				PARAM
+searchHelp				PARAM
+					ITEM
+
+listTCP					-
+pullTCP					PARAM
+searchTCP				PARAM
+					ITEM
+listUDP					-
+pullUDP					PARAM
+searchUDP				PARAM
+					ITEM
+
+listRGB					-
+pullRGB					PARAM
+searchRGB				PARAM
+					ITEM
+
+listLog					-
+pullLog					PARAM
+searchLog				PARAM
+					ITEM
+
+pullTemp				PARAM
+pushTemp				PARAM

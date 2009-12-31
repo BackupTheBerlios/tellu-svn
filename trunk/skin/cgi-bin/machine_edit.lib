@@ -1,0 +1,1515 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub editMachineNode {
+	my ($arg) = @_;
+
+	my @l = ('Additional info', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments', 'Ping', 'Wake');
+
+	if($q->param('verb')) {
+		@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			if($s[0] && $s[0] != 0) {
+				if($q->param('verb') eq "attdev") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "attachGlobalDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Device is attached to all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "attachDomainDevice", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Device is attached to all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "attachDevice", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Device is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "remdev") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "removeGlobalDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Device is detached from all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "removeDomainDevice", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Device is detached from all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "removeDevice", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Device is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "attper") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "attachGlobalPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Peripheral is attached to all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "attachDomainPeripheral", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Peripheral is attached to all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "attachPeripheral", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Peripheral is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "remper") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "removeGlobalPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Peripheral is detached from all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "removeDomainPeripheral", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Peripheral is detached from all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "removePeripheral", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Peripheral is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "attser") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "attachGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "machine" });
+
+						$PAGE .= "<p class=\"info\">Service is attached to all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "attachDomainProvider", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
+
+						$PAGE .= "<p class=\"info\">Service is attached to all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "attachProvider", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
+
+						$PAGE .= "<p class=\"info\">Service is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "remser") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "removeGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "machine" });
+
+						$PAGE .= "<p class=\"info\">Service is detached from all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "removeDomainProvider", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
+
+						$PAGE .= "<p class=\"info\">Service is detached from all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "removeProvider", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
+
+						$PAGE .= "<p class=\"info\">Service is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "attpwd") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Password is attached to all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "attachDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Password is attached to all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "attachPassword", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Password is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "rempwd") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Password is detached from all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "removeDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Password is detached from all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "removePassword", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Password is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "attatt") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Attachment is attached to all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "attachDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Attachment is attached to all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "attachFile", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Attachment is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "rematt") {
+					if($q->param('where') && $q->param('where') eq "global") {
+						@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+						$PAGE .= "<p class=\"info\">Attachment is detached from all machines globally.</p>";
+					}
+					elsif($q->param('where') && $q->param('where') eq "domain") {
+						@r = &sendCommand({ command => "removeDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+
+						$PAGE .= "<p class=\"info\">Attachment is detached from all machines in " . $arg->{domain} . ".</p>";
+					}
+					else {
+						@r = &sendCommand({ command => "removeFile", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+
+						$PAGE .= "<p class=\"info\">Attachment is detached fom " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+					}
+				}
+				elsif($q->param('verb') eq "ping") {
+					@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+						foreach my $s (@s) {
+							my @u = split(/$ITEM_SEPARATOR/, $s);
+
+							if($u[1] eq $q->param('ping')) {
+								require "ping.lib";
+
+								if(&sendPing({ address => $u[2] }) == 0) {
+									$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . "/" . $u[1] . " is alive.</p>";
+								}
+								else {
+									$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . "/" . $u[1] . " is unreachable.</p>";
+								}
+
+								last;
+							}
+						}
+					}
+				}
+				elsif($q->param('verb') eq "wake") {
+					@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+						foreach my $s (@s) {
+							my @u = split(/$ITEM_SEPARATOR/, $s);
+
+							if($u[1] eq $q->param('wake')) {
+								require "ping.lib";
+
+								&sendWake({ address => $u[2], mac => $u[5] });
+
+								$PAGE .= "<p class=\"info\">Wake on LAN request is sent to " . $arg->{node} . "." . $arg->{domain} . "/" . $u[1] . ".</p>";
+
+								last;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if($q->param('verb') && $q->param('verb') eq "update") {
+		my @r = ();
+		my @i = ('model', 'descr', 'sernum', 'secnum', 'location', 'addinfo');
+
+		foreach my $i (@i) {
+			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => $i, option => cleanHtml({ string => $q->param($i) }) });
+		}
+
+		$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . " is updated.</p>";
+	}
+
+	if($q->param('disposed') == 1) {
+		my @r = &sendCommand({ command => "deleteMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
+
+		$PAGE .= $arg->{node} . "." . $arg->{domain} . " is disposed.</p>";
+	}
+	else {
+		if(!$q->param('leaf') || $q->param('leaf') == 0) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				$s[5] = cleanNull({ string => $s[5] });
+				$s[6] = cleanNull({ string => $s[6] });
+				$s[7] = cleanNull({ string => $s[7] });
+				$s[8] = cleanNull({ string => $s[8] });
+				$s[17] = cleanNull({ string => $s[17] });
+				$s[18] = cleanNull({ string => $s[18] });
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Machine&nbsp;model:</td>";
+				$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "model", value => $s[5] }) . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Machine&nbsp;description:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => $s[18] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Serial&nbsp;number:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "sernum", value => $s[6] }) . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Security&nbsp;number:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "secnum", value => $s[7] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Location:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "location", value => $s[8] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+				$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => $s[17] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this machine?", value => 1, onclick => "toggleUpdateButton('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 1) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attdev", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[1] . " " . $i[2] . " (" . $i[3] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No devices available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new device:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editMachineAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attdev" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remdev", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedDevice", item => "", domain => "", param => $s[0], option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullDevice", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[7] . " " . $u[5] . " (" . $u[6] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No devices attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached device:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editMachineAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remdev" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 2) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attper", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[1] . " " . $i[2] . " (" . $i[3] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No peripherals available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new peripheral:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editMachineAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attper" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remper", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedPeripheral", item => "", domain => "", param => $s[0], option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullPeripheral", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[7] . " " . $u[5] . " (" . $u[6] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No peripherals attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached peripheral:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editMachineAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remper" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 3) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attser", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[1];
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No services available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new service:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editMachineAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attser" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remser", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedProvider", item => "", domain => "", param => $s[0], option => "machine" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullProvider", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[6];
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No services attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached service:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editMachineAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remser" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 4) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attpwd", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[2] . " for " . $i[3] . " (" . $i[1] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No passwords available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new password:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editMachineAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attpwd" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=rempwd", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullPassword", item => $s, domain => "", param => "id", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[2] . " for " . $u[3] . " (" . $u[1] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No passwords attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached password:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editMachineAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "rempwd" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 5) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attatt", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listFile", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[2] . ", " . $i[3] . " (" . $i[1] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No attachments available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new attachment:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editMachineAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attatt" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=rematt", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullFile", item => $s, domain => "", param => "id", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[2] . ", " . $u[3] . " (" . $u[1] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No attachments attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached attachment:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editMachineAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "rematt" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 6) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=ping", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my @u = split(/$ITEM_SEPARATOR/, $s);
+
+					push @t, $u[1];
+					$l{$u[1]} = $u[1] . " (" . $u[2] . ")";
+				}
+
+				if(!@t) {
+					$t[0] = "0";
+					$l{0} = "No interfaces available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Ping interface:</td>";
+
+				if($t[0] eq "0") {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "ping", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Ping", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "ping", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Ping" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "ping" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 7) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=wake", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my @u = split(/$ITEM_SEPARATOR/, $s);
+
+					push @t, $u[1];
+					$l{$u[1]} = $u[1] . " (" . $u[5] . ")";
+				}
+
+				if(!@t) {
+					$t[0] = "0";
+					$l{0} = "No interfaces available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Wake interface:</td>";
+
+				if($t[0] eq "0") {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "wake", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Wake", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "wake", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Wake" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "wake" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+	}
+}
+
+sub editMachineNote {
+	my ($arg) = @_;
+
+	my @l = ('Review existing notes', 'Add new note');
+
+	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
+		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			my $w = $s[19] . "<DELIMBEG>" . $SESSION_UID . "<DELIMSEP>" . localtime(time()) . "<DELIMEND>";
+
+			$w .= cleanHtml({ string => $q->param('note') });
+
+			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => "note", option => $w });
+		}
+	}
+
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			$s[19] = cleanNull({ string => $s[19] });
+
+			if(!$s[19] || $s[19] eq "") {
+				$s[19] = "No notes are available for this node.";
+			}
+			else {
+				$s[19] =~ s/<DELIMBEG>/<h4>/go;
+				$s[19] =~ s/<DELIMEND>/<\/h4>/go;
+				$s[19] =~ s/<DELIMSEP>/ commented at /go;
+			}
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td width=\"100%\">" . $s[19] . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+		}
+
+		$PAGE .= "</table>";
+	}
+	elsif($q->param('leaf') && $q->param('leaf') == 1) {
+		$PAGE .= &htmlFormBegin({ name => "noteForm", action => $SELF . "?action=note&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Add&nbsp;new&nbsp;note:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlInputField({ name => "note", value => "" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Add note" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "note" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+		$PAGE .= &htmlFormEnd();
+	}
+}
+
+sub editMachineAffect {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	my @t = ('this', 'domain', 'global');
+
+	my %l = (
+		'this' => 'only on this machine,',
+		'domain' => 'all machines in this domain, or',
+		'global' => 'all machines in all domains?'
+	);
+
+	$r .= "<tr class=\"middle\">";
+	$r .= "<td align=\"right\">Affect modifications:</td>";
+	$r .= "<td>";
+	$r .= &htmlSelectRadio({ name => "where", value => \@t, label => \%l, select => $t[0] }) . "</td>";
+	$r .= "</tr>";
+
+	return $r;
+}
+
+1;

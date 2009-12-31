@@ -1,0 +1,78 @@
+AC_INIT(telmon, 3.0.0, jani@lasipalatsi.fi)
+
+dnl
+dnl Checks for programs.
+dnl
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_LANG_C
+AC_CHECK_PROGS(LN, ln)
+AC_CHECK_PROGS(RM, rm)
+AC_CHECK_PROGS(UNAME, uname)
+
+dnl
+dnl Check if compiler accepts -Wall.
+dnl
+AC_MSG_CHECKING([if compiler accepts -Wall])
+SAVEDCFLAGS=$CFLAGS
+CFLAGS=$CFLAGS" -Wall"
+wall="no"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+	[wall="yes"; SAVEDCFLAGS=$CFLAGS; efl=$efl" -Wall"])
+AC_MSG_RESULT([$wall])
+CFLAGS=$SAVEDCFLAGS
+
+dnl
+dnl Get parameters.
+dnl
+CFLAGS=$CFLAGS" -I/usr/include/X11 -I/usr/X11R6/include"
+LDFLAGS=$LDFLAGS" -L/usr/lib/X11 -L/usr/X11R6/lib"
+
+AC_ARG_WITH(motif,
+	[  --with-motif=DIR        where Motif is installed],
+	[CFLAGS=$CFLAGS" -I$withval/include"
+		LDFLAGS=$LDFLAGS" -L$withval/lib"
+		LIBS=$LIBS" -lXm"])
+AC_ARG_WITH(x11,
+	[  --with-x11=DIR          where X Window System is installed],
+	[CFLAGS=$CFLAGS" -I$withval/include"
+		LDFLAGS=$LDFLAGS" -L$withval/lib"])
+
+dnl
+dnl Checks for header files.
+dnl
+AC_HEADER_STDC
+AC_CHECK_HEADERS([arpa/inet.h locale.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/systeminfo.h sys/time.h syslog.h unistd.h])
+
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
+AC_TYPE_UID_T
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+
+dnl
+dnl Checks for library functions.
+dnl
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([gethostbyaddr gethostbyname gethostname gettimeofday inet_ntoa memset setlocale socket strchr strerror strncasecmp sysinfo uname])
+
+dnl
+dnl Checks for libraries.
+dnl
+AC_CHECK_LIB([X11], [XOpenDisplay],
+	[],
+	AC_MSG_ERROR(telmon requires X Window System))
+AC_CHECK_LIB([Xm], [XmCreatePromptDialog],
+	[],
+	AC_MSG_ERROR(telmon requires Motif))
+
+dnl
+dnl Output Makefiles.
+dnl
+AC_CONFIG_FILES([Makefile defines.h])
+AC_OUTPUT

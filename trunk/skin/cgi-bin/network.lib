@@ -1,0 +1,202 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+my @cmdArrays = (
+	"appGetName", "appGetVersion", "appGetDataPacket",
+	"sessUid", "sessCookie",
+	"thisCommand", "thisItem", "thisDomain", "thisParam", "thisOption",
+	"termNull"
+);
+
+sub sendCommand {
+	my ($arg) = @_;
+
+	use Socket;
+
+	my $mc = "TELLUTELLUTELLUTELLUTELLUTELLU";
+
+	#
+	# Prepare data packet for server
+	#
+
+	my $dataPacket = "";
+	my $dataPointer = "";
+
+	my $t = int(length($mc) + int($DATA_ARRAYS_COUNT * $DATA_POINTER_SIZE));
+	my $s = int(length($CONFIG_SERVER_PASSWORD));
+
+	if($s > int(length($mc))) {
+		$s = int(length($mc));
+	}
+
+	$mc = substr($CONFIG_SERVER_PASSWORD, 0, $s) . substr($mc, length($CONFIG_SERVER_PASSWORD));
+
+	for(my $i = 0; $i < $DATA_ARRAYS_COUNT; $i++) {
+		my $q = $cmdArrays[$i];
+		my $r = &$q({ command => $arg->{command}, item => $arg->{item}, domain => $arg->{domain}, param => $arg->{param}, option => $arg->{option} });
+
+		$dataPointer .= sprintf("%.8u", $t);
+		$dataPacket .= $r;
+
+		$t += length($r);
+	}
+
+	my $ic = sprintf("%.8u%.8u%.8u", 0, $t, $t);
+
+	$dataPacket = $mc . $ic . $dataPointer . $dataPacket;
+
+	#
+	# Send data packet to the server
+	#
+
+	my @t = ('00000002', '00000001', '00000001', '');
+
+	my $ia;
+
+	if(!($ia = inet_aton($CONFIG_SERVER_NAME))) {
+		$t[3] = "Error occurred while trying to resolve server name";
+
+		return(@t);
+	}
+
+	my $pa = sockaddr_in($CONFIG_SERVER_PORT, $ia);
+
+	socket(S, PF_INET, SOCK_STREAM, getprotobyname("tcp"));
+
+	if(!connect(S, $pa)) {
+		close(S);
+
+		$t[3] = "Error occurred while trying to connect to server";
+
+		return(@t);
+	}
+
+	my $r = send(S, $dataPacket, 0);
+
+	if(length($dataPacket) != $r) {
+		$t[3] = "Sending message to server failed, tried to send " . length($dataPacket) . " bytes, but " . $r . " was sent";
+	}
+	else {
+		recv(S, $r, length($mc), MSG_WAITALL);
+
+		if($mc ne $r) {
+			$t[3] = "Sending message to server failed, handshake with the server terminated impolitely";
+		}
+		else {
+			recv(S, $r, length($ic), MSG_WAITALL);
+
+			if(length($r) != length($ic)) {
+				$t[3] = "Receiving message from server failed, expected " . length($ic) . " bytes, but only " . length($r) . " was received";
+			}
+			else {
+				my @ic = (
+					substr($r, 0, $DATA_POINTER_SIZE),
+					substr($r, $DATA_POINTER_SIZE, $DATA_POINTER_SIZE),
+					substr($r, $DATA_POINTER_SIZE * 2, $DATA_POINTER_SIZE)
+				);
+
+				recv(S, $r, $ic[2] - length($mc), MSG_WAITALL);
+
+				if(length($r) != $ic[2] - length($mc)) {
+					$t[3] = "Receiving message from server failed, expected " . ($ic[2] - length($mc)) . " bytes, but only " . length($r) . " was received";
+				}
+				else {
+					my $j = 0;
+					my $k = 0;
+
+					for(my $i = 0; $i < 4; $i++) {
+						$j = int(substr($r, $i * $DATA_POINTER_SIZE, $DATA_POINTER_SIZE));
+						$k = int(substr($r, ($i + 1) * $DATA_POINTER_SIZE, $DATA_POINTER_SIZE));
+
+						$j -= length($mc);
+						$k -= length($mc);
+						$k -= $j;
+
+						$t[$i] = substr($r, $j, $k);
+					}
+
+					@t = split($ITEM_DELIMITER, $t[3], 4);
+				}
+			}
+		}
+	}
+
+	close(S);
+
+	return(@t);
+}
+
+sub appGetName {
+	my ($arg) = @_;
+
+	return $APP_NAME;
+}
+
+sub appGetVersion {
+	my ($arg) = @_;
+
+	return $APP_VERSION;
+}
+
+sub appGetDataPacket {
+	my ($arg) = @_;
+
+	return $APP_PACKET;
+}
+
+sub termNull {
+	my ($arg) = @_;
+
+	return "";
+}
+
+sub sessUid {
+	my ($arg) = @_;
+
+	return $SESSION_UID;
+}
+
+sub sessCookie {
+	my ($arg) = @_;
+
+	return $SESSION_CID;
+}
+
+sub thisCommand {
+	my ($arg) = @_;
+
+	return $arg->{command};
+}
+
+sub thisItem {
+	my ($arg) = @_;
+
+	return $arg->{item};
+}
+
+sub thisDomain {
+	my ($arg) = @_;
+
+	return $arg->{domain};
+}
+
+sub thisParam {
+	my ($arg) = @_;
+
+	return $arg->{param};
+}
+
+sub thisOption {
+	my ($arg) = @_;
+
+	return $arg->{option};
+}
+
+1;

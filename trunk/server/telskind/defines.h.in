@@ -1,0 +1,327 @@
+#include "globines.h"
+
+#define APPLICATION_NAME "telskind"
+#define APPLICATION_VERSION "3.0.0-unix"
+#define APPLICATION_YEAR "2010"
+#define APPLICATION_COPYRIGHT "Jani Salonen <jani@lasipalatsi.fi>"
+
+#define CONFIG_DEFAULT_FILE "@prefix@/etc/telskind.conf"
+#define CONFIG_DEFAULT_PID "/var/run/telskind.pid"
+#define CONFIG_DEFAULT_LOCALE "C"
+#define CONFIG_DEFAULT_ROOT "/"
+#define CONFIG_DEFAULT_PORT 1702
+#define CONFIG_DEFAULT_PORT_S "1702"
+#define CONFIG_DEFAULT_UID -1
+#define CONFIG_DEFAULT_GID -1
+#define CONFIG_DEFAULT_ENGINEMYSQL "mysql"
+#define CONFIG_DEFAULT_ENGINEPLAIN "plain"
+#define CONFIG_DEFAULT_ENGINE CONFIG_DEFAULT_ENGINEMYSQL
+#define CONFIG_DEFAULT_PLAINFILE "/tmp/telskind.out"
+
+#define DATA_ARRAYS_COUNT 10
+#define DATA_REPLY_COMMAND_COUNT 5
+
+#define DATA_PACKET_COLLECT "reply"
+
+#define ERROR_CLASS_SERVER 1
+#define ERROR_CLASS_AUTH 2
+#define ERROR_CLASS_GENERAL 3
+#define ERROR_CLASS_DATABASE 4
+
+#define ERROR_CODE_SERVER_INTERNALERROR 1
+#define ERROR_CODE_SERVER_OUTOFMEMORY 2
+#define ERROR_CODE_AUTH_LOGINNEEDED 1
+#define ERROR_CODE_AUTH_LOGINNOTNEEDED 2
+#define ERROR_CODE_AUTH_LOGINFAILED 3
+#define ERROR_CODE_AUTH_LOGOUTNOTNEEDED 4
+#define ERROR_CODE_AUTH_LOGOUTFAILED 5
+#define ERROR_CODE_AUTH_PERMISSIONDENIED 6
+#define ERROR_CODE_GENERAL_PARAMETERNEEDED 1
+#define ERROR_CODE_DATABASE_CONNECTFAILED 1
+#define ERROR_CODE_DATABASE_PULLFAILED 2
+
+#define ERROR_MESS_SERVER_INTERNALERROR "Unknown internal server error occurred."
+#define ERROR_MESS_SERVER_OUTOFMEMORY "Error occurred while trying to allocate memory."
+#define ERROR_MESS_AUTH_LOGINNEEDED "You must login before you can access to resources."
+#define ERROR_MESS_AUTH_LOGINNOTNEEDED "Login is not needed."
+#define ERROR_MESS_AUTH_LOGINFAILED "Login has failed."
+#define ERROR_MESS_AUTH_LOGOUTNOTNEEDED "Logout is not needed."
+#define ERROR_MESS_AUTH_LOGOUTFAILED "Logout has failed."
+#define ERROR_MESS_AUTH_PERMISSIONDENIED "Your permission to access this resource is denied."
+#define ERROR_MESS_GENERAL_PARAMETERNEEDED "Required parameter is needed for received command."
+#define ERROR_MESS_DATABASE_CONNECTFAILED "Error occurred while trying to connect to database. More information is available in the server log."
+#define ERROR_MESS_DATABASE_PULLFAILED "Error occurred while trying to pull data from database. More information is available in the server log."
+
+#define HANDLER_ARRAY_APPNAME 0
+#define HANDLER_ARRAY_APPVERSION 1
+#define HANDLER_ARRAY_APPBUSINESS 2
+#define HANDLER_ARRAY_UID 3
+#define HANDLER_ARRAY_COOKIE 4
+#define HANDLER_ARRAY_COMMAND 5
+#define HANDLER_ARRAY_ITEM 6
+#define HANDLER_ARRAY_DOMAIN 7
+#define HANDLER_ARRAY_PARAM 8
+#define HANDLER_ARRAY_OPTION 9
+
+#define LDAP_MYHOSTNAME "localhost"
+#define LDAP_MYPORT LDAP_PORT
+#define LDAP_MYUSERNAME ""
+#define LDAP_MYPASSWORD ""
+#define LDAP_MYATTR "uid"
+#define LDAP_MYBASE "dc=example,dc=com"
+#define LDAP_MYFILTER "(objectClass=*)"
+#define LDAP_MYTIMEOUT 30
+#define LDAP_MYVERSION LDAP_VERSION3
+
+#define PRIVILEGE_LEVEL_DEFAULT 2
+#define PRIVILEGE_LEVEL_NONE 0
+#define PRIVILEGE_LEVEL_PREAUTH 1
+#define PRIVILEGE_LEVEL_READ 2
+#define PRIVILEGE_LEVEL_WRITE 4
+#define PRIVILEGE_LEVEL_DELETE 8
+#define PRIVILEGE_LEVEL_RESTORE 16
+#define PRIVILEGE_LEVEL_SUPERVISOR 32
+#define PRIVILEGE_LEVEL_ADMIN 64
+
+#define QUERY_TYPE_PULL 1
+#define QUERY_TYPE_PUSH 2
+#define QUERY_TYPE_ROUND 3
+
+#define SESSION_COOKIE_SIZE 65
+
+//#define TABLE_PWD_HASH "MD5"
+//#define TABLE_PWD_HASH "PASSWORD"
+#define TABLE_PWD_HASH "SHA1"
+//#define TABLE_SECRET_HASH "DES"
+#define TABLE_SECRET_HASH "AES"
+
+#define TABLE_AGENT "agent"
+#define TABLE_AGENTBUSINESS "agentbusiness"
+#define TABLE_AGENTVERSION "agentversion"
+#define TABLE_DEVICE "skin_devices"
+#define TABLE_DEVICE_MAP "skin_devices_map"
+#define TABLE_FILES "skin_files"
+#define TABLE_FILES_MAP "skin_files_map"
+#define TABLE_LOG "log"
+#define TABLE_HELP "skin_help"
+#define TABLE_HIST "history"
+#define TABLE_MISC "skin_misc"
+#define TABLE_PERIPHERAL "skin_peripherals"
+#define TABLE_PERIPHERAL_MAP "skin_peripherals_map"
+#define TABLE_PERM_NODES "skin_perm_nodes"
+#define TABLE_PORT_TCP "skin_port_tcp"
+#define TABLE_PORT_UDP "skin_port_udp"
+#define TABLE_PWD "skin_passwords"
+#define TABLE_PWD_MAP "skin_passwords_map"
+#define TABLE_RGB "skin_rgb"
+#define TABLE_SERVICE "skin_services"
+#define TABLE_SERVICE_DATA "skin_services_data"
+#define TABLE_SERVICE_MAP "skin_services_map"
+#define TABLE_SESSION "skin_sessions"
+#define TABLE_TEMP "skin_temp"
+#define TABLE_USERS "skin_users"
+
+#define TABLECOL_DEVICE_CATEGORY "category"
+#define TABLECOL_DEVICE_DISPOSED "disposed"
+#define TABLECOL_DEVICE_ID "id"
+#define TABLECOL_DEVICE_IPADDRESS "ipaddress"
+#define TABLECOL_DEVICE_LOCATION "location"
+#define TABLECOL_DEVICE_MANUFACTURER "manufacturer"
+#define TABLECOL_DEVICE_MODEL "model"
+#define TABLECOL_DEVICE_MODIFIED "modified"
+#define TABLECOL_DEVICE_MODIFIER "modifier"
+#define TABLECOL_DEVICE_MOSD "mosd"
+#define TABLECOL_DEVICE_SECNUM "secnum"
+#define TABLECOL_DEVICE_SERNUM "sernum"
+#define TABLECOL_DEVICE_SIZE "size"
+#define TABLECOL_DEVICE_MAP_DEVICE_ID "device_id"
+#define TABLECOL_DEVICE_MAP_MACHINE_ID "machine_id"
+#define TABLECOL_DEVICE_MAP_DEVICES_ID "devices_id"
+#define TABLECOL_DEVICE_MAP_PERIPHERALS_ID "peripherals_id"
+#define TABLECOL_LOG "level,node,domain,sys,rel,uid,grp,proc,procver,note"
+#define TABLECOL_LOG_PROC "proc"
+#define TABLECOL_LOG_PROCVER "procver"
+#define TABLECOL_LOG_TIME "time"
+#define TABLECOL_FILES_NAME "name"
+#define TABLECOL_FILES_OWNER "owner"
+#define TABLECOL_FILES_PUBLIC "public"
+#define TABLECOL_FILES_MAP_FILE_ID "file_id"
+#define TABLECOL_FILES_MAP_NODE_ID "node_id"
+#define TABLECOL_HELP_NAME "name"
+#define TABLECOL_HIST "node,domain,sys,rel,uid,grp,proc,procver,conns"
+#define TABLECOL_HIST_PROC "proc"
+#define TABLECOL_HIST_TIME "time"
+#define TABLECOL_PERIPHERAL_CATEGORY "category"
+#define TABLECOL_PERIPHERAL_DISPOSED "disposed"
+#define TABLECOL_PERIPHERAL_ID "id"
+#define TABLECOL_PERIPHERAL_IPADDRESS "ipaddress"
+#define TABLECOL_PERIPHERAL_LOCATION "location"
+#define TABLECOL_PERIPHERAL_MANUFACTURER "manufacturer"
+#define TABLECOL_PERIPHERAL_MODEL "model"
+#define TABLECOL_PERIPHERAL_MODIFIED "modified"
+#define TABLECOL_PERIPHERAL_MODIFIER "modifier"
+#define TABLECOL_PERIPHERAL_MOSD "mosd"
+#define TABLECOL_PERIPHERAL_SECNUM "secnum"
+#define TABLECOL_PERIPHERAL_SERNUM "sernum"
+#define TABLECOL_PERIPHERAL_SIZE "size"
+#define TABLECOL_PERIPHERAL_MAP_PERIPHERAL_ID "peripheral_id"
+#define TABLECOL_PERIPHERAL_MAP_MACHINE_ID "machine_id"
+#define TABLECOL_PORT_TCP_PORT "port"
+#define TABLECOL_PORT_UDP_PORT "port"
+#define TABLECOL_PWD_NAME "name"
+#define TABLECOL_PWD_OWNER "owner"
+#define TABLECOL_PWD_PASSWORD "password"
+#define TABLECOL_PWD_PUBLIC "public"
+#define TABLECOL_PWD_MAP_NODE_ID "node_id"
+#define TABLECOL_PWD_MAP_PWD_ID "pwd_id"
+#define TABLECOL_USER_DESCR "descr"
+#define TABLECOL_USER_DOMAIN "domain"
+#define TABLECOL_USER_GECOS "gecos"
+#define TABLECOL_USER_HOMEPAGE "homepage"
+#define TABLECOL_USER_ID "id"
+#define TABLECOL_USER_LOCKED "locked"
+#define TABLECOL_USER_NOTE "note"
+#define TABLECOL_USER_UID "name"
+#define TABLECOL_USER_USID "user_id"
+#define TABLECOL_USER_PWD "password"
+#define TABLECOL_USER_PREFS "prefs"
+#define TABLECOL_USER_PERM "perm"
+#define TABLECOL_SERVICE_DISPOSED "disposed"
+#define TABLECOL_SERVICE_ID "id"
+#define TABLECOL_SERVICE_DESCR "descr"
+#define TABLECOL_SERVICE_MODIFIED "modified"
+#define TABLECOL_SERVICE_MODIFIER "modifier"
+#define TABLECOL_SERVICE_NAME "name"
+#define TABLECOL_SERVICE_NOTE "note"
+#define TABLECOL_SERVICE_DATA_ADDINFO "addinfo"
+#define TABLECOL_SERVICE_DATA_BRANDS "brands"
+#define TABLECOL_SERVICE_DATA_CITY "city"
+#define TABLECOL_SERVICE_DATA_CONTEMAIL1 "cont_email1"
+#define TABLECOL_SERVICE_DATA_CONTEMAIL2 "cont_email2"
+#define TABLECOL_SERVICE_DATA_CONTFAX1 "cont_fax1"
+#define TABLECOL_SERVICE_DATA_CONTFAX2 "cont_fax2"
+#define TABLECOL_SERVICE_DATA_CONTPERSON "cont_person"
+#define TABLECOL_SERVICE_DATA_CONTTELE1 "cont_telephone1"
+#define TABLECOL_SERVICE_DATA_CONTTELE2 "cont_telephone2"
+#define TABLECOL_SERVICE_DATA_COUNTRY "country"
+#define TABLECOL_SERVICE_DATA_DESCR "descr"
+#define TABLECOL_SERVICE_DATA_DISPOSED "disposed"
+#define TABLECOL_SERVICE_DATA_FAX1 "fax1"
+#define TABLECOL_SERVICE_DATA_FAX2 "fax2"
+#define TABLECOL_SERVICE_DATA_ID "id"
+#define TABLECOL_SERVICE_DATA_MODIFIED "modified"
+#define TABLECOL_SERVICE_DATA_MODIFIER "modifier"
+#define TABLECOL_SERVICE_DATA_NAME "name"
+#define TABLECOL_SERVICE_DATA_NOTE "note"
+#define TABLECOL_SERVICE_DATA_STREET "street"
+#define TABLECOL_SERVICE_DATA_TELE1 "telephone1"
+#define TABLECOL_SERVICE_DATA_TELE2 "telephone2"
+#define TABLECOL_SERVICE_DATA_TYPE "type_id"
+#define TABLECOL_SERVICE_DATA_ZIP "zip"
+#define TABLECOL_SERVICE_MAP_DEVICE "device"
+#define TABLECOL_SERVICE_MAP_DEVICE_ID "device_id"
+#define TABLECOL_SERVICE_MAP_MACHINE "machine"
+#define TABLECOL_SERVICE_MAP_MACHINE_ID "machine_id"
+#define TABLECOL_SERVICE_MAP_PERIPHERAL "peripheral"
+#define TABLECOL_SERVICE_MAP_PERIPHERAL_ID "peripheral_id"
+#define TABLECOL_SERVICE_MAP_SERVICE_ID "service_id"
+#define TABLECOL_SESSION_ACCESS "access"
+#define TABLECOL_SESSION_COOKIE "cookie"
+#define TABLECOL_SESSION_COUNT "count"
+#define TABLECOL_SESSION_UID "name"
+#define TABLECOL_MACHINE_CPU "cpu"
+#define TABLECOL_MACHINE_DAEMON "daemon"
+#define TABLECOL_MACHINE_DOMAIN "domain"
+#define TABLECOL_MACHINE_DEV "dev"
+#define TABLECOL_MACHINE_DISK "disk"
+#define TABLECOL_MACHINE_DISPOSED "disposed"
+#define TABLECOL_MACHINE_MACHINE "machine"
+#define TABLECOL_MACHINE_MEM "mem"
+#define TABLECOL_MACHINE_NAME "name"
+#define TABLECOL_MACHINE_NIC "nic"
+#define TABLECOL_MACHINE_NODE "node"
+#define TABLECOL_MACHINE_NID "node_id"
+#define TABLECOL_MACHINE_PORT "port"
+#define TABLECOL_MACHINE_PROC "proc"
+#define TABLECOL_MACHINE_RUN "run"
+#define TABLECOL_MACHINE_UTIL "util"
+#define TABLECOL_MACHINE_SOFTWARE "software"
+#define TABLECOL_MACHINE_SYSTEM "system"
+#define TABLECOL_MACHINE_USER "user"
+#define TABLECOL_MISC_CLASS "class"
+#define TABLECOL_RGB_NAME "name"
+#define TABLECOL_TEMP_ID "id"
+#define TABLECOL_TEMP_CREATED "created"
+#define TABLECOL_TEMP_TEMP "temp"
+
+#define TABLEKEY_DEVICE_DATA "created,creator,modified,modifier,disposed,model,category,manufacturer,size,memory,connection,netsupport,ipaddress,sernum,secnum,location,iis,esd,dosd,mosd,totrepairs,lastrepair,acquired,warranty,addinfo,descr,note"
+#define TABLEKEY_DEVICE_NEW "creator,model,category,manufacturer"
+#define TABLEKEY_FILES_LIST "id,owner,name,file,size,public,descr,note,rand"
+#define TABLEKEY_FILES_FILES "owner,name,file,public"
+#define TABLEKEY_HELP_HELP "name,title,help,descr,note"
+#define TABLEKEY_LOG_LIST "proc,procver,node,domain,level"
+#define TABLEKEY_LOG_LOG "time,proc,procver,node,domain,level,note"
+#define TABLEKEY_MACHINE_CPU "node_id,cpus,cores,siblings,mhz,cache,mips"
+#define TABLEKEY_MACHINE_DAEMON "node_id,cmdline,name,state,pid,ppid,threads,vmdata,vmexe,vmhwm,vmlib,vmpeak,vmpte,vmrss,vmsize,vmstk,rchar,wchar,syscr,syscw,rbyte,wbyte,uid,gid"
+#define TABLEKEY_MACHINE_DEV "node_id,category,product,subsystem,capabilities,vendor,opt"
+#define TABLEKEY_MACHINE_DISK "node_id,dev,path,fs,opts,size,avail,serial"
+#define TABLEKEY_MACHINE_MEM "node_id,totalram,availram,totalswap,availswap,buffers,cached"
+#define TABLEKEY_MACHINE_NAME "node_id,node,domain"
+#define TABLEKEY_MACHINE_NIC "node_id,name,ip4,broadcast4,netmask4,mac"
+#define TABLEKEY_MACHINE_NODE "node_id,sys,rel,dist,arch,model,sernum,secnum,location,iis,esd,dosd,mosd,totrepairs,lastrepair,acquired,warranty,addinfo,descr,note"
+#define TABLEKEY_MACHINE_PORT "node_id,tcp"
+#define TABLEKEY_MACHINE_PROC "node_id,cmdline,name,state,pid,ppid,threads,vmdata,vmexe,vmhwm,vmlib,vmpeak,vmpte,vmrss,vmsize,vmstk,rchar,wchar,syscr,syscw,rbyte,wbyte,uid,gid"
+#define TABLEKEY_MACHINE_RUN "node_id,procs,threads"
+#define TABLEKEY_MACHINE_UTIL "node_id,load1,load2,load3,uptime1,uptime2"
+#define TABLEKEY_MACHINE_SOFTWARE "node_id,type,name,version,size,url"
+#define TABLEKEY_MACHINE_SYSTEM "node_id,bbmanufacturer,bbproduct,bbversion,sysfamily,sysmanufacturer,sysproduct,sysversion"
+#define TABLEKEY_MISC_MISC "value,title"
+#define TABLEKEY_PERIPHERAL_DATA "created,creator,modified,modifier,disposed,model,category,manufacturer,size,memory,connection,netsupport,ipaddress,sernum,secnum,location,iis,esd,dosd,mosd,totrepairs,lastrepair,acquired,warranty,addinfo,descr,note"
+#define TABLEKEY_PERIPHERAL_NEW "creator,model,category,manufacturer"
+#define TABLEKEY_PORT_TCP "port,name,descr"
+#define TABLEKEY_PORT_UDP "port,name,descr"
+#define TABLEKEY_PWD_LIST "id,owner,name,service,username,password,public,descr,note"
+#define TABLEKEY_PWD_PWDS "owner,name,service,public"
+#define TABLEKEY_RGB_RGB "name,red,green,blue"
+#define TABLEKEY_SERVICE_DATA_DATA "type_id,created,creator,modified,modifier,disposed,name,street,zip,city,country,telephone1,telephone2,fax1,fax2,cont_person,cont_telephone1,cont_telephone2,cont_fax1,cont_fax2,cont_email1,cont_email2,brands,addinfo,descr,note"
+#define TABLEKEY_SERVICE_DATA_NEW "type_id,creator,name"
+#define TABLEKEY_SERVICE_SERVICE "name,descr,note"
+#define TABLEKEY_SERVICE_NEW "creator,name"
+#define TABLEKEY_TEMP_TEMP "creator,temp"
+#define TABLEKEY_USER_DESCR "id,descr"
+#define TABLEKEY_USER_GECOS "id,gecos"
+#define TABLEKEY_USER_HOMEPAGE "id,homepage"
+#define TABLEKEY_USER_LOCKED "id,locked"
+#define TABLEKEY_USER_NOTE "id,note"
+#define TABLEKEY_USER_PREFS "id,prefs"
+#define TABLEKEY_USER_UID "id,name"
+
+#define TABLEORD_DEVICE_NAME "manufacturer,model"
+#define TABLEORD_HELP_HELP "name,title"
+#define TABLEORD_LOG_LIST "proc,procver,level"
+#define TABLEORD_LOG_LOG "time,proc,procver,level"
+#define TABLEORD_MACHINE_DAEMON "node_id,name"
+#define TABLEORD_MACHINE_DEV "node_id,category,product"
+#define TABLEORD_MACHINE_DISK "node_id,path"
+#define TABLEORD_MACHINE_NIC "node_id,name"
+#define TABLEORD_MACHINE_PROC "node_id,name"
+#define TABLEORD_MACHINE_SOFTWARE "node_id,name"
+#define TABLEORD_MACHINE_SYSTEM "node_id,bbproduct"
+#define TABLEORD_MISC_PLACE "place"
+#define TABLEORD_PERIPHERAL_NAME "manufacturer,model"
+#define TABLEORD_PORT_TCP_PORT "port"
+#define TABLEORD_PORT_UDP_PORT "port"
+#define TABLEORD_RGB_NAME "name"
+#define TABLEORD_SERVICE_NAME "name"
+#define TABLEORD_SERVICE_DATA_NAME "name"
+
+#define TABLESRC_MACHINE_DAEMON "WHERE cmdline LIKE '%%%s%%' OR name LIKE '%%%s%%' OR uid LIKE '%%%s%%' OR gid LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_DEV "WHERE category LIKE '%%%s%%' OR product LIKE '%%%s%%' OR subsystem LIKE '%%%s%%' OR capabilities LIKE '%%%s%%' OR vendor LIKE '%%%s%%' OR opt LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_DISK "WHERE dev LIKE '%%%s%%' OR path LIKE '%%%s%%' OR fs LIKE '%%%s%%' OR opts LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_NIC "WHERE name LIKE '%%%s%%' OR ip4 LIKE '%%%s%%' OR broadcast4 LIKE '%%%s%%' OR netmask4 LIKE '%%%s%%' OR mac LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_NODE "WHERE node LIKE '%%%s%%' OR domain LIKE '%%%s%%' OR sys LIKE '%%%s%%' OR rel LIKE '%%%s%%' OR dist LIKE '%%%s%%' OR arch LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_PORT "WHERE tcp LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_PROC "WHERE cmdline LIKE '%%%s%%' OR name LIKE '%%%s%%' OR uid LIKE '%%%s%%' OR gid LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_SOFTWARE "WHERE name LIKE '%%%s%%' OR version LIKE '%%%s%%' OR url LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_SYSTEM "WHERE bbmanufacturer LIKE '%%%s%%' OR bbproduct LIKE '%%%s%%' OR bbversion LIKE '%%%s%%' OR sysfamily LIKE '%%%s%%' OR sysmanufacturer LIKE '%%%s%%' OR sysproduct LIKE '%%%s%%' OR sysversion LIKE '%%%s%%'"
+#define TABLESRC_MACHINE_USER "WHERE uid LIKE '%%%s%%' OR grp LIKE '%%%s%%' OR gecos LIKE '%%%s%%' OR homedir LIKE '%%%s%%'"

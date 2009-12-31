@@ -1,0 +1,109 @@
+#include "globines.h"
+
+#define APPLICATION_NAME "telmon"
+#define APPLICATION_VERSION "3.0.0-unix"
+#define APPLICATION_YEAR "2010"
+#define APPLICATION_COPYRIGHT "Jani Salonen <jani@lasipalatsi.fi>"
+
+#define CONFIG_ARG_COUNT 10
+
+#define CONFIG_DEFAULT_SAVE "conf"
+#define CONFIG_DEFAULT_FILE "@prefix@/etc/telmon.conf"
+#define CONFIG_DEFAULT_LOCALE "C"
+#define CONFIG_DEFAULT_PORT 1701
+#define CONFIG_DEFAULT_PORT_S "1701"
+#define CONFIG_DEFAULT_FREQUENCY 10
+#define CONFIG_DEFAULT_FREQUENCY_S "10"
+#define CONFIG_DEFAULT_SERVER "localhost"
+
+#define COLOR_HISTORY_BACKGROUND "white"
+#define COLOR_HISTORY_BORDER "black"
+#define COLOR_HISTORY_FONT "black"
+#define COLOR_HISTORY_GRID "gray85"
+#define COLOR_HISTORY_SEPARATOR "gray50"
+#define COLOR_HISTORY_TOWER "indianred"
+#define COLOR_HISTORY_TOWERBORDER "black"
+#define COLOR_HISTORY_TOWERMERIDIAN "orange"
+
+#define DATA_ARRAYS_COUNT 5
+
+#define DATA_REPLY_HIST_COUNT 4
+#define DATA_REPLY_CHART_COUNT 4
+#define DATA_REPLY_STAT_COUNT 11
+
+#define DATA_PACKET_COLLECT "monitor"
+
+#define NUM_MAIN_BUTTONS 6
+#define NUM_MAIN_COLUMNS 120
+#define NUM_MAIN_COLROWS 780
+#define NUM_MAIN_COLLINES 240
+#define NUM_MAIN_COLMARGIN 10
+
+#define NUM_HISTORY_WIDTH 697
+#define NUM_HISTORY_HEIGHT 300
+#define NUM_HISTORY_MARGIN_TOP 10
+#define NUM_HISTORY_MARGIN_BOTTOM 49
+#define NUM_HISTORY_MARGIN_SIDE 60
+#define NUM_HISTORY_FONT_HEIGHT 12
+
+#define TITLE_BUTTON_1 "Info"
+#define TITLE_BUTTON_2 "Help"
+#define TITLE_BUTTON_3 "Update"
+#define TITLE_BUTTON_4 "History"
+#define TITLE_BUTTON_5 "Settings"
+#define TITLE_BUTTON_6 "Quit"
+
+#define TITLE_MENU_SERVER "Monitor:"
+#define TITLE_MENU_SERVER_OPTION_1 "tellud"
+#define TITLE_MENU_SERVER_OPTION_2 "telmond"
+#define TITLE_MENU_SERVER_OPTION_3 "telskind"
+#define TITLE_MENU_SERVER_OPTIONS 3
+
+#define TITLE_INFO_TITLE "Information"
+#define TITLE_WARNING_TITLE "Warning"
+#define TITLE_HISTORY_TITLE "History"
+#define TITLE_HISTORY_EXPORT_TITLE "Export"
+#define TITLE_SETTINGS_TITLE "Settings"
+
+#define TITLE_HISTORY_BUTTON_UPDATE "Update"
+#define TITLE_HISTORY_BUTTON_SAVE "Export Image"
+#define TITLE_HISTORY_BUTTON_DISMISS "Dismiss"
+#define TITLE_HISTORY_MENU_EMPTY "No history available"
+#define TITLE_HISTORY_EXPORT "Enter name for image file:"
+
+#define TITLE_SETTINGS_CHECKBOX_SAVEONEXIT "Save settings on exit?"
+#define TITLE_SETTINGS_BUTTON_DISMISS "Dismiss"
+
+#define STAT_USAGE_TELLUD "100"
+#define STAT_USAGE_TELMOND "200"
+#define STAT_USAGE_TELSKIND "300"
+#define STAT_HISTORY_DAYS "400"
+#define STAT_HISTORY_CHART "500"
+
+#define WINDOW_TITLE "Tellu server monitor"
+#define WINDOW_TITLE_HISTORY "Tellu server monitor history"
+#define WINDOW_TITLE_HISTORY_EXPORT "Tellu server monitor history - Export Image"
+#define WINDOW_TITLE_SETTINGS "Tellu server monitor settings"
+
+#define MESSAGE_HELP "\
+All statistics, information and error messages can be seen in main area of Telmon window.\n\
+Content of main area is automatically updated, or it can be updated manually by pressing\n\
+'Update' button located in menu area at lower part of Telmon window.\n\n\
+Server to be monitored can be selected from the drop down menu located above the button area.\n\
+Only one server can be monitored at a time by one Telmon instance.\n\n\
+BUTTONS AND MENUES ON THE BOTTOM\n\n\
+Monitor:\n\
+  Select which server program to monitor.\n\n\
+Info:\n\
+  Display version and license information.\n\n\
+Help:\n\
+  Display this help message.\n\n\
+Update:\n\
+  Update all text fields immediately.\n\n\
+History (opens in new window):\n\
+  Display history chart for selected server program.\n\n\
+Settings (opens in new window):\n\
+  Select if settings are saved when program terminates normally.\n\n\
+Quit:\n\
+  Close all open resources and terminate program immediately.\
+"

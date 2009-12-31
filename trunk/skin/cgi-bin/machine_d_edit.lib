@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub editDisposedMachineNode {
+	my ($arg) = @_;
+
+	if($q->param('restore') == 1) {
+		my @r = &sendCommand({ command => "restoreDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
+
+		$PAGE .= $arg->{node} . "." . $arg->{domain} . " is restored.</p>";
+	}
+	elsif($q->param('disposed') == 2) {
+		my @r = &sendCommand({ command => "deleteDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
+
+		$PAGE .= $arg->{node} . "." . $arg->{domain} . " is disposed permanently.</p>";
+	}
+	else {
+		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			$PAGE .= &htmlFormBegin({ name => "modifyDisposedForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td align=\"right\" width=\"20%\">&nbsp;</td>";
+			$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "restore", label => "Restore this machine?", value => 1, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this machine permanently?", value => 2, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"middle\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+	}
+}
+
+sub editDisposedMachineNote {
+	my ($arg) = @_;
+
+	my @l = ('Review existing notes', 'Add new note');
+
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	my $s = 0;
+
+	foreach my $l (@l) {
+		if($s == $q->param('leaf')) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\">" . $l . "</td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+	my @r = &sendCommand({ command => "pullDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+		$s[19] = cleanNull({ string => $s[19] });
+
+		if(!$s[19] || $s[19] eq "") {
+			$s[19] = "No notes are available for this node.";
+		}
+		else {
+			$s[19] =~ s/<DELIMBEG>/<h4>/go;
+			$s[19] =~ s/<DELIMEND>/<\/h4>/go;
+			$s[19] =~ s/<DELIMSEP>/ commented at /go;
+		}
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td width=\"100%\">" . $s[19] . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "</table>";
+}
+
+1;

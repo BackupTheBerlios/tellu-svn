@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+require "chest.lib";
+require "network.lib";
+
+sub telConsole {
+	my ($arg) = @_;
+
+	my @r = ();
+	my @l = ('Tellu expression console');
+
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$PAGE .= &htmlFormBegin({ name => "expressionForm", action => $SELF . "?action=expression&verb=execute", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+		$PAGE .= "<p>&nbsp;</p>";
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Expression:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlInputField({ name => "expression", value => "", columns => 60, rows => 10 }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Execute" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		if($q->param('verb') && $q->param('verb') eq "execute" && $q->param('expression') ne "") {
+			my $k = 0;
+			my $v = "";
+			my @l = ("set");
+			my @t = split(/\n/, $q->param('expression'));
+
+			foreach my $t (@t) {
+				$k++;
+
+				$t =~ s/\r+$|\n+$//g;
+
+				next if($t eq "");
+				next if($t =~ /^#|^%|^;/);
+
+				my ($c, $d) = split(/\(/, $t, 2);
+				my $e = 0;
+
+				#
+				# Handle special commands
+				#
+
+				if($c && $c ne "" && $d && $d ne "") {
+					$c = cleanPart({ string => $c });
+
+					foreach my $l (@l) {
+						if($c eq $l) {
+							my ($d, $t) = split(/\)/, $d, 2);
+
+							if($d && $d ne "" && $t && $t ne "") {
+								my ($i, $d) = split(/','|',\s+'/, $d, 2);
+
+								$i = cleanPart({ string => $i });
+								$d = cleanPart({ string => $d });
+
+								&telSetParam({ param => $i, value => $d });
+
+								$e = 1;
+
+								last;
+							}
+						}
+					}
+				}
+
+				#
+				# Handle server commands
+				#
+
+				if($e == 0) {
+					if($c && $c ne "") {
+						$r[0] = "00000002";
+						$r[1] = "00000001";
+						$r[2] = "00000001";
+						$r[3] = "Syntax error in line " . $k . ", correct usage is: command('param1', 'param2' [, ...]);";
+
+						my ($d, $t) = split(/\)/, $d, 2);
+
+						if($d && $d ne "" && $t && $t ne "") {
+							my ($i, $d, $p, $o) = split(/','|',\s+'/, $d, 4);
+
+							$c = cleanPart({ string => $c });
+							$i = cleanPart({ string => $i });
+							$d = cleanPart({ string => $d });
+							$p = cleanPart({ string => $p });
+							$o = cleanPart({ string => $o });
+
+							@r = &sendCommand({ command => $c, item => $i, domain => $d, param => $p, option => $o });
+						}
+					}
+
+					if(@r && $r[3] && $r[3] ne "") {
+						foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+							$e =~ s/$ITEM_SEPARATOR$//;
+							$e =~ s/$ITEM_SEPARATOR/$CMD_DELIMITER/go;
+
+							$e =~ s/\r+$|\n+$//g;
+
+							$v .= $e . $CONFIG_LINEFEED;
+						}
+					}
+				}
+			}
+
+			#
+			# Output result to required target
+			#
+
+			if($v && $v ne "") {
+				if($CMD_OUTPUT eq "here") {
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td align=\"right\">Result:</td>";
+					$PAGE .= "<td>" . &htmlInputField({ name => "result", value => $v, readonly => 1, flush => 1, columns => 60, rows => 25 }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+				elsif($CMD_OUTPUT eq "file") {
+					print STDOUT "Cache-control: no-cache" . $CONFIG_LINEFEED;
+					print STDOUT "Content-disposition: attachment; filename=\"tellu_expression_output.txt\"" . $CONFIG_LINEFEED;
+					print STDOUT "Content-length: " . length($v) . $CONFIG_LINEFEED;
+					print STDOUT "Content-type: application/x-download" . $CONFIG_LINEFEED . $CONFIG_LINEFEED;
+
+					binmode(STDOUT);
+
+					print STDOUT $v;
+
+					exit(0);
+				}
+			}
+		}
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "expression" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "execute" });
+
+		$PAGE .= &htmlFormEnd();
+	}
+}
+
+sub telSetParam {
+	my ($arg) = @_;
+
+	if($arg->{param} =~ /delimiter/i) {
+		$CMD_DELIMITER = $arg->{value};
+	}
+	elsif($arg->{param} =~ /output/i) {
+		$CMD_OUTPUT = $arg->{value};
+	}
+}
+
+sub tableConsoleSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"plain\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/console/console.png\"></td>";
+	$MENU .= "<td class=\"c3\">Tellu<br />expression<br />console</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "</ul>";
+}
+
+1;

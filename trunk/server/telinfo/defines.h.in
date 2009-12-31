@@ -1,0 +1,10 @@
+#include "globines.h"
+
+#define APPLICATION_NAME "telinfo"
+#define APPLICATION_VERSION "3.0.0-unix"
+#define APPLICATION_YEAR "2010"
+#define APPLICATION_COPYRIGHT "Jani Salonen <jani@lasipalatsi.fi>"
+
+#define CONFIG_DEFAULT_FILE "@prefix@/etc/tellud.conf"
+#define CONFIG_DEFAULT_LOCALE "C"
+#define CONFIG_DEFAULT_ROOT "/"

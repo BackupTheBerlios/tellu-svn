@@ -1,0 +1,47 @@
+#include <windows.h>
+
+#define IDI_TELLU					107
+#define IDI_SMALL					108
+
+#ifndef IDC_STATIC
+	#define IDC_STATIC				-1
+#endif
+
+IDI_TELLU		ICON				"tellu.ico"
+IDI_SMALL		ICON				"tellu_small.ico"
+
+VS_VERSION_INFO		VERSIONINFO
+FILEOS			VOS_NT_WINDOWS32
+FILEVERSION		0, 1, 0, 0
+PRODUCTVERSION		3, 0, 0, 0
+BEGIN
+	BLOCK						"StringFileInfo"
+	BEGIN
+		BLOCK					"040904B0"
+		BEGIN
+			VALUE				"CompanyName", "Jani Salonen\0"
+			VALUE				"FileDescription", "Tellu Agent\0"
+			VALUE				"FileVersion", "0.1\0"
+			VALUE				"InternalName", "Tellu.exe\0"
+			VALUE				"LegalCopyright", "Copyright (c) 2010, Jani Salonen\0"
+			VALUE				"OriginalFilename", "Tellu.exe\0"
+			VALUE				"ProductName", "Tellu\0"
+			VALUE				"ProductVersion", "3.0.0\0"
+		END
+		BLOCK					"040904E4"
+		BEGIN
+			VALUE				"CompanyName", "Jani Salonen\0"
+			VALUE				"FileDescription", "Tellu Agent\0"
+			VALUE				"FileVersion", "0.1\0"
+			VALUE				"InternalName", "Tellu.exe\0"
+			VALUE				"LegalCopyright", "Copyright (c) 2010, Jani Salonen\0"
+			VALUE				"OriginalFilename", "Tellu.exe\0"
+			VALUE				"ProductName", "Tellu\0"
+			VALUE				"ProductVersion", "3.0.0\0"
+		END
+	END
+	BLOCK						"VarFileInfo"
+	BEGIN
+			VALUE				"Translation", 1033, 1200
+	END
+END

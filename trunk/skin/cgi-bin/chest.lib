@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub cleanNull {
+	my ($arg) = @_;
+
+	if($arg->{string} eq "(null)") {
+		return "";
+	}
+
+	return $arg->{string};
+}
+
+sub cleanPart {
+	my ($arg) = @_;
+
+	if($arg->{string} ne "") {
+		$arg->{string} =~ s/^"+|^'+|^\s+|^\t+//g;
+		$arg->{string} =~ s/"+$|'+$|\s+$|\t+$//g;
+		$arg->{string} =~ s/\r+$|\n+$//g;
+
+		return $arg->{string};
+	}
+
+	return "";
+}
+
+sub cleanString {
+	my ($arg) = @_;
+
+	$arg->{string} =~ s/\t+|  +/ /g;
+	$arg->{string} =~ s/\r\n\r\n+/\r\n/g;
+	$arg->{string} =~ s/^ +|^\t+| +$|\t+$//g;
+	$arg->{string} =~ s/^\r\n+|\r\n+$//g;
+
+	return $arg->{string};
+}
+
+sub cleanHtml {
+	my ($arg) = @_;
+
+	my $r = $q->escapeHTML(cleanString({ string => $arg->{string} }));
+
+	$r =~ s/\\/\\\\/go;
+	$r =~ s/\n/<br \/>/go;
+
+	if($arg->{string} eq "") {
+		return "(null)";
+	}
+
+	return $r;
+}
+
+sub checkError {
+	my ($arg) = @_;
+
+	if(int($arg->{packet}[0]) == $ERROR_NOERROR) {
+		return(0);
+	}
+	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_LOGINNEEDED) {
+		require "access.lib";
+
+		&formAccessLogin({ message => $arg->{packet}[3] });
+
+		return(-1);
+	}
+	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_PERMISSIONDENIED) {
+		$SESSION_ERR = $arg->{packet}[3];
+
+		$PAGE .= "<p>Please contact your system administrator or help desk if you need to have an access to this resource.</p>";
+
+		return(-1);
+	}
+	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && (int($arg->{packet}[1]) == $ERROR_CLASS_DATABASE || int($arg->{packet}[1]) == $ERROR_CLASS_SERVER)) {
+		$SESSION_ERR = $arg->{packet}[3];
+
+		$PAGE .= "<p>System is in unusable state. Please contact your system administrator or help desk for assistance.</p>";
+
+		return(-1);
+	}
+	else {
+		$SESSION_ERR = $arg->{packet}[3];
+
+		return(-1);
+	}
+}
+
+sub randString {
+	my ($arg) = @_;
+
+	my $r = "";
+	my $k = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	if($arg->{length} && $arg->{length} > 0) {
+		for(my $i = 0; $i < $arg->{length}; $i++) {
+			$r .= substr($k, int(rand(length($k))), 1);
+		}
+	}
+
+	return $r;
+}
+
+1;

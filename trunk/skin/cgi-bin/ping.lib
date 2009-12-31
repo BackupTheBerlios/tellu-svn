@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub sendPing {
+	my ($arg) = @_;
+
+	use Net::Ping;
+
+	my $r = 0;
+	my $p = Net::Ping->new();
+
+	if($p->ping($arg->{address}, 5)) {
+		$r = 0;
+	}
+	else {
+		$r = -1;
+	}
+
+	$p->close();
+
+	return $r;
+}
+
+sub sendWake {
+	my ($arg) = @_;
+
+	use Socket;
+
+	my $r;
+	my $i, $m;
+
+	if(defined($i = inet_aton($arg->{address}))) {
+		socket(S, PF_INET, SOCK_DGRAM, getprotobyname("udp"));
+
+		$m = ("\xff" x 6) . (pack('H12', $arg->{mac}) x 16);
+
+		send(S, $m, 0, sockaddr_in(0x2fff, $i));
+
+		$arg->{mac} =~ s/://g;
+
+		$m = ("\xff" x 6) . (pack('H12', $arg->{mac}) x 16);
+
+		send(S, $m, 0, sockaddr_in(0x2fff, $i));
+
+		close(S);
+
+		$r = 0;
+	}
+	else {
+		$r = -1;
+	}
+
+	return $r;
+}
+
+1;

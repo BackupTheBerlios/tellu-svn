@@ -1,0 +1,58 @@
+Please read this guide carefully and go through each step.
+
+-------------------------------------------------------------------------------
+ 1. BUILDING THE AGENT
+-------------------------------------------------------------------------------
+ These prerequisities are mandatory:
+
+  * DBus library and header files (version 1.0 or greater),
+  * Hal library and header files (version 0.5 or greater).
+
+ Once you have all required libraries and headers reachable, you can build the
+ agent with following commands seen below, here you need to tune paths to suit
+ your environment ($ denotes shell prompt, so don't type it):
+
+  $ ./configure --prefix=/usr/local --with-dbus=/opt/dbus --with-hal=/opt/hal
+  $ make clean
+  $ make
+  $ make install
+
+ If build fails because of missing dependencies (even when configure script
+ succeeded), you need to tailor Makefile by hand. Makefile is very simple
+ (less than 40 lines), so editing it should not be too painful. For example,
+ if you are on Solaris, you may need to define some additional libraries
+ `-lsocket -lnsl', in line 16 where all other libraries are defined.
+
+-------------------------------------------------------------------------------
+ 2. CONFIGURING THE AGENT
+-------------------------------------------------------------------------------
+
+ Before starting tellu agent you need to check the configuration file, it is
+ located in PREFIX/etc. Prefix is the place which you chose when you installed
+ the agent. Parameters which needs modification are at least `tellud_server',
+ `tellud_port' and possibly `domain_override'. Do not touch other parameters
+ yet. Set `tellud_server' parameter to server name where tellud is running, and
+ `tellud_port' to the port which tellud listens (by default this is 1700). If
+ agent is unable to resolve the domain name, you need to set `domain_override'
+ parameter as well. So check the domain name, for example:
+
+  $ domainname
+
+ and if command above does not return anything related to domain name, hardcode
+ domain in agent's configuration. Otherwise you can comment out the whole
+ `domain_override' parameter.
+
+-------------------------------------------------------------------------------
+ 3. STARTING THE AGENT
+-------------------------------------------------------------------------------
+
+ Now you can start the agent:
+
+  $ cd PREFIX/bin
+  $ ./tellu
+
+ which collects machine data and sends them to tellud which stores collected
+ data in database. Please check the server's syslog, there should be note about
+ agent's connection, as well the database is populated with collected machine
+ data.
+

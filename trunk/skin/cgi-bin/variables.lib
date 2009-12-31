@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+$APP_NAME = "skin";
+$APP_VERSION = "3.0.0-noarch";
+$APP_PACKET = "request";
+
+$CMD_DELIMITER = "|";
+$CMD_OUTPUT = "here";
+
+$CONFIG_DEBUG = 0;
+$CONFIG_LINEFEED = "\r\n";
+$CONFIG_MAXPOST = 100;
+$CONFIG_SERVER_NAME = "localhost";
+$CONFIG_SERVER_PORT = 1702;
+$CONFIG_SERVER_PASSWORD = "secret";
+
+$DATA_ARRAYS_COUNT = 11;
+$DATA_POINTER_SIZE = 8;
+
+$DIR_TEMPLATE = "/var/www/templates";
+$DIR_UPLOAD = "/var/www/files";
+
+$ERROR_NOERROR = 1;
+$ERROR_SLIGHT = 2;
+
+$ERROR_CLASS_SERVER = 1;
+$ERROR_CLASS_AUTH = 2;
+$ERROR_CLASS_GENERAL = 3;
+$ERROR_CLASS_DATABASE = 4;
+
+$ERROR_CODE_SERVER_INTERNALERROR = 1;
+$ERROR_CODE_SERVER_OUTOFMEMORY = 2;
+$ERROR_CODE_AUTH_LOGINNEEDED = 1;
+$ERROR_CODE_AUTH_LOGINNOTNEEDED = 2;
+$ERROR_CODE_AUTH_LOGINFAILED = 3;
+$ERROR_CODE_AUTH_LOGOUTFAILED = 4;
+$ERROR_CODE_AUTH_LOGOUTFAILED = 5;
+$ERROR_CODE_AUTH_PERMISSIONDENIED = 6;
+$ERROR_CODE_GENERAL_PARAMETERNEEDED = 1;
+$ERROR_CODE_DATABASE_CONNECTFAILED = 1;
+$ERROR_CODE_DATABASE_PULLFAILED = 2;
+
+$HTML_CHARSET = "ISO-8859-1";
+$HTML_CONTYPE = "text/html";
+
+$HTMLAREA_COLUMNS = 50;
+$HTMLAREA_ROWS = 5;
+$HTMLLIST_SIZE = 10;
+$HTMLPWD_MAXLENGTH = 64;
+$HTMLPWD_SIZE = 50;
+$HTMLRADIO_COLUMNS = 1;
+$HTMLTEXT_MAXLENGTH = 64;
+$HTMLTEXT_SIZE = 50;
+$HTMLTICKS_COLUMNS = 1;
+$HTMLUPLOAD_MAXLENGTH = 64;
+$HTMLUPLOAD_SIZE = 50;
+
+$ITEM_DELIMITER = pack('c', 27);
+$ITEM_SEPARATOR = pack('c', 26);
+$ITEM_SPLITTER = '|';
+
+$SESSION_ERR = "";
+$SESSION_CID = "";
+$SESSION_UID = "";
+
+$WINDOW_TITLE = "Tellu Skin";
+
+%SESSION_CACHE = ();
+
+%NUMWORDS = (
+	1 => 'one', 2 => 'two', 3 => 'three', 4 => 'four', 5 => 'five', 6 => 'six', 7 => 'seven', 8 => 'eight', 9 => 'nine', 10 => 'ten',
+	16 => 'sixteen', 24 => 'twentyfour', 32 => 'thirtytwo', 48 => 'fourtyeight', 64 => 'sixtyfour'
+);
+
+%SUMWORDS = (
+	0 => 'never', 1 => 'once', 2 => 'twice', 3 => 'three times', 4 => 'four times', 5 => 'five times', 6 => 'six times', 7 => 'seven times', 8 => 'eight times', 9 => 'nine times', 10 => 'ten times'
+);
+
+%MONTHCON = (
+	'Jan', '1', 'Feb', '2', 'Mar', '3', 'Apr', '4', 'May', '5', 'Jun', '6', 'Jul', '7', 'Aug', '8', 'Sep', '9', 'Oct', '10', 'Nov', '11', 'Dec', '12'
+);
+
+1;

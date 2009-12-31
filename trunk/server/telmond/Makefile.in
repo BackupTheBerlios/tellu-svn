@@ -1,0 +1,39 @@
+C = @CC@
+LN = @LN@
+RM = @RM@
+
+SRC = ../common/cmdline.c ../common/config.c ../common/jip.c ../common/network.c ../common/node.c ../common/pid.c ../common/shm.c ../common/thread.c ../common/timer.c ../common/uid.c application.c db_mysql.c db_plain.c messages.c network.c reply.c telmond.c terminate.c worker.c
+DEP = ../common/banner.h ../common/cmdline.h ../common/config.h ../common/globines.h ../common/jip.h ../common/node.h ../common/shm.h declarations.h defines.h structures.h telmond.h worker.h
+
+ARC = `@UNAME@ -m 2>/dev/null`
+OSV = `@UNAME@ -s 2>/dev/null`
+
+OBJ = $(SRC:.c=.o)
+OUT = $(SRC:.c=)
+
+INC = @CFLAGS@ -I. -I../common
+LIB = @LDFLAGS@
+LNK = @LIBS@
+
+.SUFFIXES = .c
+
+.c.o:
+	$(CC) $(INC) -c -o $@ $<
+
+$(OUT): $(OBJ)
+	$(CC) -Wl,-s $(LIB) $(LNK) -o telmond-$(OSV)-$(ARC) $(OBJ)
+
+$(OBJ): $(DEP)
+
+install:
+	@INSTALL@ -m 0755 telmond-$(OSV)-$(ARC) @prefix@/sbin/
+	@INSTALL@ -m 0644 telmond.conf @prefix@/etc/
+	$(LN) -sf @prefix@/sbin/telmond-$(OSV)-$(ARC) @prefix@/sbin/telmond
+
+uninstall:
+	$(RM) -f @prefix@/sbin/telmond
+	$(RM) -f @prefix@/sbin/telmond-$(OSV)-$(ARC)
+	$(RM) -f @prefix@/etc/telmond.conf
+
+clean:
+	$(RM) -f $(OBJ) telmond-$(OSV)-$(ARC)

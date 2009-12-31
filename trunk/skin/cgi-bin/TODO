@@ -1,0 +1,16 @@
+devices
+	password attach/detach
+	files attach/detach
+
+virheentarkistukset:
+	new, push
+		device_edit
+		machine_edit
+		personal
+
+loput modify kentät (is in service, dispose, etc.)
+haku
+
+redhat koot / 1000
+redhat urli ei näy jos n/a
+

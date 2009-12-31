@@ -1,0 +1,90 @@
+Please read this guide carefully and go through each step.
+
+-------------------------------------------------------------------------------
+ 1. BUILDING THE SERVERS
+-------------------------------------------------------------------------------
+ These prerequisities are mandatory:
+
+  * MySQL client library and header files,
+  * OpenLDAP libraries and header files,
+
+ and following are optional, you need them only if you want to build telmon
+ (the graphical tellu server monitoring tool):
+
+  * Motif libraries and header files,
+  * X Window System libraries and header files.
+
+ Once you have all required libraries and headers reachable, you can build all
+ server programs and telmon at once with following script seen below, here you
+ need to tune paths to suit your environment:
+
+ for i in telinfo tellud telmon telmond telskind; do
+	(cd $i && ./configure \
+		--prefix=/usr/local \
+		--with-mysql=/opt/mysql \
+		--with-openldap=/opt/openldap \
+		--with-motif=/opt/motif \
+		--with-x11=/usr/X11R6 && \
+		make clean && make && make install ) || exit 1 ;
+ done
+
+ If you don't want to use script above, remember that it is VERY important to
+ run `make clean' before `make' and `make install', because there is some
+ common source files shared between servers in `common' directory, and if
+ some common file compiled for one server is linked to another it may cause
+ fatal conflicts. So please always remember `make clean' before `make'.
+
+ After succesful build, you can copy common/tellu.init.d file to /etc/init.d/
+ directory and use that for controlling the servers. tellu.init.d script obeys
+ normal init-script style parameters, like start, stop, restart and status,
+ whose behaviour should be self explainable.
+
+ If build fails because of missing dependencies (even when configure script
+ succeeded), you need to tailor Makefile by hand. Makefiles are very simple
+ (less than 40 lines), so editing them should not be too painful.
+
+-------------------------------------------------------------------------------
+ 2. CONFIGURING THE SERVERS
+-------------------------------------------------------------------------------
+
+ Before starting tellu servers you need to check configuration files, they are
+ located at PREFIX/etc. Prefix is the place which you chose when you installed
+ the servers. For now it is wise to go with default settings, except MySQL
+ parameters, which may be necessary to change. So, open `tellud.conf',
+ `telmond.conf' and `telskind.conf' and look for `mysql_' parameters from
+ bottom of each file and change them to suit your environment. Leave
+ `mysql_database', `mysql_username' and `mysql_password' as they are for now.
+ You can also set `ldap_' parameters in `telskind.conf' at this point, if you
+ want to use LDAP authentication in Tellu Skin. More of setting up Skin later.
+
+-------------------------------------------------------------------------------
+ 3. THE DATABASE
+-------------------------------------------------------------------------------
+
+ Now initialize tellu database by issuing command ($ denotes shell prompt, so
+ don't type it):
+
+  $ mysql -h MYSQLHOST -u root -p < tellu_db.sql
+
+ and ofcourse replace MYSQLHOST with your MySQL host name, and if you like to
+ use some other user for initializing than root, replace user also. If your
+ user does not have a password, you can remove the `-p' switch.
+
+ If some reason you need to reinitialize the database, you need to drop tellu
+ database first before running `mysql' statement again. If you don't, you get
+ all data duplicated in database because `tellu_db.sql' does not remove
+ possibly already existing data.
+
+-------------------------------------------------------------------------------
+ 4. STARTING THE SERVERS
+-------------------------------------------------------------------------------
+
+ To fire up the servers, use `tellu.init.d' script which you hopefully copied
+ to /etc/init.d or whichever is the place in your environment for init scripts.
+
+  $ /etc/init.d/tellu.init.d start
+
+ should start all three servers, `tellud', `telmond' and `telskind'. If all
+ went ok, you can proceed to installing Tellu Skin. In case of troubles, please
+ consult the syslog.
+

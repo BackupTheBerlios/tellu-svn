@@ -1,0 +1,97 @@
+table a:link {
+	color: #f0f0f0;
+	text-decoration: none;
+}
+
+table a:hover, a:focus {
+	background: #2580a2;
+	color: #f0f0f0;
+	text-decoration: none;
+}
+
+table a:visited {
+	color: #f0f0f0;
+	text-decoration: none;
+}
+
+table.default {
+	border: 1px solid #444444;
+	empty-cells: show;
+	width: 100%;
+}
+
+table.logo {
+	border: none;
+	empty-cells: show;
+	width: 100%;
+}
+
+table.plain {
+	border: none;
+	empty-cells: show;
+	width: 100%;
+}
+
+tr.top {
+	vertical-align: top;
+}
+
+tr.middle {
+	vertical-align: middle;
+}
+
+td.c1 {
+	background-color: #ffffdd;
+	border-width: 0px;
+	color: #000000;
+	text-align: left;
+}
+
+td.c2 {
+	background-color: #eeeecc;
+	border-width: 0px;
+	color: #000000;
+	text-align: left;
+}
+
+td.c3 {
+	border: none;
+	color: #f0f0f0;
+	text-align: left;
+}
+
+td.header {
+	background-color: #444444;
+	border-width: 0px;
+	color: #000000;
+	text-align: center;
+}
+
+td.select {
+	background-color: #2580a2;
+	border-width: 0px;
+	color: #000000;
+	text-align: center;
+}
+
+td.leaf {
+	background: url("/pics/leaf_center.png") left bottom repeat-x;
+}
+
+td.leaf_s {
+	background: url("/pics/leaf_center_s.png") left bottom repeat-x;
+}
+
+ul.tight {
+	list-style-position: inside;
+	list-style-type: disc;
+	margin: 0;
+	padding-left: 0;
+}
+
+ul.summary {
+	list-style-position: inside;
+	list-style-type: disc;
+	margin: 0 0 1em 1em;
+	padding-left: 0;
+}

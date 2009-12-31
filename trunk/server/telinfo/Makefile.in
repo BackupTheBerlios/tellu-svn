@@ -1,0 +1,37 @@
+C = @CC@
+LN = @LN@
+RM = @RM@
+
+SRC = cmdline.c config.c messages.c shm.c telinfo.c
+DEP = ../common/banner.h ../common/globines.h ../common/shm.h cmdline.h config.h declarations.h defines.h
+
+ARC = `@UNAME@ -m 2>/dev/null`
+OSV = `@UNAME@ -s 2>/dev/null`
+
+OBJ = $(SRC:.c=.o)
+OUT = $(SRC:.c=)
+
+INC = @CFLAGS@ -I. -I../common
+LIB = @LDFLAGS@
+LNK = @LIBS@
+
+.SUFFIXES = .c
+
+.c.o:
+	$(CC) $(INC) -c -o $@ $<
+
+$(OUT): $(OBJ)
+	$(CC) -Wl,-s $(LIB) $(LNK) -o telinfo-$(OSV)-$(ARC) $(OBJ)
+
+$(OBJ): $(DEP)
+
+install:
+	@INSTALL@ -m 0755 telinfo-$(OSV)-$(ARC) @prefix@/bin/
+	$(LN) -sf @prefix@/bin/telinfo-$(OSV)-$(ARC) @prefix@/bin/telinfo
+
+uninstall:
+	$(RM) -f @prefix@/bin/telinfo
+	$(RM) -f @prefix@/bin/telinfo-$(OSV)-$(ARC)
+
+clean:
+	$(RM) -f $(OBJ) telinfo-$(OSV)-$(ARC)

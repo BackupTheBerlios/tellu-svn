@@ -1,0 +1,39 @@
+C = @CC@
+LN = @LN@
+RM = @RM@
+
+SRC = ../common/jip.c application.c button.c cmdline.c config.c export.c history.c home.c image.c messages.c network.c settings.c stat.c telmon.c terminate.c window.c
+DEP = ../common/banner.h ../common/globines.h ../common/jip.h cmdline.h config.h declarations.h defines.h export.h fallback.h history.h image.h network.h settings.h structures.h telmon.h
+
+ARC = `@UNAME@ -m 2>/dev/null`
+OSV = `@UNAME@ -s 2>/dev/null`
+
+OBJ = $(SRC:.c=.o)
+OUT = $(SRC:.c=)
+
+INC = @CFLAGS@ -I. -I../common
+LIB = @LDFLAGS@
+LNK = @LIBS@
+
+.SUFFIXES = .c
+
+.c.o:
+	$(CC) $(INC) -c -o $@ $<
+
+$(OUT): $(OBJ)
+	$(CC) -Wl,-s $(LIB) $(LNK) -o telmon-$(OSV)-$(ARC) $(OBJ)
+
+$(OBJ): $(DEP)
+
+install:
+	@INSTALL@ -m 0755 telmon-$(OSV)-$(ARC) @prefix@/bin/
+	@INSTALL@ -m 0644 telmon.conf @prefix@/etc/
+	$(LN) -sf @prefix@/bin/telmon-$(OSV)-$(ARC) @prefix@/bin/telmon
+
+uninstall:
+	$(RM) -f @prefix@/bin/telmon
+	$(RM) -f @prefix@/bin/telmon-$(OSV)-$(ARC)
+	$(RM) -f @prefix@/etc/telmon.conf
+
+clean:
+	$(RM) -f $(OBJ) telmon-$(OSV)-$(ARC)

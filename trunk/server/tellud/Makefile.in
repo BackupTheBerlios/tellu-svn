@@ -1,0 +1,39 @@
+C = @CC@
+LN = @LN@
+RM = @RM@
+
+SRC = ../common/cmdline.c ../common/config.c ../common/jip.c ../common/network.c ../common/node.c ../common/pid.c ../common/shm.c ../common/thread.c ../common/timer.c ../common/uid.c db_mysql.c db_plain.c messages.c rand.c tellud.c worker.c
+DEP = ../common/banner.h ../common/cmdline.h ../common/config.h ../common/globines.h ../common/jip.h ../common/node.h ../common/shm.h declarations.h defines.h structures.h tellud.h worker.h
+
+ARC = `@UNAME@ -m 2>/dev/null`
+OSV = `@UNAME@ -s 2>/dev/null`
+
+OBJ = $(SRC:.c=.o)
+OUT = $(SRC:.c=)
+
+INC = @CFLAGS@ -I. -I../common
+LIB = @LDFLAGS@
+LNK = @LIBS@
+
+.SUFFIXES = .c
+
+.c.o:
+	$(CC) $(INC) -c -o $@ $<
+
+$(OUT): $(OBJ)
+	$(CC) -Wl,-s $(LIB) $(LNK) -o tellud-$(OSV)-$(ARC) $(OBJ)
+
+$(OBJ): $(DEP)
+
+install:
+	@INSTALL@ -m 0755 tellud-$(OSV)-$(ARC) @prefix@/sbin/
+	@INSTALL@ -m 0644 tellud.conf @prefix@/etc/
+	$(LN) -sf @prefix@/sbin/tellud-$(OSV)-$(ARC) @prefix@/sbin/tellud
+
+uninstall:
+	$(RM) -f @prefix@/sbin/tellud
+	$(RM) -f @prefix@/sbin/tellud-$(OSV)-$(ARC)
+	$(RM) -f @prefix@/etc/tellud.conf
+
+clean:
+	$(RM) -f $(OBJ) tellud-$(OSV)-$(ARC)

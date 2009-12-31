@@ -1,0 +1,44 @@
+#include "globines.h"
+
+#define APPLICATION_NAME "telmond"
+#define APPLICATION_VERSION "3.0.0-unix"
+#define APPLICATION_YEAR "2010"
+#define APPLICATION_COPYRIGHT "Jani Salonen <jani@lasipalatsi.fi>"
+
+#define CONFIG_DEFAULT_FILE "@prefix@/etc/telmond.conf"
+#define CONFIG_DEFAULT_PID "/var/run/telmond.pid"
+#define CONFIG_DEFAULT_LOCALE "C"
+#define CONFIG_DEFAULT_ROOT "/"
+#define CONFIG_DEFAULT_PORT 1701
+#define CONFIG_DEFAULT_PORT_S "1701"
+#define CONFIG_DEFAULT_UID -1
+#define CONFIG_DEFAULT_GID -1
+#define CONFIG_DEFAULT_ENGINEMYSQL "mysql"
+#define CONFIG_DEFAULT_ENGINEPLAIN "plain"
+#define CONFIG_DEFAULT_ENGINE CONFIG_DEFAULT_ENGINEMYSQL
+#define CONFIG_DEFAULT_PLAINFILE "/tmp/telmond.out"
+
+#define DATA_ARRAYS_COUNT 4
+
+#define DATA_REPLY_CHART_COUNT 5
+#define DATA_REPLY_HIST_COUNT 5
+#define DATA_REPLY_STAT_COUNT 12
+
+#define DATA_PACKET_COLLECT "reply"
+
+#define STAT_USAGE_TELLUD 100
+#define STAT_USAGE_TELMOND 200
+#define STAT_USAGE_TELSKIND 300
+#define STAT_HISTORY_DAYS 400
+#define STAT_HISTORY_CHART 500
+
+#define TABLE_LOG "log"
+#define TABLE_HIST "history"
+
+#define TABLECOL_LOG "level,node,domain,sys,rel,uid,grp,proc,procver,note"
+#define TABLECOL_LOG_PROC "proc"
+#define TABLECOL_LOG_TIME "time"
+#define TABLECOL_HIST "node,domain,sys,rel,uid,grp,proc,procver,conns"
+#define TABLECOL_HIST_PROC "proc"
+#define TABLECOL_HIST_TIME "time"
+#define TABLECOL_CHART "conns"

@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+require "network.lib";
+
+sub formAccessLogin {
+	my ($arg) = @_;
+
+	$PAGE .= &htmlFormBegin({ name => "loginForm", action => "login.pl", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<p>&nbsp;</p>";
+	$PAGE .= "<table align=\"center\" border=\"0\" cellpadding=\"5\" cellspacing=\"0\">";
+
+	if($arg->{message} ne "") {
+		$PAGE .= "<tr valign=\"top\"><td colspan=\"2\"><h4>" . $arg->{message} . "</h4></td></tr>";
+	}
+
+	$PAGE .= "<tr valign=\"middle\">";
+	$PAGE .= "<td align=\"right\">Username:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "uid" }) . "</td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr valign=\"middle\">";
+	$PAGE .= "<td align=\"right\">Password:</td>";
+	$PAGE .= "<td>" . &htmlInputPassword({ name => "pwd" }) . "</td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr valign=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr valign=\"top\">";
+	$PAGE .= "<td>&nbsp;</td>";
+	$PAGE .= "<td align=\"center\">" . &htmlButtonSubmit({ name => "submit", value => "Log In" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlFormEnd();
+
+	return(0);
+}
+
+sub formAccessHandshake {
+	my ($arg) = @_;
+
+	my @r = &sendCommand({ command => "tryLogin", item => $arg->{pwd}, domain => "", param => "", option => "" });
+
+	if($r[0] == int(1)) {
+		$SESSION_CID = $r[3];
+
+		return(0);
+	}
+	else {
+		$SESSION_ERR = $r[3];
+
+		return(-1);
+	}
+}
+
+sub tableAccessSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"plain\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/access/login.png\"></td>";
+	$MENU .= "<td class=\"c3\">Login</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "</ul>";
+}
+
+1;

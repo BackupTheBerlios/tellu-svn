@@ -1,0 +1,545 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub headPrepare {
+	$SELF = $0;
+	$SELF =~ s/^.*\///;
+	$CALLER = $SELF;
+	$CALLER =~ s/\..*$//;
+
+	$PAGE = "";
+	$MENU = "";
+
+	$SESSION_ERR = "";
+
+	if($ENV{'REMOTE_USER'}) {
+		if($ENV{'REMOTE_USER'} eq "") {
+			$SESSION_UID = "dummy";
+		}
+		else {
+			$SESSION_UID = $ENV{'REMOTE_USER'};
+		}
+	}
+	else {
+		$SESSION_CID = &headCookieGet({ name => "tellu_cid" });
+		$SESSION_UID = &headCookieGet({ name => "tellu_uid" });
+	}
+
+	if($CONFIG_DEBUG != 0) {
+		$PAGE .= $q->Dump();
+
+		$PAGE .= "<ul>";
+
+		while((my $e, $v) = each %ENV) {
+			$PAGE .= "<li>" . $e . ": " . $v . "</li>";
+		}
+
+		$PAGE .= "</ul>";
+	}
+}
+
+sub headCookieGet {
+	my ($arg) = @_;
+
+	my $r = $q->cookie( $arg->{name} );
+
+	return $r;
+}
+
+sub headCookieSet {
+	my ($arg) = @_;
+
+	my $r = $q->cookie( -name => $arg->{name}, -value => $arg->{value}, -path => '/' );
+
+	return $r;
+}
+
+sub htmlButtonAction {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if($arg->{disabled}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->button( -id => $arg->{style}, -name => $arg->{name}, -value => $arg->{value}, -onclick => $arg->{function}, -disabled => $arg->{disabled} );
+		}
+		else {
+			$r = $q->button( -id => "submit", -name => $arg->{name}, -value => $arg->{value}, -onclick => $arg->{function}, -disabled => $arg->{disabled} );
+		}
+	}
+	else {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->button( -id => $arg->{style}, -name => $arg->{name}, -value => $arg->{value}, -onclick => $arg->{function} );
+		}
+		else {
+			$r = $q->button( -id => "submit", -name => $arg->{name}, -value => $arg->{value}, -onclick => $arg->{function} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlButtonReset {
+	my ($arg) = @_;
+
+	my $r = $q->defaults( $arg->{name} );
+
+	return $r;
+}
+
+sub htmlButtonSubmit {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if($arg->{disabled}) {
+		$r = $q->submit( -id => "submit", -name => $arg->{name}, -value => $arg->{value}, -disabled => $arg->{disabled} );
+	}
+	else {
+		$r = $q->submit( -id => "submit", -name => $arg->{name}, -value => $arg->{value} );
+	}
+
+	return $r;
+}
+
+sub htmlFormBegin {
+	my ($arg) = @_;
+
+	my $r = $q->start_form( -name => $arg->{name}, -action => $arg->{action}, -enctype => $arg->{enctype}, -method => $arg->{method} );
+
+	return $r;
+}
+
+sub htmlFormMultiBegin {
+	my ($arg) = @_;
+
+	my $r = $q->start_multipart_form( -name => $arg->{name}, -action => $arg->{action}, -enctype => $arg->{enctype}, -method => $arg->{method} );
+
+	return $r;
+}
+
+sub htmlFormEnd {
+	my ($arg) = @_;
+
+	my $r = $q->endform();
+
+	return $r;
+}
+
+sub htmlHiddenField {
+	my ($arg) = @_;
+
+	my $r = $q->hidden( -name => $arg->{name}, -default => $arg->{value} );
+
+	return $r;
+}
+
+sub htmlInputField {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{columns}) {
+		$arg->{columns} = $HTMLAREA_COLUMNS;
+	}
+
+	if(!$arg->{rows}) {
+		$arg->{rows} = $HTMLAREA_ROWS;
+	}
+
+	if(!$arg->{value}) {
+		$arg->{value} = "";
+	}
+
+	if(!$arg->{flush}) {
+		$arg->{flush} = 0;
+	}
+
+	if($arg->{disabled}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->textarea( -force => $arg->{flush}, -id => $arg->{style}, -name => $arg->{name}, -columns => $arg->{columns}, -rows => $arg->{rows}, -default => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+		else {
+			$r = $q->textarea( -force => $arg->{flush}, -id => "textarea", -name => $arg->{name}, -columns => $arg->{columns}, -rows => $arg->{rows}, -default => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+	}
+	elsif($arg->{readonly}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->textarea( -force => $arg->{flush}, -id => $arg->{style}, -name => $arg->{name}, -columns => $arg->{columns}, -rows => $arg->{rows}, -default => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+		else {
+			$r = $q->textarea( -force => $arg->{flush}, -id => "textarea", -name => $arg->{name}, -columns => $arg->{columns}, -rows => $arg->{rows}, -default => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+	}
+	else {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->textarea( -force => $arg->{flush}, -id => $arg->{style}, -name => $arg->{name}, -columns => $arg->{columns}, -rows => $arg->{rows}, -default => $arg->{value} );
+		}
+		else {
+			$r = $q->textarea( -force => $arg->{flush}, -id => "textarea", -name => $arg->{name}, -columns => $arg->{columns}, -rows => $arg->{rows}, -default => $arg->{value} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlInputPassword {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{maxlength}) {
+		$arg->{maxlength} = $HTMLPWD_MAXLENGTH;
+	}
+
+	if(!$arg->{size}) {
+		$arg->{size} = $HTMLPWD_SIZE;
+	}
+
+	if(!$arg->{value}) {
+		$arg->{value} = "";
+	}
+
+	if($arg->{disabled}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->password_field( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+		else {
+			$r = $q->password_field( -id => "pwd", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+	}
+	elsif($arg->{readonly}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->password_field( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+		else {
+			$r = $q->password_field( -id => "pwd", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+	}
+	else {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->password_field( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value} );
+		}
+		else {
+			$r = $q->password_field( -id => "pwd", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlInputText {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{maxlength}) {
+		$arg->{maxlength} = $HTMLTEXT_MAXLENGTH;
+	}
+
+	if(!$arg->{size}) {
+		$arg->{size} = $HTMLTEXT_SIZE;
+	}
+
+	if(!$arg->{value}) {
+		$arg->{value} = "";
+	}
+
+	if($arg->{disabled}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->textfield( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+		else {
+			$r = $q->textfield( -id => "text", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+	}
+	elsif($arg->{readonly}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->textfield( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+		else {
+			$r = $q->textfield( -id => "text", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+	}
+	else {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->textfield( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value} );
+		}
+		else {
+			$r = $q->textfield( -id => "text", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -value => $arg->{value} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlInputUpload {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{maxlength}) {
+		$arg->{maxlength} = $HTMLUPLOAD_MAXLENGTH;
+	}
+
+	if(!$arg->{size}) {
+		$arg->{size} = $HTMLUPLOAD_SIZE;
+	}
+
+	if(!$arg->{value}) {
+		$arg->{value} = "";
+	}
+
+	if($arg->{disabled}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->filefield( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -default => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+		else {
+			$r = $q->filefield( -id => "file", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -default => $arg->{value}, -disabled => $arg->{disabled} );
+		}
+	}
+	elsif($arg->{readonly}) {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->filefield( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -default => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+		else {
+			$r = $q->filefield( -id => "file", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -default => $arg->{value}, -readonly => $arg->{readonly} );
+		}
+	}
+	else {
+		if($arg->{style} && $arg->{style} ne "") {
+			$r = $q->filefield( -id => $arg->{style}, -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -default => $arg->{value} );
+		}
+		else {
+			$r = $q->filefield( -id => "file", -name => $arg->{name}, -maxlength => $arg->{maxlength}, -size => $arg->{size}, -default => $arg->{value} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlSelectList {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{size}) {
+		$arg->{size} = $HTMLLIST_SIZE;
+	}
+
+	if($arg->{disabled}) {
+		$r = $q->scrolling_list( -id => "select", -name => $arg->{name}, -size => $arg->{size}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -disabled => $arg->{disabled} );
+	}
+	else {
+		if($arg->{multiple}) {
+			$r = $q->scrolling_list( -id => "select", -name => $arg->{name}, -size => $arg->{size}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -multiple => $arg->{multiple} );
+		}
+		else {
+			$r = $q->scrolling_list( -id => "select", -name => $arg->{name}, -size => $arg->{size}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlSelectMenu {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if($arg->{style} && $arg->{style} ne "") {
+		if($arg->{select}) {
+			if($arg->{disabled}) {
+				$r = $q->popup_menu( -id => $arg->{style}, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -disabled => $arg->{disabled} );
+			}
+			else {
+				if($arg->{onchange}) {
+					$r = $q->popup_menu( -id => $arg->{style}, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -onchange => $arg->{onchange} );
+				}
+				else {
+					$r = $q->popup_menu( -id => $arg->{style}, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select} );
+				}
+			}
+		}
+		else {
+			if($arg->{disabled}) {
+				$r = $q->popup_menu( -id => $arg->{style}, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -disabled => $arg->{disabled} );
+			}
+			else {
+				if($arg->{onchange}) {
+					$r = $q->popup_menu( -id => $arg->{style}, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -onchange => $arg->{onchange} );
+				}
+				else {
+					$r = $q->popup_menu( -id => $arg->{style}, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label} );
+				}
+			}
+		}
+	}
+	else {
+		if($arg->{select}) {
+			if($arg->{disabled}) {
+				$r = $q->popup_menu( -id => "select", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -disabled => $arg->{disabled} );
+			}
+			else {
+				if($arg->{onchange}) {
+					$r = $q->popup_menu( -id => "select", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -onchange => $arg->{onchange} );
+				}
+				else {
+					$r = $q->popup_menu( -id => "select", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select} );
+				}
+			}
+		}
+		else {
+			if($arg->{disabled}) {
+				$r = $q->popup_menu( -id => "select", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -disabled => $arg->{disabled} );
+			}
+			else {
+				if($arg->{onchange}) {
+					$r = $q->popup_menu( -id => "select", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -onchange => $arg->{onchange} );
+				}
+				else {
+					$r = $q->popup_menu( -id => "select", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label} );
+				}
+			}
+		}
+	}
+
+	return $r;
+}
+
+sub htmlSelectRadio {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{columns}) {
+		$arg->{columns} = $HTMLRADIO_COLUMNS;
+	}
+
+	if($arg->{disabled}) {
+		$r = $q->radio_group( -id => "radio", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns}, -disabled => $arg->{disabled} );
+	}
+	else {
+		$r = $q->radio_group( -id => "radio", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns} );
+	}
+
+	return $r;
+}
+
+sub htmlSelectTick {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if($arg->{disabled}) {
+		$r = $q->checkbox( -id => "tick", -name => $arg->{name}, -value => $arg->{value}, -label => $arg->{label}, -checked => $arg->{select}, -disabled => $arg->{disabled} );
+	}
+	else {
+		if($arg->{onclick}) {
+			$r = $q->checkbox( -id => "tick", -name => $arg->{name}, -value => $arg->{value}, -label => $arg->{label}, -checked => $arg->{select}, -onclick => $arg->{onclick} );
+		}
+		else {
+			$r = $q->checkbox( -id => "tick", -name => $arg->{name}, -value => $arg->{value}, -label => $arg->{label}, -checked => $arg->{select} );
+		}
+	}
+
+	return $r;
+}
+
+sub htmlSelectTicks {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{columns}) {
+		$arg->{columns} = $HTMLTICKS_COLUMNS;
+	}
+
+	if($arg->{disabled}) {
+		$r = $q->checkbox_group( -id => "tick", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns}, -disabled => $arg->{disabled} );
+	}
+	else {
+		$r = $q->checkbox_group( -id => "tick", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns} );
+	}
+
+	return $r;
+}
+
+sub htmlPage {
+	my ($arg) = @_;
+
+	my $t = "master";
+
+	if($arg->{template} && $arg->{template} ne "") {
+		$t = $arg->{template};
+	}
+
+	my @p = &htmlTemplate({ theme => "Standard", template => $t });
+
+	@p = grep { $_ =~ s/<!--caller-->/$CALLER/go } @p;
+	@p = grep { $_ =~ s/<!--charset-->/$HTML_CHARSET/go } @p;
+	@p = grep { $_ =~ s/<!--content-->/$arg->{content}/go } @p;
+	@p = grep { $_ =~ s/<!--contype-->/$HTML_CONTYPE/go } @p;
+	@p = grep { $_ =~ s/<!--script-->/$arg->{script}/go } @p;
+	@p = grep { $_ =~ s/<!--slices-->/$arg->{slices}/go } @p;
+	@p = grep { $_ =~ s/<!--title-->/$arg->{title}/go } @p;
+
+	if($arg->{header} && $arg->{header} ne "") {
+		@p = grep { $_ =~ s/<!--header-->/<h3>$arg->{header}<\/h3>/go } @p;
+	}
+
+	if($arg->{subheader} && $arg->{subheader} ne "") {
+		@p = grep { $_ =~ s/<!--subheader-->/<p>$arg->{subheader}<\/p>/go } @p;
+	}
+
+	if($SESSION_UID && $SESSION_UID ne "") {
+		@p = grep { $_ =~ s/<!--myself-->/($SESSION_UID)/go } @p;
+	}
+	else {
+		@p = grep { $_ =~ s/<!--myself-->//go } @p;
+	}
+
+	if($arg->{cookie}) {
+		if($arg->{redirect}) {
+			print STDOUT $q->header( -location => $arg->{redirect} . ".pl", -status => "302", -type => $HTML_CONTYPE, -charset => $HTML_CHARSET, -cookie => $arg->{cookie} );
+		}
+		else {
+			print STDOUT $q->header( -type => $HTML_CONTYPE, -charset => $HTML_CHARSET, -cookie => $arg->{cookie} );
+		}
+	}
+	else {
+		if($arg->{redirect}) {
+			print STDOUT $q->header( -location => $arg->{redirect} . ".pl", -status => "302", -type => $HTML_CONTYPE, -charset => $HTML_CHARSET );
+		}
+		else {
+			print STDOUT $q->header( -type => $HTML_CONTYPE, -charset => $HTML_CHARSET );
+		}
+	}
+
+	print STDOUT "@p";
+
+	exit(0);
+}
+
+sub htmlTemplate {
+	my ($arg) = @_;
+
+	my @p = ();
+
+	if(open(FILE, $DIR_TEMPLATE . "/" . $arg->{theme} . "/" . $arg->{template} . ".html")) {
+		@p = <FILE>;
+
+		close(FILE);
+	}
+
+	return("@p");
+}
+
+1;

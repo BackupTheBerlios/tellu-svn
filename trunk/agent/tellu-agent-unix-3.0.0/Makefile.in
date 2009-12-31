@@ -1,0 +1,39 @@
+C = @CC@
+LN = @LN@
+RM = @RM@
+
+SRC = application.c config.c disk.c hal.c jip.c load.c machine.c memory.c message.c network.c node.c processor.c services.c software.c system.c tellu.c terminate.c timer.c user.c
+DEP = config.h declarations.h defines.h hal.h jip.h load.h memory.h network.h node.h param.h processor.h services.c software.h structures.h system.h tellu.h
+
+ARC = `@UNAME@ -m 2>/dev/null`
+OSV = `@UNAME@ -s 2>/dev/null`
+
+OBJ = $(SRC:.c=.o)
+OUT = $(SRC:.c=)
+
+INC = @CFLAGS@ -I.
+LIB = @LDFLAGS@
+LNK = @LIBS@
+
+.SUFFIXES = .c
+
+.c.o:
+	$(CC) $(INC) -c -o $@ $<
+
+$(OUT): $(OBJ)
+	$(CC) -Wl,-s $(LIB) $(LNK) -o tellu-$(OSV)-$(ARC) $(OBJ)
+
+$(OBJ): $(DEP)
+
+install:
+	@INSTALL@ -m 0755 tellu-$(OSV)-$(ARC) @prefix@/bin/
+	@INSTALL@ -m 0644 tellu.conf @prefix@/etc/
+	$(LN) -sf @prefix@/bin/tellu-$(OSV)-$(ARC) @prefix@/bin/tellu
+
+uninstall:
+	$(RM) -f @prefix@/bin/tellu
+	$(RM) -f @prefix@/bin/tellu-$(OSV)-$(ARC)
+	$(RM) -f @prefix@/etc/tellu.conf
+
+clean:
+	$(RM) -f $(OBJ) tellu-$(OSV)-$(ARC)

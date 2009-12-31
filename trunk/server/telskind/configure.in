@@ -1,0 +1,89 @@
+AC_INIT(telskind, 3.0.0, jani@lasipalatsi.fi)
+
+dnl
+dnl Checks for programs.
+dnl
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_LANG_C
+AC_CHECK_PROGS(LN, ln)
+AC_CHECK_PROGS(RM, rm)
+AC_CHECK_PROGS(UNAME, uname)
+
+dnl
+dnl Check if compiler accepts -Wall.
+dnl
+AC_MSG_CHECKING([if compiler accepts -Wall])
+SAVEDCFLAGS=$CFLAGS
+CFLAGS=$CFLAGS" -Wall"
+wall="no"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+	[wall="yes"; SAVEDCFLAGS=$CFLAGS; efl=$efl" -Wall"])
+AC_MSG_RESULT([$wall])
+CFLAGS=$SAVEDCFLAGS
+
+dnl
+dnl Get parameters.
+dnl
+AC_ARG_WITH(mysql,
+	[  --with-mysql=DIR        where MySQL is installed],
+	[CFLAGS=$CFLAGS" -I$withval/include -I$withval/include/mysql"
+		LDFLAGS=$LDFLAGS" -L$withval/lib"
+		LIBS=$LIBS" -lmysqlclient"])
+AC_ARG_WITH(openldap,
+	[  --with-openldap=DIR     where OpenLDAP is installed],
+	[CFLAGS=$CFLAGS" -I$withval/include -DLDAP_DEPRECATED"
+		LDFLAGS=$LDFLAGS" -L$withval/lib"
+		LIBS=$LIBS" -lldap"])
+AC_ARG_WITH(pthreads,
+	[  --with-pthreads=DIR     where POSIX threads is installed],
+	[CFLAGS=$CFLAGS" -I$withval/include"
+		LDFLAGS=$LDFLAGS" -L$withval/lib"])
+
+dnl
+dnl Checks for header files.
+dnl
+AC_HEADER_STDC
+AC_CHECK_HEADERS([arpa/inet.h locale.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/systeminfo.h sys/time.h syslog.h unistd.h])
+
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
+AC_TYPE_UID_T
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+
+dnl
+dnl Checks for library functions.
+dnl
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([gethostbyaddr gethostbyname gethostname gettimeofday inet_ntoa memset setlocale socket strchr strerror strncasecmp sysinfo uname])
+
+dnl
+dnl Checks for libraries.
+dnl
+AC_CHECK_LIB([pthread], [pthread_create],
+	[LIBS=$LIBS" -lpthread"],
+	[AC_CHECK_LIB([c_r], [pthread_create],
+		[LIBS=$LIBS" -lc_r"],
+		[AC_CHECK_LIB([pthreads -lpthread], [pthread_create],
+			[LIBS=$LIBS" -lpthreads -lpthread"],
+			AC_MSG_ERROR(telskind requires POSIX threads))
+		])
+	])
+AC_CHECK_LIB([mysqlclient], [mysql_init],
+	[],
+	AC_MSG_ERROR(telskind requires MySQL))
+AC_CHECK_LIB([ldap], [ldap_init],
+	[],
+	AC_MSG_ERROR(telskind requires OpenLDAP))
+
+dnl
+dnl Output Makefiles.
+dnl
+AC_CONFIG_FILES([Makefile defines.h])
+AC_OUTPUT
