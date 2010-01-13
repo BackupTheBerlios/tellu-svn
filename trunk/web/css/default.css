@@ -1,0 +1,154 @@
+html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+p {
+	line-height: 1.5;
+	margin: 2em 0 2em 0;
+}
+
+p.small {
+	font-size: 70%;
+	font-style: italic;
+	line-height: 1.5;
+	margin: 0;
+}
+
+p.footer {
+	border-top: dotted 1px #a0a0a0;
+	font-size: 70%;
+	font-style: italic;
+	line-height: 1.5;
+	margin: 4em 0 0 0;
+}
+
+img {
+	border: solid 2px #000000;
+	padding: 8px;
+}
+
+h1 {
+	border-bottom: dotted 1px #a0a0a0;
+	color: #337483;
+	font-size: 120%;
+	margin: 2em 0 1em 0;
+}
+
+h2 {
+	color: #f96d17;
+	font-size: 100%;
+	margin: 2em 0 2em 0;
+}
+
+ol {
+	list-style: decimal outside none;
+	margin: 10px 0px 10px 0px;
+}
+
+ul {
+	list-style: disc outside none;
+	margin: 10px 0px 10px 0px;
+}
+
+a:link {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+a:visited {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+a:focus {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+#linkarea {
+	background: #337483;
+	border-bottom: solid 2px #034453;
+	color: #ffffff;
+	font-family: "Lucida Sans", "Tahoma", "Verdana", "Helvetica", "sans-serif";
+	font-size: 100%;
+	padding: 10px 20px 10px 20px;
+}
+
+#linkarea a:link {
+	color: #ffffff;
+	font-weight: normal;
+	text-decoration: none;
+}
+
+#linkarea a:visited {
+	color: #ffffff;
+	font-weight: normal;
+	text-decoration: none;
+}
+
+#linkarea a:focus {
+	color: #ffffff;
+	font-weight: normal;
+	text-decoration: underline;
+}
+
+#linkarea a:hover {
+	color: #ffffff;
+	font-weight: normal;
+	text-decoration: underline;
+}
+
+#jumparea {
+	background: #ffffff;
+	color: #000000;
+	font-family: "Lucida Sans", "Tahoma", "Verdana", "Helvetica", "sans-serif";
+	font-size: 100%;
+	padding: 0px 20px 0px 20px;
+}
+
+#jumparea a:link {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+#jumparea a:visited {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+#jumparea a:focus {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+#jumparea a:hover {
+	color: #555555;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+#mainpage {
+	background: #ffffff;
+	color: #000000;
+	font-family: "Lucida Sans", "Tahoma", "Verdana", "Helvetica", "sans-serif";
+	font-size: 100%;
+	padding: 10px 20px 10px 20px;
+}

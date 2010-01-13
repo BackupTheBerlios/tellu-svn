@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="author" content="Jani Salonen">
+<meta name="distribution" content="global">
+<meta name="robots" content="index,follow">
+<link rel="stylesheet" type="text/css" href="css/default.css" title="default" media="screen">
+<link rel="stylesheet" type="text/css" href="css/print.css" title="print" media="print">
+<title>Tellu Inventory Management</title>
+
+<script type="text/javascript">
+<!--
+
+ function popup(param) {
+  window.open('pics/' + param + '', '', 'toolbar=yes,scrollbars=yes,resizable=yes,height=868,width=1220');
+ }
+
+// -->
+</script>
+</head>
+
+<body>
+
+<div id="linkarea">
+
+<u>Front page</u> | <a href="download.html">Download</a> | <a href="installation.html">Installation</a> | <a href="screenshots.html">Screenshots</a> | <a href="author.html">Author</a> | <a href="license.html">License</a>
+
+</div>
+<div id="jumparea">
+
+<p>Jump to: <a href="#1">Tellu Inventory Management</a> | <a href="#2">Items Collected by the Agent</a> | <a href="#3">Tellu Installation Schema</a></p>
+
+</div>
+<div id="mainpage">
+
+<a name="1"></a><h1><font size="+2">T</font>ELLU <font size="+2">I</font>NVENTORY <font size="+2">M</font>ANAGEMENT</h1>
+
+<p>Tellu inventory management software collects hardware and software information automatically from networked servers and workstations, and stores collected data in <a href="http://mysql.com" target="_blank">MySQL</a> database where data is easily readable using comprehensive <a href="http://en.wikipedia.org/wiki/User_interface" target="_blank">user interface</a> useable by any modern <a href="http://en.wikipedia.org/wiki/Web_browser" target="_blank">web-browser</a>. Devices - like routers and switches, peripherals - like video projectors and displays, service providers - like hosting and maintenance can also be stored in database using web-interface, called <i>Tellu Skin</i>.</p>
+<p>It is also possible to store passwords in database, so for example shared administrator's passwords can be reachable only by admins, confidential information is encrypted using <a href="http://en.wikipedia.org/wiki/Advanced_Encryption_Standard" target="_blank">AES</a>-algorithm when saved in database. Also file attachments can be stored in database, for example driver programs, user guides, installation packages or even whole CD/DVD images of installation discs. Passwords and files can be marked as private when they are accessible only by owner, or public when they are accessible by all Tellu Skin users.</p>
+<p>New <i>Tellu Expression Language</i>, TEL, was introduced along with Tellu release 3. With TEL it is possible to do database operations by writing simple scripts, TEL syntax is very easy to learn, especially for those who already knows some kind of programming language.</p>
+
+<h2>Tellu consists of four parts</h2>
+
+<ol>
+ <li>Agent</li>
+ <ul>
+  <li>inspects the machine where Agent is started, and sends collected data to the Tellu server</li>
+  <li>written in <a href="http://en.wikipedia.org/wiki/C_(programming_language)" target="_blank">C</a>-language</li>
+  <li>supported operating systems where data can be automatically collected;</li>
+  <ul>
+   <li><a href="http://www.freebsd.org" target="_blank">FreeBSD</a></li>
+   <li><a href="http://www.netbsd.org" target="_blank">NetBSD</a></li>
+   <li><a href="http://www.openbsd.org" target="_blank">OpenBSD</a></li>
+   <li>Linux</li>
+   <li>MacOSX</li>
+   <li>Solaris/<a href="http://www.opensolaris.org" target="_blank">OpenSolaris</a></li>
+   <li>Windows&nbsp;(95&nbsp;-&gt;&nbsp;)</li>
+   <li><a href="http://www.winehq.org" target="_blank">Wine</a> (<i>one can use Windows binary under Wine emulator</i>)</li>
+  </ul>
+ </ul>
+
+ <li>Server, includes three different server programs</li>
+ <ul>
+  <li>tellud</li>
+  <ul>
+   <li>receives collected machine data from the Agent and stores data in database</li>
+   <li>keeps track for its own usage, saves error- and informational messages, whose are readable by monitoring client</li>
+   <li>written in <a href="http://en.wikipedia.org/wiki/C_(programming_language)" target="_blank">C</a>-language</li>
+  </ul>
+  <li>telskind</li>
+  <ul>
+   <li>serves user interface</li>
+   <li>handles TEL-commands</li>
+   <li>does database maintenance (<i>cleans expired log items, deletes temporary tags, etc.</i>)</li>
+   <li>keeps track for its own usage, saves error- and informational messages, whose are readable by monitoring client</li>
+   <li>written in <a href="http://en.wikipedia.org/wiki/C_(programming_language)" target="_blank">C</a>-language</li>
+  </ul>
+  <li>telmond</li>
+  <ul>
+   <li>serves monitoring client</li>
+   <li>keeps track for its own usage, saves error- and informational messages, whose are readable by monitoring client</li>
+   <li>written in <a href="http://en.wikipedia.org/wiki/C_(programming_language)" target="_blank">C</a>-language</li>
+  </ul>
+ </ul>
+
+ <li>User interface, called Tellu Skin</li>
+ <ul>
+  <li>user interface using by any modern web-browser</li>
+  <li>all information gathered by the Agent is parsed in comprehensive tables</li>
+  <li>written in <a href="http://en.wikipedia.org/wiki/Perl" target="_blank">Perl</a>-language</li>
+ </ul>
+
+ <li>Monitoring client</li>
+ <ul>
+  <li>Tellu servers can be monitored using graphical, mouse driven monitoring client</li>
+  <li>written in <a href="http://en.wikipedia.org/wiki/C_(programming_language)" target="_blank">C</a>-language top of <a href="http://en.wikipedia.org/wiki/Motif_(widget_toolkit)" target="_blank">Motif</a>/<a href="http://en.wikipedia.org/wiki/X_Window_System" target="_blank">X11</a>-libraries</li>
+ </ul>
+</ol>
+
+<h2>Tellu installation requires</h2>
+
+<ul>
+ <li><a href="http://en.wikipedia.org/wiki/POSIX" target="_blank">POSIX</a> compliant Unix/Linux server machine for <i>tellud</i>, <i>telskind</i> and <i>telmond</i> programs</li>
+ <li><a href="http://mysql.com" target="_blank">MySQL</a> database server for central data storage, either local or remote</li>
+ <li><a href="http://www.apache.org" target="_blank">Apache</a> web server capable of running <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> (<a href="http://en.wikipedia.org/wiki/Perl" target="_blank"><i>Perl</i></a>) scripts for user interface, either in same machine where Tellu server programs runs, or in dedicated server</li>
+ <li>Optionally <a href="http://en.wikipedia.org/wiki/X_Window_System" target="_blank">X11</a>-workstation for monitoring client</li>
+</ul>
+
+<a name="2"></a><h1><font size="+2">I</font>TEMS <font size="+2">C</font>OLLECTED BY THE <font size="+2">A</font>GENT</h1>
+
+<p>Tellu Agent is mainly useable under <b>Linux</b> (<i>which is Tellu's primary development platform</i>) and <b>Windows</b> operating environments, where Agent can collect every item listed below. Other operating environments items collected is more limited, and may or may not include network interfaces for example.</p>
+
+<h2>Item list collected by the Agent</h2>
+
+<ul>
+ <li>host and domain names</li>
+ <li>operating system name, release, hardware platform and distribution package</li>
+ <li>system manufacturer, family, product and system version</li>
+ <li>baseboard manufacturer, product and baseboard version</li>
+ <li>processor count, core count, speed and available cache</li>
+ <li>total, free and cached RAM and swap memory</li>
+ <li>device list and some info for each device</li>
+ <li>network interfaces, their MAC, IP and broadcast addresses, interface's netmask</li>
+ <li>storage node, mountpoint, filesystem type and mount options, capacity and available space</li>
+ <li>installed software, package name, version, size and package's homepage</li>
+ <li>running services and some info for each service process</li>
+ <li>running processes and some info for each process</li>
+ <li>running process and total thread count</li>
+ <li>open TCP ports, port name and description</li>
+ <li>one, five and ten minute load, uptime and idletime</li>
+</ul>
+
+<a name="3"></a><h1><font size="+2">T</font>ELLU <font size="+2">I</font>NSTALLATION <font size="+2">S</font>CHEMA</h1>
+
+<p>Chart for simple installation schema. Although this schema may look a bit complex at first look, Tellu can be installed to follow this schema just in minutes. It is also possible to do a distributed installation, for example to use multiple <i>tellud</i> and <i>telskind</i> servers, one for each continent and/or network cell serving dedicated clients, where all distributed servers connects to the same central database.</p>
+
+<a href="javascript:popup('tellu_chart1.png');"><img src="pics/tellu_chart1t.png" alt=" "></a>
+<p class="small">Chart for simple installation schema,<br />1200x848, 185Kb</p>
+
+<p class="footer">Copyright &copy; 2010, Jani Salonen &lt;jani at lasipalatsi piste fi&gt;. All rights reserved.</p>
+</div>
+
+</body>
+
+</html>

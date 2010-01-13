@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="author" content="Jani Salonen">
+<meta name="distribution" content="global">
+<meta name="robots" content="index,follow">
+<link rel="stylesheet" type="text/css" href="css/default.css" title="default" media="screen">
+<link rel="stylesheet" type="text/css" href="css/print.css" title="print" media="print">
+<title>Tellu Inventory Management - Installation</title>
+
+<script type="text/javascript">
+<!--
+
+ function popup(param) {
+  window.open('pics/' + param + '', '', 'toolbar=yes,scrollbars=yes,resizable=yes,height=868,width=1220');
+ }
+
+// -->
+</script>
+</head>
+
+<body>
+
+<div id="linkarea">
+
+<a href="index.html">Front page</a> | <a href="download.html">Download</a> | <u>Installation</u> | <a href="screenshots.html">Screenshots</a> | <a href="author.html">Author</a> | <a href="license.html">License</a>
+
+</div>
+<div id="jumparea">
+
+<p>Jump to: <a href="#1">Server Installation</a> | <a href="#2">Agent Installation (Unix)</a> | <a href="#3">Agent Installation (Windows)</a> | <a href="#4">Skin Installation</a></p>
+
+</div>
+<div id="mainpage">
+
+<p>It is recommended <i>first</i> to build and install the servers, <i>then</i> build the Agent, and <i>finally</i> install the Skin. Please follow this order, especially if you are a first timer with Tellu. Read this guide carefully and go through each step. You <i>will</i> need some knowledge about Unix basic usage, as well compiling software using <a href="http://www.gnu.org" target="_blank">GNU</a> tools for it.</p>
+
+<a name="1"></a><h1><font size="+2">S</font>ERVER <font size="+2">I</font>NSTALLATION</h1>
+
+<h2>Building the servers</h2>
+
+<p>These prerequisities are mandatory for succesfully building the servers:</p>
+<ul>
+ <li><a href="http://www.mysql.com" target="_blank">MySQL</a> client library and header files</li>
+ <li><a href="http://www.openldap.org" target="_blank">OpenLDAP</a> libraries and header files</li>
+</ul>
+
+<p>and following are optional, you need them only if you want to build <i>telmon</i> (the graphical Tellu server monitoring tool):</p>
+
+<ul>
+ <li><a href="http://www.openmotif.org" target="_blank">Motif</a> libraries and header files</li>
+ <li><a href="http://www.x.org" target="_blank">X Window System</a> libraries and header files</li>
+</ul>
+
+<p>Once you have all required libraries and headers reachable, you can build all server programs and <i>telmon</i> at once with following script seen below, here you need to tune paths to suit your environment:</p>
+
+<pre>
+ tar -zxvf tellu-server-3.0.0.tar.gz
+ cd tellu-server-3.0.0
+
+ for i in telinfo tellud telmon telmond telskind; do
+	(cd $i && ./configure \
+		--prefix=/usr/local \
+		--with-mysql=/opt/mysql \
+		--with-openldap=/opt/openldap \
+		--with-motif=/opt/motif \
+		--with-x11=/usr/X11R6 && \
+		make clean && make && make install ) || exit 1 ;
+ done
+</pre>
+
+<p>If you don't want to use script above, remember that it is VERY important to run `<i>make clean</i>' before `<i>make</i>' and `<i>make install</i>', because there is some common source files shared between servers in `<i>common</i>' directory, and if some common file compiled for one server is linked to another it may cause fatal conflicts. So please always remember `<i>make clean</i>' before `<i>make</i>'.</p>
+
+<p>After succesful build, you can copy `<i>common/tellu.init.d</i>' file to `<i>/etc/init.d/</i>' directory and use that for controlling the servers. <i>tellu.init.d</i> script obeys normal init-script style parameters, like <i>start</i>, <i>stop</i>, <i>restart</i> and <i>status</i>, whose behaviour should be self explainable.</p>
+
+<p>If build fails because of missing dependencies (<i>even when configure script succeeded</i>), you need to tailor <i>Makefile</i> by hand. Makefiles are very simple (<i>less than 40 lines</i>), so editing them should not be too painful.</p>
+
+<h2>Configuring the servers</h2>
+
+<p>Before starting Tellu servers you need to check configuration files, they are located at `<i>PREFIX/etc</i>'. PREFIX is the place which you chose when you installed the servers. For now it is wise to go with default settings, except <a href="http://www.mysql.com" target="_blank">MySQL</a> parameters, which may be necessary to change. So, open `<i>tellud.conf</i>', `<i>telmond.conf</i>' and `<i>telskind.conf</i>' and look for `<i>mysql_</i>' parameters from bottom of each file and change them to suit your environment. Leave `<i>mysql_database</i>', `<i>mysql_username</i>' and `<i>mysql_password</i>' as they are for now. You can also set `<i>ldap_</i>' parameters in `<i>telskind.conf</i>' at this point, if you want to use LDAP authentication in Tellu Skin. More of setting up Skin later.</p>
+
+<h2>The database</h2>
+
+<p>Now initialize Tellu database by <i>cd</i>'ing to the directory where you unpacked Tellu server package and <i>tellu_db.sql</i> file can be find, and by issuing command (<i>$ denotes shell prompt, so don't type it</i>):
+
+<pre>
+ $ tar -zxvf tellu-server-3.0.0.tar.gz
+ $ cd tellu-server-3.0.0
+ $ mysql -h MYSQLHOST -u root -p < tellu_db.sql
+</pre>
+
+<p>and ofcourse replace MYSQLHOST with your <a href="http://www.mysql.com" target="_blank">MySQL</a> host name, and if you like to use some other user for initializing than root, replace user also. If your user does not have a password, you can remove the `<i>-p</i>' switch.</p>
+
+<p>If some reason you need to reinitialize the database, you need to drop Tellu database first before running `<i>mysql</i>' statement again. If you don't, you get all data duplicated in database because `<i>tellu_db.sql</i>' does not remove possibly already existing data.</p>
+
+<h2>Starting the servers</h2>
+
+<p>To fire up the servers, use `<i>tellu.init.d</i>' script which you hopefully copied to <i>`/etc/init.d'</i> directory or whichever is the place in your environment for init scripts:</p>
+
+<pre>
+  $ /etc/init.d/tellu.init.d start
+</pre>
+
+<p>should start all three servers, `<i>tellud</i>', `<i>telmond</i>' and `<i>telskind</i>'. If all went ok, you can proceed to installing Agent and Tellu Skin. In case of troubles, please consult the syslog.</p>
+
+<a name="2"></a><h1><font size="+2">A</font>GENT <font size="+2">I</font>NSTALLATION (UNIX)</h1>
+
+<h2>Building the Unix Agent</h2>
+
+<p>These prerequisities are mandatory for succesfully building the Agent:</p>
+<ul>
+ <li><a href="http://dbus.freedesktop.org" target="_blank">DBus</a> library and header files (<i>version 1.0 or greater</i>)</li>
+ <li><a href="http://hal.freedesktop.org" target="_blank">HAL</a> library and header files (<i>version 0.5 or greater</i>)</li>
+</ul>
+
+<p>Once you have all required libraries and headers reachable, you can build the agent with following commands seen below, here you need to tune paths to suit your environment (<i>$ denotes shell prompt, so don't type it</i>):</p>
+
+<pre>
+ $ ./configure --prefix=/usr/local --with-dbus=/opt/dbus --with-hal=/opt/hal
+ $ make clean
+ $ make
+ $ make install
+</pre>
+
+<p>If build fails because of missing dependencies (<i>even when configure script succeeded</i>), you need to tailor <i>Makefile</i> by hand. Makefile is very simple (<i>less than 40 lines</i>), so editing it should not be too painful. For example, if you are on Solaris, you may need to define some additional libraries `<i>-lsocket -lnsl</i>', in line 16 where all other libraries are defined.</p>
+
+<h2>Configuring the Agent</h2>
+
+<p>Before starting Tellu Agent you need to check the configuration file, `<i>tellu.conf</i>', it is located in `<i>PREFIX/etc</i>'. PREFIX is the place which you chose when you installed the Agent. Parameters which needs modification are at least `<i>tellud_server</i>', `<i>tellud_port</i>' and possibly `<i>domain_override</i>'. Do not touch other parameters yet. Set `<i>tellud_server</i>' parameter to server name where <i>tellud</i> is running, and `<i>tellud_port</i>' to the port which <i>tellud</i> listens (<i>by default this is 1700</i>). If agent is unable to resolve the domain name, you need to set `<i>domain_override</i>' parameter as well. So check the domain name, for example:</p>
+
+<pre>
+ $ domainname
+</pre>
+
+<p>and if command above does not return anything related to domain name, hardcode domain in Agent's configuration. Otherwise you can comment out the whole `<i>domain_override</i>' parameter.</p>
+
+<h2>Starting the Agent</h2>
+
+<p>Now you can start up the Agent:</p>
+
+<pre>
+ $ cd PREFIX/bin
+ $ ./tellu
+</pre>
+
+<p>which collects machine data and sends them to <i>tellud</i> which stores collected data in database. Please check the server's syslog, there should be note about Agent's connection, as well the database is populated with collected machine data. Run Agent on every machine whose data you want to collect, either once or periodically. You can inject Agent in either boot scripts, login scripts, crontab, or whichever is suitable place in your environment.</p>
+
+<a name="3"></a><h1><font size="+2">A</font>GENT <font size="+2">I</font>NSTALLATION (WINDOWS)</h1>
+
+<h2>Building the Windows Agent</h2>
+
+<p>Ready to run executable Agent is located in `<i>tellu-agent-windows-3.0.0/Release</i>' directory after uncompressing the `<i>tellu-agent-windows-3.0.0.tar.gz</i>' package. There are some free tools to unpack <i>.tar.gz</i> packages, for example <a href="http://www.7-zip.org" target="_blank">7-Zip</a> and <a href="http://www.powerarchiver.com" target="_blank">PowerArchiver</a>. Agent is compiled using <b>Visual Studio 9</b>, which only create executables for <b>Windows 2000</b> and later. If you need to run Agent on <b>Windows 95</b>/<b>98</b> and/or <b>NT</b> machines, you need to compile Agent by yourself. I will not provide detailed compiling instructions here, because I cannot possibly know which kind of compiler you use. Basically Agent should be compilable using some earlier <b>Visual Studio</b> version, which will produce executable binary for your needs.</p>
+
+<h2>Configuring the Agent</h2>
+
+<p>Before starting Tellu Agent you need to check the configuration file, `<i>tellu.conf</i>', it is located in `<i>tellu-agent-windows-3.0.0/Release</i>' directory. It is normal <a href="http://en.wikipedia.org/wiki/ASCII" target="_blank">ASCII</a>-text file, so you can use <i>Notepad</i> for example to modify it. Parameters which needs modification are at least `<i>tellud_server</i>', `<i>tellud_port</i>' and possibly `<i>domain_override</i>'. Do not touch other parameters yet. Set `<i>tellud_server</i>' parameter to server name where <i>tellud</i> is running, and `<i>tellud_port</i>' to the port which <i>tellud</i> listens (<i>by default this is 1700</i>). If agent is unable to resolve the domain name, you need to set `<i>domain_override</i>' parameter as well.</p>
+
+<h2>Starting the Agent</h2>
+
+<p>Now you can start up the Agent in `<i>tellu-agent-windows-3.0.0/Release</i>' directory by double clicking it. If you don't see any error dialogs after couple of seconds, Agent has successfully collected machine data and sent them to Tellu server. You can open <i>Task Manager</i> to ensure that Agent has vanished from the task list and terminated its operation. Run Agent on every machine whose data you want to collect, either once or periodically. You can inject Agent in login scripts, create scheduled at-job, or whatever is suitable mechanism to run Agent in your environment.</p>
+
+<a name="4"></a><h1><font size="+2">S</font>KIN <font size="+2">I</font>NSTALLATION</h1>
+
+<p>Please use supplied installer script, found in `<i>tellu-skin-3.0.0.tar.gz</i>' package after unpacking it.</p>
+
+<pre>
+ $ tar -zxvf tellu-skin-3.0.0.tar.gz
+ $ cd tellu-skin-3.0.0
+ $ ./install.sh
+</pre>
+
+<p>Script installs the Skin after couple of questions about how Skin should be installed in your environment. Here you probably need to be root for succesfully install the Skin. You should have CGI (<i>Perl</i>) capable <a href="http://www.apache.org" target="_blank">Apache</a> installed already in same machine where you are about to install Skin.</p>
+
+<p class="footer">Copyright &copy; 2010, Jani Salonen &lt;jani at lasipalatsi piste fi&gt;. All rights reserved.</p>
+</div>
+
+</body>
+
+</html>
