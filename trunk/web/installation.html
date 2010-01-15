@@ -164,6 +164,8 @@
 
 <a name="4"></a><h1><font size="+2">S</font>KIN <font size="+2">I</font>NSTALLATION</h1>
 
+<h2>Installing the Skin</h2>
+
 <p>Please use supplied installer script, found in `<i>tellu-skin-3.0.0.tar.gz</i>' package after unpacking it.</p>
 
 <pre>
@@ -172,7 +174,35 @@
  $ ./install.sh
 </pre>
 
-<p>Script installs the Skin after couple of questions about how Skin should be installed in your environment. Here you probably need to be root for succesfully install the Skin. You should have CGI (<i>Perl</i>) capable <a href="http://www.apache.org" target="_blank">Apache</a> installed already in same machine where you are about to install Skin.</p>
+<p>Script installs the Skin after couple of questions about how Skin should be installed in your environment. Here you probably need to be root for succesfully install the Skin. You should have <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> (<i><a href="http://en.wikipedia.org/wiki/Perl" target="_blank">Perl</a></i>) capable <a href="http://www.apache.org" target="_blank">Apache</a> installed already in same machine where you are about to install Skin.</p>
+
+<h2>Finetuning the Skin</h2>
+
+<p>To finetune some of the Skin's variables, open up the `<i>PREFIX/cgi-bin/variables.lib</i>' file using some text editor. Safely modifeable variables are listed below. Do <b>NOT</b> touch any other variables, especially if you don't know what for they exists! If you do, you broke the Skin installation and Skin becomes in unusable state.</p>
+
+<ul>
+ <li><b>$CONFIG_DEBUG</b>, enable or disable debug mode. Do not enable in production use.<br /><i>Parameter type: Boolean</i></li>
+ <li><b>$CONFIG_MAXPOST</b>, maximum size for file uploads in Megabytes.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$CONFIG_SERVER_NAME</b>, telskind server name.<br /><i>Parameter type: String, host name</i></li>
+ <li><b>$CONFIG_SERVER_PORT</b>, telskind server port.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$CONFIG_SERVER_PASSWORD</b>, telskind password. Must match `<i>agent_password</i>' parameter in `<i>telskind.conf</i>' file.<br /><i>Parameter type: String, password</i></li>
+ <li><b>$DIR_TEMPLATE</b>, directory for <a href="http://en.wikipedia.org/wiki/HTML" target="_blank">HTML</a> page templates.<br /><i>Parameter type: String, directory</i></li>
+ <li><b>$DIR_UPLOAD</b>, directory for file uploads.<br /><i>Parameter type: String, directory</i></li>
+ <li><b>$HTML_CHARSET</b>, charset to use for <a href="http://en.wikipedia.org/wiki/HTML" target="_blank">HTML</a> pages.<br /><i>Parameter type: String, charset</i></li>
+ <li><b>$HTML_CONTYPE</b>, content type for <a href="http://en.wikipedia.org/wiki/HTML" target="_blank">HTML</a> pages. Do not change in production use.<br /><i>Parameter type: String, content type</i></li>
+ <li><b>$HTMLAREA_COLUMNS</b>, columns for textarea fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLAREA_ROWS</b>, rows for textarea fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLLIST_SIZE</b>, rows for select lists.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLPWD_MAXLENGTH</b>, maximum amount of characters in password fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLPWD_SIZE</b>, length of password fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLRADIO_COLUMNS</b>, columns for radiobutton groups.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLTEXT_MAXLENGTH</b>, maximum amount of characters in text fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLTEXT_SIZE</b>, length of text fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLTICKS_COLUMNS</b>, columns for checkbox groups.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLUPLOAD_MAXLENGTH</b>, maximum amount of characters in file upload fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$HTMLUPLOAD_SIZE</b>, length of file upload fields.<br /><i>Parameter type: Integer</i></li>
+ <li><b>$WINDOW_TITLE</b>, initial window title for <a href="http://en.wikipedia.org/wiki/HTML" target="_blank">HTML</a> pages. For example, you can insert your organization name here.<br /><i>Parameter type: String, window title</i></li>
+</ul>
 
 <p class="footer">Copyright &copy; 2010, Jani Salonen &lt;jani at lasipalatsi piste fi&gt;. All rights reserved.</p>
 </div>
