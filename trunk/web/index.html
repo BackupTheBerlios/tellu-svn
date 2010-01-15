@@ -103,11 +103,30 @@
 
 <h2>Tellu installation requires</h2>
 
+<p>Generally building Tellu servers and Agent for Unix/Linux needs <a href="http://www.gnu.org" target="_blank">GNU</a> <a href="http://gcc.gnu.org" target="_blank">gcc</a>, <a href="http://www.gnu.org/software/binutils" target="_blank">binutils</a>, <a href="http://www.gnu.org/software/make" target="_blank">make</a>, <a href="http://www.gnu.org/software/autoconf" target="_blank">autoconf</a> and possibly some other standard <a href="http://www.gnu.org" target="_blank">GNU</a> tools for compiling software for Unix/Linux systems. For building Agent on <b>Windows</b>, you need <b>Visual Studio</b> or some other <a href="http://en.wikipedia.org/wiki/C_(programming_language)" target="_blank">C</a>-compiler and a <b>Windows SDK</b>. Precompiled binary for <b>Windows 2000</b> and above is provided, so compiling Agent on <b>Windows</b> is not necessary.</p>
+<p>General requirements:</p>
+
 <ul>
- <li><a href="http://en.wikipedia.org/wiki/POSIX" target="_blank">POSIX</a> compliant Unix/Linux server machine for <i>tellud</i>, <i>telskind</i> and <i>telmond</i> programs</li>
  <li><a href="http://mysql.com" target="_blank">MySQL</a> database server for central data storage, either local or remote</li>
- <li><a href="http://www.apache.org" target="_blank">Apache</a> web server capable of running <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> (<a href="http://en.wikipedia.org/wiki/Perl" target="_blank"><i>Perl</i></a>) scripts for user interface, either in same machine where Tellu server programs runs, or in dedicated server</li>
- <li>Optionally <a href="http://en.wikipedia.org/wiki/X_Window_System" target="_blank">X11</a>-workstation for monitoring client</li>
+ <li><a href="http://www.apache.org" target="_blank">Apache</a> web server capable of running <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> (<a href="http://en.wikipedia.org/wiki/Perl" target="_blank"><i>Perl</i></a>) scripts for user interface, either in same machine where Tellu server programs runs, or in dedicated server<br />More detailed dependencies:</li>
+ <ul>
+  <li><a href="http://en.wikipedia.org/wiki/Perl" target="_blank">Perl</a> compiler with <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> and <a href="http://en.wikipedia.org/wiki/Internet_socket" target="_blank">Socket</a> modules</li>
+ </ul>
+ <li><a href="http://en.wikipedia.org/wiki/POSIX" target="_blank">POSIX</a> compliant Unix/Linux server machine for <i>tellud</i>, <i>telskind</i> and <i>telmond</i> server programs<br />More detailed dependencies:</li>
+ <ul>
+  <li><a href="http://www.mysql.com" target="_blank">MySQL</a> client library and header files</li>
+  <li><a href="http://www.openldap.org" target="_blank">OpenLDAP</a> libraries and header files</li>
+ </ul>
+ <li>Unix/Linux/Windows network for Agent to collect data<br />More detailed dependencies for Unix/Linux:</li>
+ <ul>
+  <li><a href="http://dbus.freedesktop.org" target="_blank">DBus</a> library and header files (<i>version 1.0 or greater</i>)</li>
+  <li><a href="http://hal.freedesktop.org" target="_blank">HAL</a> library and header files (<i>version 0.5 or greater</i>)</li>
+ </ul>
+ <li>Optionally <a href="http://en.wikipedia.org/wiki/X_Window_System" target="_blank">X11</a>-workstation for monitoring client<br />More detailed dependencies:</li>
+ <ul>
+  <li><a href="http://www.openmotif.org" target="_blank">Motif</a> libraries and header files</li>
+  <li><a href="http://www.x.org" target="_blank">X Window System</a> libraries and header files</li>
+ </ul>
 </ul>
 
 <a name="2"></a><h1><font size="+2">I</font>TEMS <font size="+2">C</font>OLLECTED BY THE <font size="+2">A</font>GENT</h1>
