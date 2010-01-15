@@ -25,8 +25,8 @@ $CONFIG_SERVER_PASSWORD = "secret";
 $DATA_ARRAYS_COUNT = 11;
 $DATA_POINTER_SIZE = 8;
 
-$DIR_TEMPLATE = "/var/www/templates";
-$DIR_UPLOAD = "/var/www/files";
+$DIR_TEMPLATE = "/home/salojan/tellu/trunk/skin/templates";
+$DIR_UPLOAD = "/home/salojan/tellu/trunk/skin/files";
 
 $ERROR_NOERROR = 1;
 $ERROR_SLIGHT = 2;
@@ -71,7 +71,7 @@ $SESSION_ERR = "";
 $SESSION_CID = "";
 $SESSION_UID = "";
 
-$WINDOW_TITLE = "Tellu Skin";
+$WINDOW_TITLE = "Tellu";
 
 %SESSION_CACHE = ();
 

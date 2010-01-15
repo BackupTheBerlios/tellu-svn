@@ -43,7 +43,7 @@ if($q->param('uid')) {
 }
 else {
 	&tableAccessSlice();
-	&formAccessLogin({ message => "Enter your account details below to login to " . $WINDOW_TITLE });
+	&formAccessLogin({ message => "Enter your account details below to login" });
 
 	&htmlPage({ template => "login", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 }
