@@ -13710,19 +13710,19 @@ INSERT INTO skin_misc (class, value, place, title) VALUES('popup_size', '1200x12
 INSERT INTO skin_misc (class, value, place, title) VALUES('popup_size', '1600x1600', '21', 'Square, 1600 x 1600');
 INSERT INTO skin_misc (class, value, place, title) VALUES('popup_size', '1920x1920', '22', 'Square, 1920 x 1920');
 INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '1', '1', 'None/unknown');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '2', '2', 'Lifetime');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '3', '3', 'One month or less');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '4', '4', 'Two months');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '5', '5', 'Three months');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '6', '6', 'Four months');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '7', '7', 'Five months');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '8', '8', 'Six months');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '9', '9', 'One year');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '10', '10', 'Two years');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '11', '11', 'Three years');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '12', '12', 'Four years');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '13', '13', 'Five years');
-INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '14', '14', 'Ten years or more');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '2', '2', 'One month or less');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '3', '3', 'Two months');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '4', '4', 'Three months');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '5', '5', 'Four months');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '6', '6', 'Five months');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '7', '7', 'Six months');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '8', '8', 'One year');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '9', '9', 'Two years');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '10', '10', 'Three years');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '11', '11', 'Four years');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '12', '12', 'Five years');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '13', '13', 'Ten years or more');
+INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '14', '14', 'Lifetime');
 
 CREATE TABLE tellu3.skin_passwords (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# password id
