@@ -84,7 +84,7 @@ a:hover {
 	background: #337483;
 	border-bottom: solid 2px #034453;
 	color: #ffffff;
-	font-family: "Lucida Sans", "Tahoma", "Verdana", "Helvetica", "sans-serif";
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-size: 100%;
 	padding: 10px 20px 10px 20px;
 }
@@ -116,7 +116,7 @@ a:hover {
 #jumparea {
 	background: #ffffff;
 	color: #000000;
-	font-family: "Lucida Sans", "Tahoma", "Verdana", "Helvetica", "sans-serif";
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-size: 100%;
 	padding: 0px 20px 0px 20px;
 }
@@ -148,7 +148,7 @@ a:hover {
 #mainpage {
 	background: #ffffff;
 	color: #000000;
-	font-family: "Lucida Sans", "Tahoma", "Verdana", "Helvetica", "sans-serif";
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-size: 100%;
 	padding: 10px 20px 10px 20px;
 }
