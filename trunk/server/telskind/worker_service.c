@@ -1202,7 +1202,7 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICE_ID ", " TABLECOL_SERVICE_MAP_PERIPHERAL_ID ") (SELECT '%s', " TABLECOL_DEVICE_ID " FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " = '0')%c",
+						"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICE_ID ", " TABLECOL_SERVICE_MAP_PERIPHERAL_ID ") (SELECT '%s', " TABLECOL_PERIPHERAL_ID " FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " = '0')%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
@@ -1283,7 +1283,7 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"DELETE FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s' AND " TABLECOL_SERVICE_MAP_PERIPHERAL_ID " IN (SELECT " TABLECOL_DEVICE_ID " FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " = '0')%c",
+						"DELETE FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s' AND " TABLECOL_SERVICE_MAP_PERIPHERAL_ID " IN (SELECT " TABLECOL_PERIPHERAL_ID " FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " = '0')%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);

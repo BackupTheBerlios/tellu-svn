@@ -54,7 +54,10 @@ char *newFile(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -118,7 +121,13 @@ char *attachFile(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -134,7 +143,13 @@ char *attachDomainFile(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -147,7 +162,13 @@ char *attachDomainFile(struct threadInfo * ti) {
 char *attachGlobalFile(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -163,7 +184,13 @@ char *removeFile(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -179,7 +206,13 @@ char *removeDomainFile(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -192,7 +225,13 @@ char *removeDomainFile(struct threadInfo * ti) {
 char *removeGlobalFile(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -203,12 +242,15 @@ char *removeGlobalFile(struct threadInfo * ti) {
 }
 
 char *attachedFile(struct threadInfo * ti) {
-	if((ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	if(((ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) &&
 	(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0)) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0)) ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -419,94 +461,286 @@ char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 				break;
 			case 7:
 				// Attach file to requested item
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_NODE_ID ") VALUES('%s', '%s')%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc4Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_MACHINE_ID ") VALUES('%s', '%s')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_PERIPHERAL) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_PERIPHERALS_ID ") VALUES('%s', '%s')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_DEVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_DEVICES_ID ") VALUES('%s', '%s')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 8:
 				// Remove file from requested item
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_NODE_ID " = '%s'%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc4Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_MACHINE_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_PERIPHERAL) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_PERIPHERALS_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_DEVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_DEVICES_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 9:
 				// Get files attached in item
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLECOL_FILES_MAP_FILE_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_NODE_ID " = '%s'%c",
-					ti->commandInfo.esc4Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FILES_MAP_FILE_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_MACHINE_ID " = '%s'%c",
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_PERIPHERAL) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FILES_MAP_FILE_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_PERIPHERALS_ID " = '%s'%c",
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_DEVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FILES_MAP_FILE_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_DEVICES_ID " = '%s'%c",
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 10:
 				// Get items attached in file
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLECOL_FILES_MAP_NODE_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s'%c",
-					ti->commandInfo.esc2Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FILES_MAP_MACHINE_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_PERIPHERAL) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FILES_MAP_PERIPHERALS_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_DEVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FILES_MAP_DEVICES_ID " FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 11:
 				// Attach file to requested domain
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_NODE_ID ") (SELECT '%s', " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc4Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_MACHINE_ID ") (SELECT '%s', " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 12:
 				// Attach file globally
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_NODE_ID ") (SELECT '%s', " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DISPOSED " = '0')%c",
-					ti->commandInfo.esc2Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_MACHINE_ID ") (SELECT '%s', " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_PERIPHERAL) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_PERIPHERALS_ID ") (SELECT '%s', " TABLECOL_PERIPHERAL_ID " FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_DEVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILE_ID ", " TABLECOL_FILES_MAP_DEVICES_ID ") (SELECT '%s', " TABLECOL_DEVICE_ID " FROM " TABLE_DEVICE " WHERE " TABLECOL_DEVICE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 13:
 				// Remove file from requested domain
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_NODE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc4Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 14:
 				// Remove file globally
-				snprintf(
-					ti->commandInfo.statBuffer,
-					ti->commandInfo.s,
-					"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_NODE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DISPOSED " = '0')%c",
-					ti->commandInfo.esc2Buffer,
-					0
-				);
+				if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_MACHINE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_PERIPHERAL) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_PERIPHERALS_ID " IN (SELECT " TABLECOL_PERIPHERAL_ID " FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FILES_MAP_DEVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_FILE_ID " = '%s' AND " TABLECOL_FILES_MAP_DEVICES_ID " IN (SELECT " TABLECOL_DEVICE_ID " FROM " TABLE_DEVICE " WHERE " TABLECOL_DEVICE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT '" APPLICATION_NAME " " APPLICATION_VERSION " (c) " APPLICATION_YEAR " " APPLICATION_COPYRIGHT "'%c",
+						0
+					);
+				}
 
 				break;
 			case 15:
