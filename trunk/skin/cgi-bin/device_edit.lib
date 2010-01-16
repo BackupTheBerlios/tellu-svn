@@ -519,48 +519,48 @@ sub editDeviceNode {
 			}
 			elsif($q->param('verb') eq "attpwd") {
 				if($q->param('where') && $q->param('where') eq "global") {
-					@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "" });
+					@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "device" });
 
 					$PAGE .= "<p class=\"info\">Password is attached to all devices globally.</p>";
 				}
 				else {
-					@r = &sendCommand({ command => "attachPassword", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+					@r = &sendCommand({ command => "attachPassword", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "device" });
 
 					$PAGE .= "<p class=\"info\">Password is attached to " . $s[7] . " " . $s[5] . ".</p>";
 				}
 			}
 			elsif($q->param('verb') eq "rempwd") {
 				if($q->param('where') && $q->param('where') eq "global") {
-					@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "" });
+					@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "device" });
 
 					$PAGE .= "<p class=\"info\">Password is detached from all devices globally.</p>";
 				}
 				else {
-					@r = &sendCommand({ command => "removePassword", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+					@r = &sendCommand({ command => "removePassword", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "device" });
 
 					$PAGE .= "<p class=\"info\">Password is detached from " . $s[7] . " " . $s[5] . ".</p>";
 				}
 			}
 			elsif($q->param('verb') eq "attatt") {
 				if($q->param('where') && $q->param('where') eq "global") {
-					@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "" });
+					@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "device" });
 
 					$PAGE .= "<p class=\"info\">Attachment is attached to all devices globally.</p>";
 				}
 				else {
-					@r = &sendCommand({ command => "attachFile", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+					@r = &sendCommand({ command => "attachFile", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "device" });
 
 					$PAGE .= "<p class=\"info\">Attachment is attached to " . $s[7] . " " . $s[5] . ".</p>";
 				}
 			}
 			elsif($q->param('verb') eq "rematt") {
 				if($q->param('where') && $q->param('where') eq "global") {
-					@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "" });
+					@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "device" });
 
 					$PAGE .= "<p class=\"info\">Attachment is detached from all devices globally.</p>";
 				}
 				else {
-					@r = &sendCommand({ command => "removeFile", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+					@r = &sendCommand({ command => "removeFile", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "device" });
 
 					$PAGE .= "<p class=\"info\">Attachment is detached fom " . $s[7] . " " . $s[5] . ".</p>";
 				}
@@ -1621,7 +1621,7 @@ sub editDeviceNode {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-				@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $arg->{node}, option => "" });
+				@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $arg->{node}, option => "device" });
 
 				if(checkError({ packet => \@r }) == 0) {
 					my %l = ();
@@ -1787,7 +1787,7 @@ sub editDeviceNode {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-				@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $arg->{node}, option => "" });
+				@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $arg->{node}, option => "device" });
 
 				if(checkError({ packet => \@r }) == 0) {
 					my %l = ();

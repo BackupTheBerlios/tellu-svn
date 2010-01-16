@@ -124,68 +124,68 @@ sub editMachineNode {
 				}
 				elsif($q->param('verb') eq "attpwd") {
 					if($q->param('where') && $q->param('where') eq "global") {
-						@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "" });
+						@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Password is attached to all machines globally.</p>";
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
-						@r = &sendCommand({ command => "attachDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+						@r = &sendCommand({ command => "attachDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Password is attached to all machines in " . $arg->{domain} . ".</p>";
 					}
 					else {
-						@r = &sendCommand({ command => "attachPassword", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+						@r = &sendCommand({ command => "attachPassword", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Password is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
 					}
 				}
 				elsif($q->param('verb') eq "rempwd") {
 					if($q->param('where') && $q->param('where') eq "global") {
-						@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "" });
+						@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Password is detached from all machines globally.</p>";
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
-						@r = &sendCommand({ command => "removeDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+						@r = &sendCommand({ command => "removeDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Password is detached from all machines in " . $arg->{domain} . ".</p>";
 					}
 					else {
-						@r = &sendCommand({ command => "removePassword", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+						@r = &sendCommand({ command => "removePassword", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Password is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
 					}
 				}
 				elsif($q->param('verb') eq "attatt") {
 					if($q->param('where') && $q->param('where') eq "global") {
-						@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "" });
+						@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Attachment is attached to all machines globally.</p>";
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
-						@r = &sendCommand({ command => "attachDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+						@r = &sendCommand({ command => "attachDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Attachment is attached to all machines in " . $arg->{domain} . ".</p>";
 					}
 					else {
-						@r = &sendCommand({ command => "attachFile", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+						@r = &sendCommand({ command => "attachFile", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Attachment is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
 					}
 				}
 				elsif($q->param('verb') eq "rematt") {
 					if($q->param('where') && $q->param('where') eq "global") {
-						@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "" });
+						@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Attachment is detached from all machines globally.</p>";
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
-						@r = &sendCommand({ command => "removeDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
+						@r = &sendCommand({ command => "removeDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Attachment is detached from all machines in " . $arg->{domain} . ".</p>";
 					}
 					else {
-						@r = &sendCommand({ command => "removeFile", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
+						@r = &sendCommand({ command => "removeFile", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
 						$PAGE .= "<p class=\"info\">Attachment is detached fom " . $arg->{node} . "." . $arg->{domain} . ".</p>";
 					}
@@ -963,7 +963,7 @@ sub editMachineNode {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-				@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "" });
+				@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "machine" });
 
 				if(checkError({ packet => \@r }) == 0) {
 					my %l = ();
@@ -1129,7 +1129,7 @@ sub editMachineNode {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-				@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "" });
+				@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "machine" });
 
 				if(checkError({ packet => \@r }) == 0) {
 					my %l = ();

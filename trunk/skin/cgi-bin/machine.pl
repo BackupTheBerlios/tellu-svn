@@ -198,7 +198,7 @@ elsif($q->param('slice')) {
 					if(checkError({ packet => \@r }) == 0) {
 						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-						@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "" });
+						@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "machine" });
 
 						if(checkError({ packet => \@r }) == 0) {
 							@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -231,7 +231,7 @@ elsif($q->param('slice')) {
 					if(checkError({ packet => \@r }) == 0) {
 						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-						@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "" });
+						@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "machine" });
 
 						if(checkError({ packet => \@r }) == 0) {
 							@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -372,7 +372,7 @@ elsif($q->param('machineNode')) {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "" });
+					@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "machine" });
 
 					if(checkError({ packet => \@r }) == 0) {
 						@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -405,7 +405,7 @@ elsif($q->param('machineNode')) {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "" });
+					@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "machine" });
 
 					if(checkError({ packet => \@r }) == 0) {
 						@s = split(/$ITEM_DELIMITER/, $r[3]);

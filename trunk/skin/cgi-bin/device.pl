@@ -125,7 +125,7 @@ elsif($q->param('slice')) {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "" });
+					@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $n, option => "device" });
 
 					if(checkError({ packet => \@r }) == 0) {
 						@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -158,7 +158,7 @@ elsif($q->param('slice')) {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "" });
+					@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $n, option => "device" });
 
 					if(checkError({ packet => \@r }) == 0) {
 						@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -182,19 +182,23 @@ elsif($q->param('slice')) {
 				@r = &sendCommand({ command => "pullDevice", item => $n, domain => "", param => "", option => "" });
 
 				if(checkError({ packet => \@r }) == 0) {
-					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
-
-					&tableDeviceDetailSlice();
-
-					if($s[5] && $s[5] ne "" && $s[6] && $s[6] ne "" && $s[7] && $s[7] ne "") {
-						$t .= $s[7] . " " . $s[5] . " (" . $s[6] . ")";
-					}
-
-					if($s[27] && $s[27] ne "" && $s[27] ne "(null)") {
-						$u .= $s[27];
-					}
-
 					&tableDeviceDetail({ data => $r[3], slice => $q->param('slice'), sort => $q->param('sort'), order => $q->param('order') });
+				}
+			}
+
+			@r = &sendCommand({ command => "pullDevice", item => $n, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				&tableDeviceDetailSlice();
+
+				if($s[5] && $s[5] ne "" && $s[6] && $s[6] ne "" && $s[7] && $s[7] ne "") {
+					$t .= $s[7] . " " . $s[5] . " (" . $s[6] . ")";
+				}
+
+				if($s[27] && $s[27] ne "" && $s[27] ne "(null)") {
+					$u .= $s[27];
 				}
 			}
 
@@ -268,7 +272,7 @@ elsif($q->param('deviceNode')) {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $s[0], option => "" });
+					@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $q->param('deviceNode'), option => "device" });
 
 					if(checkError({ packet => \@r }) == 0) {
 						@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -301,7 +305,7 @@ elsif($q->param('deviceNode')) {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $s[0], option => "" });
+					@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $q->param('deviceNode'), option => "device" });
 
 					if(checkError({ packet => \@r }) == 0) {
 						@s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -325,19 +329,23 @@ elsif($q->param('deviceNode')) {
 				@r = &sendCommand({ command => "pullDevice", item => $q->param('deviceNode'), domain => "", param => "", option => "" });
 
 				if(checkError({ packet => \@r }) == 0) {
-					my @s = split(/$ITEM_SEPARATOR/, $r[3]);
-
-					&tableDeviceDetailSlice();
-
-					if($s[5] && $s[5] ne "" && $s[6] && $s[6] ne "" && $s[7] && $s[7] ne "") {
-						$t .= $s[7] . " " . $s[5] . " (" . $s[6] . ")";
-					}
-
-					if($s[27] && $s[27] ne "" && $s[27] ne "(null)") {
-						$u .= $s[27];
-					}
-
 					&tableDeviceDetail({ data => $r[3], slice => $s, sort => $q->param('sort'), order => $q->param('order') });
+				}
+			}
+
+			@r = &sendCommand({ command => "pullDevice", item => $q->param('deviceNode'), domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				&tableDeviceDetailSlice();
+
+				if($s[5] && $s[5] ne "" && $s[6] && $s[6] ne "" && $s[7] && $s[7] ne "") {
+					$t .= $s[7] . " " . $s[5] . " (" . $s[6] . ")";
+				}
+
+				if($s[27] && $s[27] ne "" && $s[27] ne "(null)") {
+					$u .= $s[27];
 				}
 			}
 
