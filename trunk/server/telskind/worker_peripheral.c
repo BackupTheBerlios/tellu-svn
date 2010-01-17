@@ -41,10 +41,7 @@ char *newPeripheral(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);

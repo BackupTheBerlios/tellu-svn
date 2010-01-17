@@ -524,7 +524,7 @@ int mysqlSession(char *thisCookie, char *thisUid, int thisCookieLength, int this
 
 	db->e = -1;
 
-	if(thisUid == NULL || thisUid[0] == 0 || thisCookie == NULL || thisCookie[0] == 0) {
+	if(thisUid == NULL || thisUid[0] == 0 || thisUidLength == 0 || thisCookie == NULL || thisCookie[0] == 0 || thisCookieLength == 0) {
 		return(db->e);
 	}
 
@@ -592,7 +592,7 @@ int mysqlSession(char *thisCookie, char *thisUid, int thisCookieLength, int this
 int mysqlPermission(int thisLevel, char *thisUid, char *thisItem, char *thisDomain, int thisUidLength, int thisItemLength, int thisDomainLength, struct threadStorageInfo * db) {
 	db->e = -1;
 
-	if(thisUid == NULL || thisUid[0] == 0) {
+	if(thisUid == NULL || thisUid[0] == 0 || thisUidLength == 0) {
 		return(db->e);
 	}
 

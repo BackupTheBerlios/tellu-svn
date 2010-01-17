@@ -54,10 +54,7 @@ char *newPassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -159,10 +156,7 @@ char *attachPassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -181,10 +175,7 @@ char *attachDomainPassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -200,10 +191,7 @@ char *attachGlobalPassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -222,10 +210,7 @@ char *removePassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -244,10 +229,7 @@ char *removeDomainPassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -263,10 +245,7 @@ char *removeGlobalPassword(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);

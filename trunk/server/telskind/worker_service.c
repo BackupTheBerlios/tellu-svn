@@ -54,10 +54,7 @@ char *pullProvider(struct threadInfo * ti) {
 char *newService(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -73,10 +70,7 @@ char *newProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -223,10 +217,7 @@ char *attachProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -245,10 +236,7 @@ char *attachDomainProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -264,10 +252,7 @@ char *attachGlobalProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -286,10 +271,7 @@ char *removeProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -308,10 +290,7 @@ char *removeDomainProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -327,10 +306,7 @@ char *removeGlobalProvider(struct threadInfo * ti) {
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_UID].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
