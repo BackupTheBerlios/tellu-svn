@@ -116,7 +116,7 @@
  <li><a href="http://hal.freedesktop.org" target="_blank">HAL</a> library and header files (<i>version 0.5 or greater</i>)</li>
 </ul>
 
-<p>Once you have all required libraries and headers reachable, you can build the agent with following commands seen below, here you need to tune paths to suit your environment (<i>$ denotes shell prompt, so don't type it</i>):</p>
+<p>Once you have all required libraries and headers reachable, you can build the agent with following commands seen below, here you need to tune paths to suit your environment (<i>$ denotes shell prompt, so don't type it</i>). If you are using some common Linux distribution for example, setting `<i>/usr</i>' as a parameter for all those `<i>--with-*</i>' switches is probably enough.</p>
 
 <pre>
  $ ./configure --prefix=/usr/local --with-dbus=/opt/dbus --with-hal=/opt/hal
@@ -175,6 +175,50 @@
 </pre>
 
 <p>Script installs the Skin after couple of questions about how Skin should be installed in your environment. Here you probably need to be root for succesfully install the Skin. You should have <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> (<i><a href="http://en.wikipedia.org/wiki/Perl" target="_blank">Perl</a></i>) capable <a href="http://www.apache.org" target="_blank">Apache</a> installed already in same machine where you are about to install Skin.</p>
+
+<h2>Configuring the Skin</h2>
+
+<p>Skin needs modifications in your <a href="http://www.apache.org" target="_blank">Apache</a> configuration in order Skin to work. Generally you need to set `<i>PREFIX/html</i>' as <i>DocumentRoot</i>, and `<i>PREFIX/cgi-bin</i>' as <i>ScriptAlias</i>. Take a look this example below, you can use this template to create new virtualhost for Tellu Skin. Replace those PREFIX'es to the path where you installed the Skin.</p>
+
+<pre>
+ &lt;VirtualHost *:80&gt;
+	ServerName tellu
+	ServerAlias tellu.some.org
+	ServerAdmin serveradmin@some.org
+
+	DocumentRoot <b>PREFIX</b>/html/
+
+	&lt;Directory /&gt;
+		Options FollowSymLinks
+		AllowOverride None
+	&lt;/Directory&gt;
+
+	&lt;Directory "<b>PREFIX</b>/html"&gt;
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		allow from all
+	&lt;/Directory&gt;
+
+	ScriptAlias /cgi-bin/ <b>PREFIX</b>/cgi-bin/
+
+	&lt;Directory "<b>PREFIX</b>/cgi-bin"&gt;
+		AllowOverride None
+		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		Order allow,deny
+		Allow from all
+	&lt;/Directory&gt;
+ &lt;/VirtualHost&gt;
+</pre>
+
+<h2>Logging for first time in the Skin</h2>
+
+<p>First time you log into Skin, use credentials below:</p>
+
+<pre>
+ Username: admin
+ Password: admin
+</pre>
 
 <h2>Finetuning the Skin</h2>
 
