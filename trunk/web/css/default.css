@@ -21,7 +21,7 @@ p.small {
 }
 
 p.footer {
-	border-top: dotted 1px #a0a0a0;
+	border-top: 1px dotted #a0a0a0;
 	font-size: 70%;
 	font-style: italic;
 	line-height: 1.5;
@@ -29,12 +29,12 @@ p.footer {
 }
 
 img {
-	border: solid 2px #000000;
+	border: 2px solid #000000;
 	padding: 8px;
 }
 
 h1 {
-	border-bottom: dotted 1px #a0a0a0;
+	border-bottom: 1px dotted #a0a0a0;
 	color: #337483;
 	font-size: 120%;
 	margin: 2em 0 1em 0;
@@ -82,7 +82,7 @@ a:hover {
 
 #linkarea {
 	background: #337483;
-	border-bottom: solid 2px #034453;
+	border-bottom: 2px solid #034453;
 	color: #ffffff;
 	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-size: 100%;
