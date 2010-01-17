@@ -105,9 +105,20 @@ sub editPersonalFile {
 		}
 
 		my @i = ('public', 'descr', 'note');
+		my @r = ();
 
 		foreach my $i (@i) {
-			my @r = &sendCommand({ command => "pushFile", item => $q->param('name'), domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+			@r = &sendCommand({ command => "pushFile", item => $q->param('name'), domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to update attachment.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+
+				last;
+			}
 		}
 
 		$PAGE .= "<p class=\"info\">File '" . $q->param('name') . "' is updated.</p>";
@@ -639,6 +650,16 @@ sub editPersonalPwds {
 
 			foreach my $i (@i) {
 				@r = &sendCommand({ command => "pushPassword", item => $q->param('name'), domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to update password.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
 			}
 
 			if($q->param('password') ne "" || $q->param('password2') ne "" || $q->param('key') ne "" || $q->param('key2') ne "") {
@@ -672,7 +693,16 @@ sub editPersonalPwds {
 		else {
 			@r = &sendCommand({ command => "deletePassword", item => $q->param('name'), domain => "", param => "", option => "" });
 
-			$PAGE .= "<p class=\"info\">Password '" . $q->param('name') . "' is deleted.</p>";
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to delete password.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+			else {
+				$PAGE .= "<p class=\"info\">Password '" . $q->param('name') . "' is deleted.</p>";
+			}
 		}
 	}
 

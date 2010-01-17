@@ -24,170 +24,440 @@ sub editMachineNode {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "attachGlobalDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
 
-						$PAGE .= "<p class=\"info\">Device is attached to all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach device.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Device is attached to all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "attachDomainDevice", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
 
-						$PAGE .= "<p class=\"info\">Device is attached to all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach device.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Device is attached to all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "attachDevice", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
 
-						$PAGE .= "<p class=\"info\">Device is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach device.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Device is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "remdev") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "removeGlobalDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
 
-						$PAGE .= "<p class=\"info\">Device is detached from all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach device.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Device is detached from all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "removeDomainDevice", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
 
-						$PAGE .= "<p class=\"info\">Device is detached from all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach device.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Device is detached from all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "removeDevice", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
 
-						$PAGE .= "<p class=\"info\">Device is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach device.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Device is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "attper") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "attachGlobalPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
 
-						$PAGE .= "<p class=\"info\">Peripheral is attached to all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Peripheral is attached to all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "attachDomainPeripheral", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
 
-						$PAGE .= "<p class=\"info\">Peripheral is attached to all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Peripheral is attached to all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "attachPeripheral", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
 
-						$PAGE .= "<p class=\"info\">Peripheral is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Peripheral is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "remper") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "removeGlobalPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
 
-						$PAGE .= "<p class=\"info\">Peripheral is detached from all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Peripheral is detached from all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "removeDomainPeripheral", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "" });
 
-						$PAGE .= "<p class=\"info\">Peripheral is detached from all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Peripheral is detached from all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "removePeripheral", item => $q->param('attr'), domain => "", param => $s[0], option => "" });
 
-						$PAGE .= "<p class=\"info\">Peripheral is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Peripheral is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "attser") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "attachGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Service is attached to all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Service is attached to all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "attachDomainProvider", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Service is attached to all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Service is attached to all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "attachProvider", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Service is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Service is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "remser") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "removeGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Service is detached from all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Service is detached from all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "removeDomainProvider", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Service is detached from all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Service is detached from all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "removeProvider", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Service is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Service is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "attpwd") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Password is attached to all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach password.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Password is attached to all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "attachDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Password is attached to all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach password.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Password is attached to all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "attachPassword", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Password is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach password.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Password is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "rempwd") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Password is detached from all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach password.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Password is detached from all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "removeDomainPassword", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Password is detached from all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach password.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Password is detached from all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "removePassword", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Password is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach password.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Password is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "attatt") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Attachment is attached to all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach attachment.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Attachment is attached to all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "attachDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Attachment is attached to all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach attachment.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Attachment is attached to all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "attachFile", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Attachment is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to attach attachment.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Attachment is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "rematt") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Attachment is detached from all machines globally.</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach attachment.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Attachment is detached from all machines globally.</p>";
+						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
 						@r = &sendCommand({ command => "removeDomainFile", item => $q->param('attr'), domain => "", param => $arg->{domain}, option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Attachment is detached from all machines in " . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach attachment.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Attachment is detached from all machines in " . $arg->{domain} . ".</p>";
+						}
 					}
 					else {
 						@r = &sendCommand({ command => "removeFile", item => $q->param('attr'), domain => "", param => $s[0], option => "machine" });
 
-						$PAGE .= "<p class=\"info\">Attachment is detached fom " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to detach attachment.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+						}
+						else {
+							$PAGE .= "<p class=\"info\">Attachment is detached fom " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+						}
 					}
 				}
 				elsif($q->param('verb') eq "ping") {
@@ -245,6 +515,16 @@ sub editMachineNode {
 
 		foreach my $i (@i) {
 			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to update machine.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+
+				last;
+			}
 		}
 
 		$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . " is updated.</p>";
@@ -253,7 +533,16 @@ sub editMachineNode {
 	if($q->param('disposed') == 1) {
 		my @r = &sendCommand({ command => "deleteMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
 
-		$PAGE .= $arg->{node} . "." . $arg->{domain} . " is disposed.</p>";
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . " is disposed.</p>";
+		}
 	}
 	else {
 		if(!$q->param('leaf') || $q->param('leaf') == 0) {
@@ -1379,6 +1668,14 @@ sub editMachineNote {
 			$w .= cleanHtml({ string => $q->param('note') });
 
 			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => "note", option => $w });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
 		}
 	}
 

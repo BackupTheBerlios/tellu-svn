@@ -14,12 +14,30 @@ sub editDisposedMachineNode {
 	if($q->param('restore') == 1) {
 		my @r = &sendCommand({ command => "restoreDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
 
-		$PAGE .= $arg->{node} . "." . $arg->{domain} . " is restored.</p>";
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to restore " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= $arg->{node} . "." . $arg->{domain} . " is restored.</p>";
+		}
 	}
 	elsif($q->param('disposed') == 2) {
 		my @r = &sendCommand({ command => "deleteDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
 
-		$PAGE .= $arg->{node} . "." . $arg->{domain} . " is disposed permanently.</p>";
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= $arg->{node} . "." . $arg->{domain} . " is disposed permanently.</p>";
+		}
 	}
 	else {
 		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
