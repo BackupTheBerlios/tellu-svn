@@ -3,7 +3,13 @@ table a:link {
 	text-decoration: none;
 }
 
-table a:hover, a:focus {
+table a:focus {
+	background: #2580a2;
+	color: #f0f0f0;
+	text-decoration: none;
+}
+
+table a:hover {
 	background: #2580a2;
 	color: #f0f0f0;
 	text-decoration: none;

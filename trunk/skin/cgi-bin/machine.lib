@@ -15,7 +15,7 @@ require "prefs.lib";
 sub menuMachineDomain {
 	my ($arg) = @_;
 
-	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
+	my @r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @o = ();
@@ -32,11 +32,11 @@ sub menuMachineDomain {
 				$l{$e} = $e;
 			}
 
-			$t[1] = $q->optgroup( -name => "Domains", -values => \@o, -class => "header" );
+			$t[1] = $q->optgroup( -name => "Domains", -values => \@o, -labels => \%l, -class => "header" );
 
 			$PAGE .= &htmlFormBegin({ name => "domainsForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "machineDomain", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "machineDomain", value => \@t, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -68,7 +68,7 @@ sub menuMachineDomain {
 sub menuDMachineDomain {
 	my ($arg) = @_;
 
-	@r = &sendCommand({ command => "listDisposedMachine", item => "", domain => "", param => "domain", option => "" });
+	my @r = &sendCommand({ command => "listDisposedMachine", item => "", domain => "", param => "domain", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @o = ();
@@ -85,11 +85,11 @@ sub menuDMachineDomain {
 				$l{$e} = $e;
 			}
 
-			$t[1] = $q->optgroup( -name => "Domains", -values => \@o, -class => "header" );
+			$t[1] = $q->optgroup( -name => "Domains", -values => \@o, -labels => \%l, -class => "header" );
 
 			$PAGE .= &htmlFormBegin({ name => "domainsDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "machineDomain", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "machineDomain", value => \@t, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -121,7 +121,7 @@ sub menuDMachineDomain {
 sub menuMachineNode {
 	my ($arg) = @_;
 
-	@r = &sendCommand({ command => "listMachine", item => "", domain => $arg->{domain}, param => "node,node_id", option => "" });
+	my @r = &sendCommand({ command => "listMachine", item => "", domain => $arg->{domain}, param => "node,node_id", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @o = ();
@@ -138,11 +138,11 @@ sub menuMachineNode {
 				$l{$node} = $node;
 			}
 
-			$t[1] = $q->optgroup( -name => "Nodes", -values => \@o, -class => "header" );
+			$t[1] = $q->optgroup( -name => "Nodes", -values => \@o, -labels => \%l, -class => "header" );
 
 			$PAGE .= &htmlFormBegin({ name => "nodesForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "machineNode", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "machineNode", value => \@t, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -174,7 +174,7 @@ sub menuMachineNode {
 sub menuDMachineNode {
 	my ($arg) = @_;
 
-	@r = &sendCommand({ command => "listDisposedMachine", item => "", domain => $arg->{domain}, param => "node,node_id", option => "" });
+	my @r = &sendCommand({ command => "listDisposedMachine", item => "", domain => $arg->{domain}, param => "node,node_id", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @o = ();
@@ -191,11 +191,11 @@ sub menuDMachineNode {
 				$l{$node} = $node;
 			}
 
-			$t[1] = $q->optgroup( -name => "Nodes", -values => \@o, -class => "header" );
+			$t[1] = $q->optgroup( -name => "Nodes", -values => \@o, -labels => \%l, -class => "header" );
 
 			$PAGE .= &htmlFormBegin({ name => "nodesDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "machineNode", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "machineNode", value => \@t, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -780,7 +780,7 @@ sub tableMachineDetails {
 					my $r = &tableMachineClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 					if(!$r || $r eq "") {
-						$PAGE .= "&nbsp;";
+						$PAGE .= "n/a";
 					}
 					else {
 						$PAGE .= $r;
@@ -821,7 +821,7 @@ sub tableMachineListing {
 	$pr = "";
 
 	if($arg->{slice} eq "security") {
-		my $t = "Host,Serial number,Security number,Location";
+		my $t = "Node,Serial number,Security number,Location";
 		my $m = "21,0,0,0";
 
 		my @j = ();
@@ -838,7 +838,7 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
-		my $t = "Host,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
+		my $t = "Node,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
 		my $m = "21,9,18,20,0,17,20";
 
 		my @j = ();
@@ -855,7 +855,7 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Host,Acquired,Warranty";
+		my $t = "Node,Acquired,Warranty";
 		my $m = "21,20,19";
 
 		my @j = ();
@@ -872,7 +872,7 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "addinfo") {
-		my $t = "Host,Additional information,Description";
+		my $t = "Node,Additional information,Description";
 		my $m = "21,0,0";
 
 		my @j = ();
@@ -889,7 +889,7 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "fle" || $arg->{slice} eq "files") {
-		my $t = "Host,Owner,Name,Filename,Size,Public,Description,Additional information";
+		my $t = "Node,Owner,Name,Filename,Size,Public,Description,Additional information";
 		my $m = "21,0,0,14,3,9,0,0";
 
 		my @j = ();
@@ -907,91 +907,91 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "pwd" || $arg->{slice} eq "passwds") {
-		my $t = "Host,Owner,Name,Service,Username,Password,Public,Description,Additional information";
+		my $t = "Node,Owner,Name,Service,Username,Password,Public,Description,Additional information";
 		my $m = "21,0,0,0,0,8,9,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "cpu") {
-		my $t = "Host,Processors,Cores,Siblings,Speed,Cache,MIPS";
+		my $t = "Node,Processors,Cores,Siblings,Speed,Cache,MIPS";
 		my $m = "21,12,12,13,11,3,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "daemon") {
-		my $t = "Host,Command,Name,State,PID,PPID,Threads,VMdata,VMexe,VMhwm,VMlib,VMpeak,VMpte,VMrss,VMsize,VMstk,RChar,WChar,Syscr,Syscw,RByte,WByte,UID,GID";
+		my $t = "Node,Command,Name,State,PID,PPID,Threads,VMdata,VMexe,VMhwm,VMlib,VMpeak,VMpte,VMrss,VMsize,VMstk,RChar,WChar,Syscr,Syscw,RByte,WByte,UID,GID";
 		my $m = "21,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "dev") {
-		my $t = "Host,Category,Product,Subsystem,Capabilities,Vendor,Parameters";
+		my $t = "Node,Category,Product,Subsystem,Capabilities,Vendor,Parameters";
 		my $m = "21,100,0,0,16,0,15";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "disk") {
-		my $t = "Host,Device,Path,Type,Options,Capacity,Available,Serial";
+		my $t = "Node,Device,Path,Type,Options,Capacity,Available,Serial";
 		my $m = "21,0,0,0,2,103,3,7";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "mem") {
-		my $t = "Host,Total RAM,Available RAM,Total swap,Available swap,Buffered RAM,Cached RAM";
+		my $t = "Node,Total RAM,Available RAM,Total swap,Available swap,Buffered RAM,Cached RAM";
 		my $m = "21,3,3,3,3,3,3";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "nic") {
-		my $t = "Host,Interface,Address,Broadcast,Netmask,MAC";
+		my $t = "Node,Interface,Address,Broadcast,Netmask,MAC";
 		my $m = "21,0,0,0,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "node") {
-		my $t = "Host,System,Release,Distribution,Platform,Model";
+		my $t = "Node,System,Release,Distribution,Platform,Model";
 		my $m = "21,0,0,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "system") {
-		my $t = "Host,Baseboard manufacturer,Baseboard product,Baseboard version,System family,System manufacturer,System product,System version";
+		my $t = "Node,Baseboard manufacturer,Baseboard product,Baseboard version,System family,System manufacturer,System product,System version";
 		my $m = "21,0,0,0,0,0,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "port") {
-		my $t = "Host,TCP";
+		my $t = "Node,TCP";
 		my $m = "21,5";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "run") {
-		my $t = "Host,Processes,Threads";
+		my $t = "Node,Processes,Threads";
 		my $m = "21,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "proc") {
-		my $t = "Host,Command,Name,State,PID,PPID,Threads,VMdata,VMexe,VMhwm,VMlib,VMpeak,VMpte,VMrss,VMsize,VMstk,RChar,WChar,Syscr,Syscw,RByte,WByte,UID,GID";
+		my $t = "Node,Command,Name,State,PID,PPID,Threads,VMdata,VMexe,VMhwm,VMlib,VMpeak,VMpte,VMrss,VMsize,VMstk,RChar,WChar,Syscr,Syscw,RByte,WByte,UID,GID";
 		my $m = "21,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "software") {
-		my $t = "Host,Class,Name,Version,Size,URL";
+		my $t = "Node,Class,Name,Version,Size,URL";
 		my $m = "21,4,0,0,3,1";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "user") {
-		my $t = "Host,UID,Primary group,Real name,Home directory";
+		my $t = "Node,UID,Primary group,Real name,Home directory";
 		my $m = "21,0,0,0,0";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "util") {
-		my $t = "Host,One minute load,Five minute load,Ten minute load,Uptime,Idletime";
+		my $t = "Node,One minute load,Five minute load,Ten minute load,Uptime,Idletime";
 		my $m = "21,0,0,0,6,6";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
@@ -1136,7 +1136,7 @@ sub tableMachineListings {
 						my $u = &tableMachineClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 						if(!$u || $u eq "") {
-							$PAGE .= "&nbsp;";
+							$PAGE .= "n/a";
 						}
 						else {
 							$PAGE .= $u;

@@ -108,6 +108,41 @@ elsif($q->param('slice')) {
 			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
 		}
 	}
+	elsif($n eq "Device listing") {
+		if(&menuDevice({ select => $n }) == 0) {
+			&tableDeviceListingSlice();
+
+			if($q->param('slice') eq "dev") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "model,category,manufacturer,size,memory,connection", option => "" });
+			}
+			elsif($q->param('slice') eq "net") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "netsupport,ipaddress", option => "" });
+			}
+			elsif($q->param('slice') eq "security") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "sernum,secnum,location", option => "" });
+			}
+			elsif($q->param('slice') eq "repair") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "iis,esd,dosd,mosd,totrepairs,lastrepair", option => "" });
+			}
+			elsif($q->param('slice') eq "warranty") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "acquired,warranty", option => "" });
+			}
+			elsif($q->param('slice') eq "add") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "addinfo,descr,note", option => "" });
+			}
+
+			if(checkError({ packet => \@r }) == 0) {
+				&tableDeviceListing({ data => $r[3], slice => $q->param('slice'), sort => $q->param('sort'), order => $q->param('order') });
+			}
+
+			$c[0] = &headCookieSet({ name => "tellu_device_slice", value => $q->param('slice') });
+
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $n, script => &deviceListingFuncs(), header => $n, content => $PAGE, slices => $MENU, cookie => \@c });
+		}
+		else {
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
+		}
+	}
 	else {
 		#
 		# Create device selection menu and display requested device data
@@ -250,6 +285,45 @@ elsif($q->param('deviceNode')) {
 			$c[0] = &headCookieSet({ name => "tellu_device_node", value => $q->param('deviceNode') });
 
 			&htmlPage({ title => $WINDOW_TITLE . " - " . $q->param('deviceNode'), script => "", header => $q->param('deviceNode'), content => $PAGE, slices => $MENU, cookie => \@c });
+		}
+		else {
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
+		}
+	}
+	elsif($q->param('deviceNode') eq "Device listing") {
+		if(&menuDevice({ select => $q->param('deviceNode') }) == 0) {
+			&tableDeviceListingSlice();
+
+			if(!$s || $s eq "") {
+				$s = "dev";
+			}
+
+			if($s eq "dev") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "model,category,manufacturer,size,memory,connection", option => "" });
+			}
+			elsif($s eq "net") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "netsupport,ipaddress", option => "" });
+			}
+			elsif($s eq "security") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "sernum,secnum,location", option => "" });
+			}
+			elsif($s eq "repair") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "iis,esd,dosd,mosd,totrepairs,lastrepair", option => "" });
+			}
+			elsif($s eq "warranty") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "acquired,warranty", option => "" });
+			}
+			elsif($s eq "add") {
+				@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "addinfo,descr,note", option => "" });
+			}
+
+			if(checkError({ packet => \@r }) == 0) {
+				&tableDeviceListing({ data => $r[3], slice => $s, sort => $q->param('sort'), order => $q->param('order') });
+			}
+
+			$c[0] = &headCookieSet({ name => "tellu_device_node", value => $q->param('deviceNode') });
+
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $q->param('deviceNode'), script => &deviceListingFuncs(), header => $q->param('deviceNode'), content => $PAGE, slices => $MENU, cookie => \@c });
 		}
 		else {
 			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });

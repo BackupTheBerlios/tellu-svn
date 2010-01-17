@@ -8,6 +8,18 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
+sub deviceListingFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "function popupDevice(dev, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('device_popup.pl?dev=' +dev+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
 sub deviceModifyFuncs {
 	my ($arg) = @_;
 

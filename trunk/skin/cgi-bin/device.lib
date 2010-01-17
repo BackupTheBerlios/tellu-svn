@@ -10,30 +10,33 @@ if($pack eq "" && $f eq "" && $line eq "") {
 
 require "chest.lib";
 require "network.lib";
+require "prefs.lib";
 
 sub menuDevice {
 	my ($arg) = @_;
 
-	@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+	my @r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
+		my @o = ();
 		my @t = ();
 		my %l = ();
 
 		if($r[3] && $r[3] ne "") {
+			$t[0] = $q->optgroup( -name => "Device Groups", -values => [ "Device summary", "Device listing" ], -class => "header" );
+
 			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
 				my @s = split(/$ITEM_SEPARATOR/, $e);
 
-				push @t, $s[0];
+				push @o, $s[0];
 				$l{$s[0]} = $s[1] . " " . $s[2] . " (" . $s[3] . ")";
 			}
 
-			unshift(@t, "Device summary");
-			$l{"Device summary"} = "Device summary";
+			$t[1] = $q->optgroup( -name => "Devices", -values => \@o, -labels => \%l, -class => "header" );
 
 			$PAGE .= &htmlFormBegin({ name => "devicesForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "deviceNode", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "deviceNode", value => \@t, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -65,22 +68,24 @@ sub menuDevice {
 sub menuDDevice {
 	my ($arg) = @_;
 
-	@r = &sendCommand({ command => "listDisposedDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+	my @r = &sendCommand({ command => "listDisposedDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
+		my @o = ();
 		my @t = ();
 		my %l = ();
 
 		if($r[3] && $r[3] ne "") {
+			$t[0] = $q->optgroup( -name => "Device Groups", -values => [ "Device summary", "Device listing" ], -class => "header" );
+
 			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
 				my @s = split(/$ITEM_SEPARATOR/, $e);
 
-				push @t, $s[0];
+				push @o, $s[0];
 				$l{$s[0]} = $s[1] . " " . $s[2] . " (" . $s[3] . ")";
 			}
 
-			unshift(@t, "Device summary");
-			$l{"Device summary"} = "Device summary";
+			$t[1] = $q->optgroup( -name => "Devices", -values => \@o, -labels => \%l, -class => "header" );
 
 			$PAGE .= &htmlFormBegin({ name => "devicesDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -457,7 +462,7 @@ sub tableDeviceDetails {
 					my $r = &tableDeviceClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
 
 					if(!$r || $r eq "") {
-						$PAGE .= "&nbsp;";
+						$PAGE .= "n/a";
 					}
 					else {
 						$PAGE .= $r;
@@ -468,6 +473,221 @@ sub tableDeviceDetails {
 			}
 
 			$PAGE .= "</tr>";
+		}
+	}
+	else {
+		my $ev = 0;
+
+		$PAGE .= "<tr class=\"top\">";
+
+		foreach my $t (@t) {
+			if($ev == 0) {
+				$PAGE .= "<td class=\"c1\">n/a</td>";
+			}
+			else {
+				$PAGE .= "<td class=\"c2\">n/a</td>";
+			}
+
+			$ev ^= 1;
+		}
+
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "</table>";
+}
+
+sub tableDeviceListing {
+	my ($arg) = @_;
+
+	if($arg->{slice} eq "dev") {
+		my $t = "Device,Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "11,0,0,0,0,10,5";
+
+		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "net") {
+		my $t = "Device,Network support,IP address";
+		my $m = "11,3,0";
+
+		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "security") {
+		my $t = "Device,Serial number,Security number,Location";
+		my $m = "11,0,0,0";
+
+		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "repair") {
+		my $t = "Device,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
+		my $m = "11,3,7,9,0,6,9";
+
+		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "warranty") {
+		my $t = "Device,Acquired,Warranty";
+		my $m = "11,9,8";
+
+		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "add") {
+		my $t = "Device,Additional information,Description";
+		my $m = "11,0,0";
+
+		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+}
+
+sub tableDeviceListings {
+	my ($arg) = @_;
+
+	my @t = split(/,/, $arg->{title});
+	my @m = split(/,/, $arg->{modifier});
+
+	#
+	# Create table header
+	#
+
+	$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
+	$PAGE .= "<tr class=\"top\">";
+
+	my $i = 0;
+
+	foreach my $t (@t) {
+		if($i < 1) {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"#\">" . $t . "</a></td>";
+
+			$i++;
+		}
+		else {
+			if(!$arg->{order} || $arg->{order} eq "a") {
+				$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=d" . "\">" . $t . "</a></td>";
+			}
+			else {
+				$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=a" . "\">" . $t . "</a></td>";
+			}
+		}
+	}
+
+	$PAGE .= "</tr>";
+
+	#
+	# Display and sort items in requested order
+	#
+
+	my @i = split(/$ITEM_DELIMITER/, $arg->{data});
+
+	if($arg->{sort}) {
+		my @k = ();
+
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+			my $t = $j[0];
+
+			$j[0] = $j[$arg->{sort}];
+
+			push @j, $t;
+			push @k, join($ITEM_SEPARATOR, @j);
+		}
+
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			@i = sort { uc($a) cmp uc($b) } @k;
+		}
+		else {
+			@i = sort { uc($b) cmp uc($a) } @k;
+		}
+
+		@k = ();
+
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+
+			$j[0] = pop(@j);
+
+			push @k, join($ITEM_SEPARATOR, @j);
+		}
+
+		@i = @k;
+	}
+
+	if(@i) {
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+			my $id = shift(@j);
+
+			if(!$id || $id == 0 || $id eq "" || $id eq "(null)") {
+				my $ev = 0;
+
+				$PAGE .= "<tr class=\"top\">";
+
+				foreach my $t (@t) {
+					if($ev == 0) {
+						$PAGE .= "<td class=\"c1\">n/a</td>";
+					}
+					else {
+						$PAGE .= "<td class=\"c2\">n/a</td>";
+					}
+
+					$ev ^= 1;
+				}
+
+				$PAGE .= "</tr>";
+
+				last;
+			}
+
+			my $nd = "";
+			my $ev = 0;
+
+			if($SESSION_CACHE{"node" . $id} && $SESSION_CACHE{"node" . $id} ne "") {
+				$nd = $SESSION_CACHE{"node" . $id};
+			}
+			else {
+				my @r = &sendCommand({ command => "pullDevice", item => $id, domain => "", param => "name", option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					@r = split(/$ITEM_SEPARATOR/, $r[3]);
+
+					$nd = $id . "|" . $r[7] . " " . $r[5] . " (" . $r[6] . ")";
+
+					$SESSION_CACHE{"node" . $id} = $nd;
+				}
+			}
+
+			if($nd ne "") {
+				unshift(@j, $nd);
+
+				$PAGE .= "<tr class=\"top\">";
+
+				for(my $k = 0; $k < @t; $k++) {
+					if($ev == 0) {
+						$PAGE .= "<td class=\"c1\">";
+					}
+					else {
+						$PAGE .= "<td class=\"c2\">";
+					}
+
+					$ev ^= 1;
+
+					if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
+						$PAGE .= "n/a";
+					}
+					else {
+						my $u = &tableDeviceClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
+
+						if(!$u || $u eq "") {
+							$PAGE .= "n/a";
+						}
+						else {
+							$PAGE .= $u;
+						}
+					}
+
+					$PAGE .= "</td>";
+				}
+
+				$PAGE .= "</tr>";
+			}
 		}
 	}
 	else {
@@ -720,11 +940,47 @@ sub tableDeviceClean {
 			$r = "n/a";
 		}
 	}
+	elsif($arg->{flag} == 11) {
+		my @p = ();
+
+		if($SESSION_CACHE{"popup"} && $SESSION_CACHE{"popup"} ne "") {
+			@p = split(/,/, $SESSION_CACHE{"popup"}, 2);
+		}
+		else {
+			@p = split(/,/, &prefsPopup(), 2);
+
+			$SESSION_CACHE{"popup"} = $p[0] . "," . $p[1];
+		}
+
+		my @n = split(/\|/, $arg->{item}, 2);
+
+		$r = "<a href=\"javascript:popupDevice('" . $n[0] . "', '" . $arg->{slice} . "', '" . $p[0] . "', '" . $p[1] . "');\" style=\"color: #000000;\">" . $n[1] . "</a>";
+	}
 
 	return $r;
 }
 
 sub tableDeviceBriefSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/device.png\"></td>";
+	$MENU .= "<td class=\"c3\">Active<br />devices</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Device</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
+	$MENU .= "</ul>";
+}
+
+sub tableDeviceListingSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
