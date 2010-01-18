@@ -437,10 +437,10 @@ sub editDeviceNew {
 sub editDeviceNode {
 	my ($arg) = @_;
 
-	my @l = ('Device data', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments');
+	my @l = ('Device info', 'Service info', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments');
 
 	if($q->param('verb')) {
-		@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+		@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
 			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -805,7 +805,7 @@ sub editDeviceNode {
 			if($q->param('acq_day') && $q->param('acq_day') ne "" && $q->param('acq_month') && $q->param('acq_month') ne "" && $q->param('acq_year') && $q->param('acq_year') ne "") {
 				my $ac = $q->param('acq_year') . "-" . $q->param('acq_month') . "-" . $q->param('acq_day') . " 00:00:00";
 
-				@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => 'acquired', option => $ac });
+				@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => "acquired", option => $ac });
 			}
 
 			foreach my $i (@i) {
@@ -823,6 +823,61 @@ sub editDeviceNode {
 			}
 
 			$PAGE .= "<p class=\"info\">Device " . $ca . " '" . $ma . "/" . $mo . "' is updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "service") {
+		my @r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			if($q->param('iis') && $q->param('iis') == 1) {
+				my @i = ('iis', 'esd', 'mosd');
+
+				if($q->param('dosd_day') && $q->param('dosd_day') ne "" && $q->param('dosd_month') && $q->param('dosd_month') ne "" && $q->param('dosd_year') && $q->param('dosd_year') ne "") {
+					my $ac = $q->param('dosd_year') . "-" . $q->param('dosd_month') . "-" . $q->param('dosd_day') . " 00:00:00";
+
+					@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => "dosd", option => $ac });
+					@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => "lastrepair", option => $ac });
+				}
+
+				$s[20]++;
+
+				@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => "totrepairs", option => $s[20] });
+
+				foreach my $i (@i) {
+					@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to update device.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+			}
+			else {
+				my @i = ('iis', 'esd', 'dosd', 'mosd');
+
+				foreach my $i (@i) {
+					@r = sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => $i, option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to update device.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Device " . $s[6] . " '" . $s[7] . "/" . $s[5] . "' is updated.</p>";
 		}
 	}
 
@@ -1003,7 +1058,7 @@ sub editDeviceNode {
 
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -1215,6 +1270,157 @@ sub editDeviceNode {
 			$PAGE .= &htmlFormEnd();
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 1) {
+			my @es = ();
+			my @oa = ();
+			my %el = ();
+			my %ol = ();
+
+			my @od = ();
+			my @oy = ();
+
+			my ($nw, $nm, $nd, $nt, $ny) = split(/\s+/, localtime(time()), 5);
+			my $j = 0;
+
+			for(my $i = 1; $i < 32; $i++) {
+				$od[$j++] = $i;
+			}
+
+			$j = 0;
+
+			for(my $i = ($ny - 10); $i < ($ny + 2); $i++) {
+				$oy[$j++] = $i;
+			}
+
+			my @r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "esd", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @es, $p;
+					$el{$p} = $m;
+				}
+			}
+
+			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @oa, $p;
+					$ol{$p} = $m;
+				}
+			}
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=service", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				$s[19] = cleanNull({ string => $s[19] });
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Service status:</td>";
+
+				if($s[16] != 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "iis", label => "Device is in service?", value => 1, select => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "iis", label => "Device is in service?", value => 1 }) . "</td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Estimated service duration:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "esd", value => \@es, label => \%el, select => $s[17] })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Date of service delivery:</td>";
+
+				$s[18] =~ s/\s+.*//;
+				$s[18] =~ s/\-//go;
+
+				my ($my, $mm, $md) = (int(substr($s[18], 0, 4)), int(substr($s[18], 4, 2)), int(substr($s[18], 6, 2)));
+
+				if($my == 0 && $mm == 0 && $md == 0) {
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $nd });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $nm });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $ny })  . "</td>";
+				}
+				else {
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $md });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $mm });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $my })  . "</td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Method of service delivery:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "mosd", value => $s[19], style => "text" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "service" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 2) {
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attdev", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -1307,7 +1513,7 @@ sub editDeviceNode {
 			$PAGE .= "<p>&nbsp;</p>";
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -1381,7 +1587,7 @@ sub editDeviceNode {
 
 			$PAGE .= &htmlFormEnd();
 		}
-		elsif($q->param('leaf') && $q->param('leaf') == 2) {
+		elsif($q->param('leaf') && $q->param('leaf') == 3) {
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attper", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -1473,7 +1679,7 @@ sub editDeviceNode {
 			$PAGE .= "<p>&nbsp;</p>";
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -1547,7 +1753,7 @@ sub editDeviceNode {
 
 			$PAGE .= &htmlFormEnd();
 		}
-		elsif($q->param('leaf') && $q->param('leaf') == 3) {
+		elsif($q->param('leaf') && $q->param('leaf') == 4) {
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attser", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -1639,7 +1845,7 @@ sub editDeviceNode {
 			$PAGE .= "<p>&nbsp;</p>";
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -1713,7 +1919,7 @@ sub editDeviceNode {
 
 			$PAGE .= &htmlFormEnd();
 		}
-		elsif($q->param('leaf') && $q->param('leaf') == 4) {
+		elsif($q->param('leaf') && $q->param('leaf') == 5) {
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attpwd", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -1805,7 +2011,7 @@ sub editDeviceNode {
 			$PAGE .= "<p>&nbsp;</p>";
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -1879,7 +2085,7 @@ sub editDeviceNode {
 
 			$PAGE .= &htmlFormEnd();
 		}
-		elsif($q->param('leaf') && $q->param('leaf') == 5) {
+		elsif($q->param('leaf') && $q->param('leaf') == 6) {
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attatt", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -1971,7 +2177,7 @@ sub editDeviceNode {
 			$PAGE .= "<p>&nbsp;</p>";
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+			@r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -2097,7 +2303,7 @@ sub editDeviceNote {
 
 		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-		my @r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "node", option => "" });
+		my @r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
 			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
