@@ -37,6 +37,24 @@
 <div id="mainpage">
 
 <p>It is recommended <i>first</i> to build and install the servers, <i>then</i> build the Agent, and <i>finally</i> install the Skin. Please follow this order, especially if you are a first timer with Tellu. Read this guide carefully and go through each step. You <i>will</i> need some knowledge about Unix basic usage, as well compiling software using <a href="http://www.gnu.org" target="_blank">GNU</a> tools for it.</p>
+<p>Easiest way to get Tellu installed is to install everything on same machine. So for easiest and simpliest installation model you need one server machine with:</p>
+
+<ul>
+ <li><a href="http://en.wikipedia.org/wiki/POSIX" target="_blank">POSIX</a> compliant Unix/Linux operating system</li>
+ <li><a href="http://www.gnu.org" target="_blank">GNU</a> C-compiler (<i><a href="http://gcc.gnu.org" target="_blank">gcc</a></i>) and other standard build-tools (<i>like <a href="http://www.gnu.org/software/binutils" target="_blank">binutils</a>, <a href="http://www.gnu.org/software/make" target="_blank">make</a>, etc.</i>)</li>
+ <li><a href="http://www.apache.org" target="_blank">Apache</a> web server capable of running <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> (<a href="http://en.wikipedia.org/wiki/Perl" target="_blank"><i>Perl</i></a>) scripts</li>
+ <li><a href="http://www.mysql.com" target="_blank">MySQL</a> server up and running</li>
+ <li><a href="http://www.mysql.com" target="_blank">MySQL</a> client library and header files</li>
+ <li><a href="http://www.openldap.org" target="_blank">OpenLDAP</a> libraries and header files</li>
+ <li><a href="http://en.wikipedia.org/wiki/Perl" target="_blank">Perl</a> compiler with <a href="http://en.wikipedia.org/wiki/Common_Gateway_Interface" target="_blank">CGI</a> and <a href="http://en.wikipedia.org/wiki/Internet_socket" target="_blank">Socket</a> modules (<i>they come with <a href="http://en.wikipedia.org/wiki/Perl" target="_blank">Perl</a></i>)</li>
+</ul>
+
+<p>and following are optional, you need them only if you want to build <i>telmon</i> (<i>the graphical Tellu server monitoring tool</i>):</p>
+
+<ul>
+ <li><a href="http://www.openmotif.org" target="_blank">Motif</a> libraries and header files</li>
+ <li><a href="http://www.x.org" target="_blank">X Window System</a> libraries and header files</li>
+</ul>
 
 <a name="1"></a><h1><font size="+2">S</font>ERVER <font size="+2">I</font>NSTALLATION</h1>
 
@@ -48,7 +66,7 @@
  <li><a href="http://www.openldap.org" target="_blank">OpenLDAP</a> libraries and header files</li>
 </ul>
 
-<p>and following are optional, you need them only if you want to build <i>telmon</i> (the graphical Tellu server monitoring tool):</p>
+<p>and following are optional, you need them only if you want to build <i>telmon</i> (<i>the graphical Tellu server monitoring tool</i>):</p>
 
 <ul>
  <li><a href="http://www.openmotif.org" target="_blank">Motif</a> libraries and header files</li>
