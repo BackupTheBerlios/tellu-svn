@@ -11,6 +11,7 @@ if($pack eq "" && $f eq "" && $line eq "") {
 require "chest.lib";
 require "network.lib";
 require "prefs.lib";
+require "item.lib";
 
 sub menuDevice {
 	my ($arg) = @_;
@@ -123,13 +124,13 @@ sub tableDeviceBrief {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "0,0,0,0,10,5";
+		my $m = "0,0,0,0,23,22";
 
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
 		my $t = "Network support,IP address";
-		my $m = "3,0";
+		my $m = "9,0";
 
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
@@ -141,13 +142,13 @@ sub tableDeviceBrief {
 	}
 	elsif($arg->{slice} eq "repair") {
 		my $t = "Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "3,7,9,0,6,9";
+		my $m = "9,18,20,0,17,20";
 
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
 		my $t = "Acquired,Warranty";
-		my $m = "9,8";
+		my $m = "20,19";
 
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
@@ -180,7 +181,7 @@ sub tableDeviceBriefs {
 			my $s = "h" . $k;
 
 			if($j[$k] && $j[$k] ne "" && $j[$k] ne "(null)") {
-				my $r = &tableDeviceClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
+				my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
 
 				if($r && $r ne "") {
 					$$s{$r}++;
@@ -301,7 +302,7 @@ sub tableDeviceDetail {
 
 	if($arg->{slice} eq "fle" || $arg->{slice} eq "files") {
 		my $t = "Owner,Name,Filename,Size,Public,Description,Additional information";
-		my $m = "0,0,4,1,3,0,0";
+		my $m = "0,0,14,3,9,0,0";
 
 		my @j = ();
 		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
@@ -319,13 +320,13 @@ sub tableDeviceDetail {
 	}
 	elsif($arg->{slice} eq "pwd" || $arg->{slice} eq "passwds") {
 		my $t = "Owner,Name,Service,Username,Password,Public,Description,Additional information";
-		my $m = "0,0,0,0,2,3,0,0";
+		my $m = "0,0,0,0,8,9,0,0";
 
 		&tableDeviceDetails({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "dev") {
 		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "0,0,0,0,10,5";
+		my $m = "0,0,0,0,23,22";
 
 		for(my $i = 0; $i < 4; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
@@ -335,7 +336,7 @@ sub tableDeviceDetail {
 	}
 	elsif($arg->{slice} eq "net") {
 		my $t = "Network support,IP address";
-		my $m = "3,0";
+		my $m = "9,0";
 
 		for(my $i = 0; $i < 10; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
@@ -355,7 +356,7 @@ sub tableDeviceDetail {
 	}
 	elsif($arg->{slice} eq "repair") {
 		my $t = "Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "3,7,9,0,6,9";
+		my $m = "9,18,20,0,17,20";
 
 		for(my $i = 0; $i < 15; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
@@ -365,7 +366,7 @@ sub tableDeviceDetail {
 	}
 	elsif($arg->{slice} eq "warranty") {
 		my $t = "Acquired,Warranty";
-		my $m = "9,8";
+		my $m = "20,19";
 
 		for(my $i = 0; $i < 21; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
@@ -459,7 +460,7 @@ sub tableDeviceDetails {
 					$PAGE .= "n/a";
 				}
 				else {
-					my $r = &tableDeviceClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
+					my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
 
 					if(!$r || $r eq "") {
 						$PAGE .= "n/a";
@@ -502,37 +503,37 @@ sub tableDeviceListing {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Device,Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "11,0,0,0,0,10,5";
+		my $m = "21,0,0,0,0,23,22";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
 		my $t = "Device,Network support,IP address";
-		my $m = "11,3,0";
+		my $m = "21,9,0";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "security") {
 		my $t = "Device,Serial number,Security number,Location";
-		my $m = "11,0,0,0";
+		my $m = "21,0,0,0";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
 		my $t = "Device,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "11,3,7,9,0,6,9";
+		my $m = "21,9,18,20,0,17,20";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
 		my $t = "Device,Acquired,Warranty";
-		my $m = "11,9,8";
+		my $m = "21,20,19";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
 		my $t = "Device,Additional information,Description";
-		my $m = "11,0,0";
+		my $m = "21,0,0";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
@@ -673,7 +674,7 @@ sub tableDeviceListings {
 						$PAGE .= "n/a";
 					}
 					else {
-						my $u = &tableDeviceClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
+						my $u = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 						if(!$u || $u eq "") {
 							$PAGE .= "n/a";
@@ -710,254 +711,6 @@ sub tableDeviceListings {
 	}
 
 	$PAGE .= "</table>";
-}
-
-sub tableDeviceClean {
-	my ($arg) = @_;
-
-	my $r = "";
-
-	if($arg->{flag} == 0) {
-		$r = $arg->{item};
-	}
-	elsif($arg->{flag} == 1) {
-		if(int($arg->{item}) > 1000000000000000) {
-			$arg->{item} /= 1000000000000000;
-
-			$r = sprintf("%.1fEb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000000000000) {
-			$arg->{item} /= 1000000000000;
-
-			$r = sprintf("%.1fPb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000000000) {
-			$arg->{item} /= 1000000000;
-
-			$r = sprintf("%.1fTb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000000) {
-			$arg->{item} /= 1000000;
-
-			$r = sprintf("%.1fGb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000) {
-			$arg->{item} /= 1000;
-
-			$r = sprintf("%.1fMb", $arg->{item});
-		}
-		else {
-			$r = sprintf("%.1fKb", $arg->{item});
-		}
-	}
-	elsif($arg->{flag} == 2) {
-		if($arg->{key} && $arg->{key} ne "") {
-			my @r = &sendCommand({ command => "decryptPassword", item => "", domain => "", param => $arg->{item}, option => $arg->{key} });
-
-			if(checkError({ packet => \@r }) == 0) {
-				$r[3] = cleanNull({ string => $r[3] });
-
-				if(!$r[3] || $r[3] eq "") {
-					$r = "<a href=\"javascript:promptPasswordKey();\" style=\"color: #000000;\">[&nbsp;decrypt&nbsp;]</a>";
-				}
-				else {
-					$r = $r[3];
-				}
-			}
-		}
-		else {
-			$r = "<a href=\"javascript:promptPasswordKey();\" style=\"color: #000000;\">[&nbsp;decrypt&nbsp;]</a>";
-		}
-	}
-	elsif($arg->{flag} == 3) {
-		if($arg->{item} eq "1") {
-			$r = "Yes";
-		}
-	}
-	elsif($arg->{flag} == 4) {
-		my ($i, $j) = split(/\|/, $arg->{item}, 2);
-
-		$r = "<a href=\"file.pl?file=" . $j . "&name=" . $i . "\" style=\"color: #000000;\">" . $i . "</a>";
-	}
-	elsif($arg->{flag} == 5) {
-		if($SESSION_CACHE{"connection" . $arg->{item}} && $SESSION_CACHE{"connection" . $arg->{item}} ne "") {
-			$r = $SESSION_CACHE{"connection" . $arg->{item}};
-		}
-		else {
-			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "connection", option => "" });
-
-			if(checkError({ packet => \@r }) == 0) {
-				my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-					$SESSION_CACHE{"connection" . $p} = $m;
-
-					if($p eq $arg->{item}) {
-						$r = $m;
-
-						last;
-					}
-				}
-			}
-		}
-
-		if($r eq "") {
-			$r = "n/a";
-		}
-	}
-	elsif($arg->{flag} == 6) {
-		if($SUMWORDS{$arg->{item}}) {
-			$r = ucfirst($SUMWORDS{$arg->{item}});
-		}
-		else {
-			$r = $arg->{item} . " times";
-		}
-	}
-	elsif($arg->{flag} == 7) {
-		if($SESSION_CACHE{"esd" . $arg->{item}} && $SESSION_CACHE{"esd" . $arg->{item}} ne "") {
-			$r = $SESSION_CACHE{"esd" . $arg->{item}};
-		}
-		else {
-			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "esd", option => "" });
-
-			if(checkError({ packet => \@r }) == 0) {
-				my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-					$SESSION_CACHE{"esd" . $p} = $m;
-
-					if($p eq $arg->{item}) {
-						$r = $m;
-
-						last;
-					}
-				}
-			}
-		}
-
-		if($r eq "") {
-			$r = "n/a";
-		}
-	}
-	elsif($arg->{flag} == 8) {
-		if($SESSION_CACHE{"warranty" . $arg->{item}} && $SESSION_CACHE{"warranty" . $arg->{item}} ne "") {
-			$r = $SESSION_CACHE{"warranty" . $arg->{item}};
-		}
-		else {
-			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "warranty", option => "" });
-
-			if(checkError({ packet => \@r }) == 0) {
-				my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-					$SESSION_CACHE{"warranty" . $p} = $m;
-
-					if($p eq $arg->{item}) {
-						$r = $m;
-
-						last;
-					}
-				}
-			}
-		}
-
-		if($r eq "") {
-			$r = "n/a";
-		}
-	}
-	elsif($arg->{flag} == 9) {
-		if($arg->{item} =~ /^0/) {
-			$r = "n/a";
-		}
-		else {
-			$arg->{item} =~ s/\s+.*//;
-			$arg->{item} =~ s/\-//go;
-
-			my ($y, $n, $d) = (int(substr($arg->{item}, 0, 4)), int(substr($arg->{item}, 4, 2)), int(substr($arg->{item}, 6, 2)));
-
-			$r = $d . ". ";
-
-			if($SESSION_CACHE{"month" . $n} && $SESSION_CACHE{"month" . $n} ne "") {
-				$r .= $SESSION_CACHE{"month" . $n} . ", ";
-			}
-			else {
-				@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
-
-				if(checkError({ packet => \@r }) == 0) {
-					my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-					foreach my $s (@s) {
-						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-						$SESSION_CACHE{"month" . $p} = $m;
-
-						if($p eq $n) {
-							$r .= $m . ", ";
-
-							last;
-						}
-					}
-				}
-				else {
-					$r .= $n . ",";
-				}
-			}
-
-			$r .= $y;
-		}
-	}
-	elsif($arg->{flag} == 10) {
-		if($SESSION_CACHE{"memory" . $arg->{item}} && $SESSION_CACHE{"memory" . $arg->{item}} ne "") {
-			$r = $SESSION_CACHE{"memory" . $arg->{item}};
-		}
-		else {
-			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "memory", option => "" });
-
-			if(checkError({ packet => \@r }) == 0) {
-				my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-					$SESSION_CACHE{"memory" . $p} = $m;
-
-					if($p eq $arg->{item}) {
-						$r = $m;
-
-						last;
-					}
-				}
-			}
-		}
-
-		if($r eq "") {
-			$r = "n/a";
-		}
-	}
-	elsif($arg->{flag} == 11) {
-		my @p = ();
-
-		if($SESSION_CACHE{"popup"} && $SESSION_CACHE{"popup"} ne "") {
-			@p = split(/,/, $SESSION_CACHE{"popup"}, 2);
-		}
-		else {
-			@p = split(/,/, &prefsPopup(), 2);
-
-			$SESSION_CACHE{"popup"} = $p[0] . "," . $p[1];
-		}
-
-		my @n = split(/\|/, $arg->{item}, 2);
-
-		$r = "<a href=\"javascript:popupDevice('" . $n[0] . "', '" . $arg->{slice} . "', '" . $p[0] . "', '" . $p[1] . "');\" style=\"color: #000000;\">" . $n[1] . "</a>";
-	}
-
-	return $r;
 }
 
 sub tableDeviceBriefSlice {

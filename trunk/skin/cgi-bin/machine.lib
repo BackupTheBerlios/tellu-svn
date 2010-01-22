@@ -11,6 +11,7 @@ if($pack eq "" && $f eq "" && $line eq "") {
 require "chest.lib";
 require "network.lib";
 require "prefs.lib";
+require "item.lib";
 
 sub menuMachineDomain {
 	my ($arg) = @_;
@@ -404,7 +405,7 @@ sub tableMachineBriefs {
 			my $s = "h" . $k;
 
 			if($j[$k] && $j[$k] ne "" && $j[$k] ne "(null)") {
-				my $r = &tableMachineClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
+				my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 				if($r && $r ne "") {
 					$$s{$r}++;
@@ -593,7 +594,7 @@ sub tableMachineDetail {
 
 		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
-	elsif($arg->{slice} eq "fle" || $arg->{slice} eq "files") {
+	elsif($arg->{slice} eq "fle" || ($arg->{slice} eq "incs") && $arg->{leaf} == 1){
 		my $t = "Owner,Name,Filename,Size,Public,Description,Additional information";
 		my $m = "0,0,14,3,9,0,0";
 
@@ -611,11 +612,29 @@ sub tableMachineDetail {
 
 		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
-	elsif($arg->{slice} eq "pwd" || $arg->{slice} eq "passwds") {
+	elsif($arg->{slice} eq "pwd" || ($arg->{slice} eq "incs" && $arg->{leaf} == 2)) {
 		my $t = "Owner,Name,Service,Username,Password,Public,Description,Additional information";
 		my $m = "0,0,0,0,8,9,0,0";
 
 		&tableMachineDetails({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 3) {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 4) {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 5) {
+		my $t = "Name,Street,Zip,Town,Country";
+		my $m = "0,0,0,0,0";
+
+		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "cpu") {
 		my $t = "Processors,Cores,Siblings,Speed,Cache,MIPS";
@@ -777,7 +796,7 @@ sub tableMachineDetails {
 					$PAGE .= "n/a";
 				}
 				else {
-					my $r = &tableMachineClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
+					my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 					if(!$r || $r eq "") {
 						$PAGE .= "n/a";
@@ -887,30 +906,6 @@ sub tableMachineListing {
 		}
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "fle" || $arg->{slice} eq "files") {
-		my $t = "Node,Owner,Name,Filename,Size,Public,Description,Additional information";
-		my $m = "21,0,0,14,3,9,0,0";
-
-		my @j = ();
-		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
-
-		foreach my $i (@i) {
-			my @s = split(/$ITEM_SEPARATOR/, $i);
-
-			$s[3] .= "|" . $s[8];
-			$i = join($ITEM_SEPARATOR, @s);
-
-			push @j, $i;
-		}
-
-		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "pwd" || $arg->{slice} eq "passwds") {
-		my $t = "Node,Owner,Name,Service,Username,Password,Public,Description,Additional information";
-		my $m = "21,0,0,0,0,8,9,0,0";
-
-		&tableMachineListings({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "cpu") {
 		my $t = "Node,Processors,Cores,Siblings,Speed,Cache,MIPS";
@@ -1133,7 +1128,7 @@ sub tableMachineListings {
 						$PAGE .= "n/a";
 					}
 					else {
-						my $u = &tableMachineClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
+						my $u = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 						if(!$u || $u eq "") {
 							$PAGE .= "n/a";
@@ -1170,471 +1165,6 @@ sub tableMachineListings {
 	}
 
 	$PAGE .= "</table>";
-}
-
-sub tableMachineClean {
-	my ($arg) = @_;
-
-	my $r = "";
-
-	if($arg->{flag} == 0) {
-		$r = $arg->{item};
-	}
-	elsif($arg->{flag} == 100) {
-		$r = $arg->{item};
-		$pr = $arg->{item};
-	}
-	elsif($arg->{flag} == 1) {
-		if($arg->{item} =~ /^http:\/\/|^https:\/\/|^ftp:\/\//) {
-			$r = "<a href=\"" . $arg->{item} . "\" target=\"_blank\" style=\"color: #000000;\">" . $arg->{item} . "</a>";
-		}
-	}
-	elsif($arg->{flag} == 2) {
-		$arg->{item} =~ s/,/, /go;
-		$arg->{item} =~ s/\//\/ /go;
-
-		$r = $arg->{item};
-	}
-	elsif($arg->{flag} == 3 || $arg->{flag} == 103) {
-		if($arg->{flag} == 103) {
-			$pr = $arg->{item};
-		}
-		elsif($pr ne "" && $pr ne "n/a" && $pr > $arg->{item}) {
-			if($arg->{item} != 0) {
-				$pr /= $arg->{item};
-				$pr = int(100 / $pr);
-
-				if($pr < 2) {
-					$r .= "<font color=\"#dd4444\">" . $pr . "%</font>&nbsp;/&nbsp;";
-				}
-				else {
-					$r .= $pr . "%&nbsp;/&nbsp;";
-				}
-			}
-		}
-
-		if(int($arg->{item}) > 1000000000000000) {
-			$arg->{item} /= 1000000000000000;
-
-			$r .= sprintf("%.1fEb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000000000000) {
-			$arg->{item} /= 1000000000000;
-
-			$r .= sprintf("%.1fPb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000000000) {
-			$arg->{item} /= 1000000000;
-
-			$r .= sprintf("%.1fTb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000000) {
-			$arg->{item} /= 1000000;
-
-			$r .= sprintf("%.1fGb", $arg->{item});
-		}
-		elsif(int($arg->{item}) > 1000) {
-			$arg->{item} /= 1000;
-
-			$r .= sprintf("%.1fMb", $arg->{item});
-		}
-		else {
-			$r .= sprintf("%.1fKb", $arg->{item});
-		}
-	}
-	elsif($arg->{flag} == 4) {
-		if($arg->{item} == 1) {
-			$r = "deb";
-		}
-		elsif($arg->{item} == 2) {
-			$r = "rpm";
-		}
-		elsif($arg->{item} == 3) {
-			$r = "app";
-		}
-		elsif($arg->{item} == 4) {
-			$r = "pkg";
-		}
-		elsif($arg->{item} == 100) {
-			$r = "msi";
-		}
-	}
-	elsif($arg->{flag} == 5) {
-		my @n = split(/\|/, $arg->{item});
-
-		$r = "<ul class=\"summary\">";
-
-		foreach my $n (@n) {
-			if($SESSION_CACHE{"port" . $n} && $SESSION_CACHE{"port" . $n} ne "") {
-				my ($p, $m, $d) = split(/\|/, $SESSION_CACHE{"port" . $n}, 3);
-
-				if($p && $m && $d) {
-					$r .= "<li>" . $p . ", " . $m . " - " . $d . "</li>";
-				}
-				elsif($p && $m) {
-					$r .= "<li>" . $p . ", " . $m . "</li>";
-				}
-				else {
-					$r .= "<li>" . $n . "</li>";
-				}
-			}
-			else {
-				@r = &sendCommand({ command => "pullTCP", item => "", domain => "", param => $n, option => "" });
-
-				if(checkError({ packet => \@r }) == 0) {
-					my ($p, $m, $d) = split(/$ITEM_SEPARATOR/, $r[3], 3);
-
-					if($p && $m && $d) {
-						$r .= "<li>" . $p . ", " . $m . " - " . $d . "</li>";
-					}
-					elsif($p && $m) {
-						$r .= "<li>" . $p . ", " . $m . "</li>";
-					}
-					else {
-						$r .= "<li>" . $n . "</li>";
-					}
-
-					$SESSION_CACHE{"port" . $n} = $p . "|" . $m . "|" . $d;
-				}
-				else {
-					$r .= "<li>" . $n . "</li>";
-				}
-			}
-		}
-
-		$r .= "</ul>";
-	}
-	elsif($arg->{flag} == 6) {
-		my $d = 0;
-
-		if($arg->{item} > 31536000) {
-			$r .= int(int($arg->{item}) / 31536000) . " years";
-			$arg->{item} %= 31536000;
-			$d++;
-		}
-		else {
-			$d = 0;
-		}
-
-		if($arg->{item} > 2592000) {
-			if($d != 0) {
-				$r .= ", ";
-			}
-
-			$r .= int(int($arg->{item}) / 2592000) . " months";
-			$arg->{item} %= 2592000;
-			$d++;
-		}
-		else {
-			$d = 0;
-		}
-
-		if($arg->{item} > 604800) {
-			if($d != 0) {
-				$r .= ", ";
-			}
-
-			$r .= int(int($arg->{item}) / 604800) . " weeks";
-			$arg->{item} %= 604800;
-			$d++;
-		}
-		else {
-			$d = 0;
-		}
-
-		if($arg->{item} > 86400) {
-			if($d != 0) {
-				$r .= ", ";
-			}
-
-			$r .= int(int($arg->{item}) / 86400) . " days";
-			$arg->{item} %= 86400;
-			$d++;
-		}
-		else {
-			$d = 0;
-		}
-
-		if($arg->{item} > 3600) {
-			if($d != 0) {
-				$r .= ", ";
-			}
-
-			$r .= int(int($arg->{item}) / 3600) . " hours";
-			$arg->{item} %= 3600;
-			$d++;
-		}
-		else {
-			$d = 0;
-		}
-
-		if($arg->{item} > 60) {
-			if($d != 0) {
-				$r .= ", ";
-			}
-
-			$r .= int(int($arg->{item}) / 60) . " minutes";
-		}
-		else {
-			if($d != 0) {
-				$r .= ", ";
-			}
-
-			$r .= int($arg->{item}) . " seconds";
-		}
-	}
-	elsif($arg->{flag} == 7) {
-		$r = "0" x int(16 - length($arg->{item})) . $arg->{item};
-		$r = join('-', unpack('A4' x 4, $r));
-	}
-	elsif($arg->{flag} == 8) {
-		if($arg->{key} && $arg->{key} ne "") {
-			my @r = &sendCommand({ command => "decryptPassword", item => "", domain => "", param => $arg->{item}, option => $arg->{key} });
-
-			if(checkError({ packet => \@r }) == 0) {
-				$r[3] = cleanNull({ string => $r[3] });
-
-				if(!$r[3] || $r[3] eq "") {
-					$r = "<a href=\"javascript:promptPasswordKey();\" style=\"color: #000000;\">[&nbsp;decrypt&nbsp;]</a>";
-				}
-				else {
-					$r = $r[3];
-				}
-			}
-		}
-		else {
-			$r = "<a href=\"javascript:promptPasswordKey();\" style=\"color: #000000;\">[&nbsp;decrypt&nbsp;]</a>";
-		}
-	}
-	elsif($arg->{flag} == 9) {
-		if($arg->{item} eq "1") {
-			$r = "Yes";
-		}
-	}
-	elsif($arg->{flag} == 10) {
-		$r = "n/a";
-	}
-	elsif($arg->{flag} == 11) {
-		$r = int($arg->{item} / 100) * 100;
-
-		if($r <= 1000) {
-			$r .= "MHz";
-		}
-		elsif($r <= 1000000) {
-			$r /= 1000;
-			$r = sprintf("%.1fGHz", $r);
-		}
-		elsif($r <= 1000000000) {
-			$r /= 1000000;
-			$r = snprintf("%.1fTHz", $r);
-		}
-		else {
-			$r /= 1000000000;
-			$r = snprintf("%.1PHz", $r);
-		}
-	}
-	elsif($arg->{flag} == 12) {
-		if($arg->{item} eq "0" || $arg->{item} eq "n/a") {
-			$r = "1";
-		}
-
-		if($NUMWORDS{$arg->{item}}) {
-			$r = ucfirst($NUMWORDS{$arg->{item}});
-		}
-	}
-	elsif($arg->{flag} == 13) {
-		if($arg->{item} ne "0" && $arg->{item} ne "n/a") {
-			if($NUMWORDS{$arg->{item}}) {
-				$r = ucfirst($NUMWORDS{$arg->{item}});
-			}
-		}
-	}
-	elsif($arg->{flag} == 14) {
-		my ($i, $j) = split(/\|/, $arg->{item}, 2);
-
-		$r = "<a href=\"file.pl?file=" . $j . "&name=" . $i . "\" style=\"color: #000000;\">" . $i . "</a>";
-	}
-	elsif($arg->{flag} == 15) {
-		my @n = split(/\|/, $arg->{item});
-
-		if($pr eq "acadapter" || $pr eq "battery" || $pr eq "btacl" || $pr eq "bthci" || $pr eq "btsco" || $pr eq "killswitch" || $pr eq "panel" || $pr eq "lightsensor" || $pr eq "mmc" || $pr eq "mmchost" || $pr eq "netbluetooth" || $pr eq "netirda" || $pr eq "serial" || $pr eq "v4l") {
-			$r .= "n/a";
-		}
-		elsif($pr eq "button" || $pr eq "camera" || $pr eq "ide" || $pr eq "idehost" || $pr eq "ieee1394" || $pr eq "ieee1394host" || $pr eq "input" || $pr eq "inputjoystick" || $pr eq "inputkeyboard" || $pr eq "inputkeymap" || $pr eq "inputkeypad" || $pr eq "inputkeys" || $pr eq "inputmouse" || $pr eq "inputswitch" || $pr eq "inputtablet") {
-			$r .= "Device:&nbsp;" . $n[0] . "<br />";
-		}
-		elsif($pr eq "net" || $pr eq "net80203") {
-			$r .= "Address:&nbsp;" . $n[0] . "<br />";
-			$r .= "Hardware&nbsp;id:&nbsp;" . $n[1] . "<br />";
-			$r .= "Interface:&nbsp;" . $n[2] . "<br />";
-		}
-		elsif($pr eq "processor") {
-			$r .= "Number:&nbsp;" . $n[0] . "<br />";
-			$r .= "Can&nbsp;throttle:&nbsp;" . $n[1] . "<br />";
-		}
-		elsif($pr eq "net80211" || $pr eq "net80211ctrl" || $pr eq "netbridge" || $pr eq "netloopback" || $pr eq "pcmciasocket" || $pr eq "portableaudioplayer" || $pr eq "powermanagement" || $pr eq "printer" || $pr eq "scanner") {
-			$r .= "Address:&nbsp;" . $n[0] . "<br />";
-			$r .= "Hardware&nbsp;id:&nbsp;" . $n[1] . "<br />";
-			$r .= "Interface:&nbsp;" . $n[2] . "<br />";
-		}
-		elsif($pr eq "scsi" || $pr eq "scsihost") {
-			$r .= "Host:&nbsp;" . $n[0] . "<br />";
-		}
-		elsif($pr eq "sound") {
-			$r .= "Sound&nbsp;card:&nbsp;" . $n[0] . "<br />";
-		}
-		elsif($pr eq "storage" || $pr eq "system" || $pr eq "tape") {
-			$r .= "Model:&nbsp;" . $n[5] . "<br />";
-			$r .= "Bus:&nbsp;" . $n[1] . "<br />";
-			$r .= "Drive&nbsp;type:&nbsp;" . $n[2] . "<br />";
-			$r .= "Size:&nbsp;" . $n[9] . "<br />";
-			$r .= "Hotpluggable:&nbsp;" . $n[3] . "<br />";
-			$r .= "Removable:&nbsp;" . $n[7] . "<br />";
-			$r .= "Automount&nbsp;enabled:&nbsp;" . $n[0] . "<br />";
-			$r .= "Media&nbsp;check&nbsp;enabled:&nbsp;" . $n[4] . "<br />";
-			$r .= "No&nbsp;partitions:&nbsp;" . $n[6] . "<br />";
-			$r .= "Requires&nbsp;eject:&nbsp;" . $n[8] . "<br />";
-		}
-		elsif($pr eq "volume") {
-			$r .= "Device:&nbsp;" . $n[0] . "<br />";
-			$r .= "Is&nbsp;volume:&nbsp;" . $n[1] . "<br />";
-			$r .= "Major:&nbsp;" . $n[2] . "<br />";
-			$r .= "Minor:&nbsp;" . $n[3] . "<br />";
-		}
-	}
-	elsif($arg->{flag} == 16) {
-		my @n = split(/\|/, $arg->{item});
-
-		@n = sort { uc($a) cmp uc($b) } @n;
-
-		foreach my $n (@n) {
-			$r .= $n . "<br />";
-		}
-	}
-	elsif($arg->{flag} == 17) {
-		if($SUMWORDS{$arg->{item}}) {
-			$r = ucfirst($SUMWORDS{$arg->{item}});
-		}
-		else {
-			$r = $arg->{item} . " times";
-		}
-	}
-	elsif($arg->{flag} == 18) {
-		if($SESSION_CACHE{"esd" . $arg->{item}} && $SESSION_CACHE{"esd" . $arg->{item}} ne "") {
-			$r = $SESSION_CACHE{"esd" . $arg->{item}};
-		}
-		else {
-			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "esd", option => "" });
-
-			if(checkError({ packet => \@r }) == 0) {
-				my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-					$SESSION_CACHE{"esd" . $p} = $m;
-
-					if($p eq $arg->{item}) {
-						$r = $m;
-
-						last;
-					}
-				}
-			}
-		}
-
-		if($r eq "") {
-			$r = "n/a";
-		}
-	}
-	elsif($arg->{flag} == 19) {
-		if($SESSION_CACHE{"warranty" . $arg->{item}} && $SESSION_CACHE{"warranty" . $arg->{item}} ne "") {
-			$r = $SESSION_CACHE{"warranty" . $arg->{item}};
-		}
-		else {
-			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "warranty", option => "" });
-
-			if(checkError({ packet => \@r }) == 0) {
-				my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-					$SESSION_CACHE{"warranty" . $p} = $m;
-
-					if($p eq $arg->{item}) {
-						$r = $m;
-
-						last;
-					}
-				}
-			}
-		}
-
-		if($r eq "") {
-			$r = "n/a";
-		}
-	}
-	elsif($arg->{flag} == 20) {
-		if($arg->{item} =~ /^0/) {
-			$r = "n/a";
-		}
-		else {
-			$arg->{item} =~ s/\s+.*//;
-			$arg->{item} =~ s/\-//go;
-
-			my ($y, $n, $d) = (int(substr($arg->{item}, 0, 4)), int(substr($arg->{item}, 4, 2)), int(substr($arg->{item}, 6, 2)));
-
-			$r = $d . ". ";
-
-			if($SESSION_CACHE{"month" . $n} && $SESSION_CACHE{"month" . $n} ne "") {
-				$r .= $SESSION_CACHE{"month" . $n} . ", ";
-			}
-			else {
-				@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
-
-				if(checkError({ packet => \@r }) == 0) {
-					my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-					foreach my $s (@s) {
-						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
-
-						$SESSION_CACHE{"month" . $p} = $m;
-
-						if($p eq $n) {
-							$r .= $m . ", ";
-
-							last;
-						}
-					}
-				}
-				else {
-					$r .= $n . ",";
-				}
-			}
-
-			$r .= $y;
-		}
-	}
-	elsif($arg->{flag} == 21) {
-		my @p = ();
-		my $n = $arg->{item};
-
-		if($SESSION_CACHE{"popup"} && $SESSION_CACHE{"popup"} ne "") {
-			@p = split(/,/, $SESSION_CACHE{"popup"}, 2);
-		}
-		else {
-			@p = split(/,/, &prefsPopup(), 2);
-
-			$SESSION_CACHE{"popup"} = $p[0] . "," . $p[1];
-		}
-
-		$n =~ s/\|/./go;
-
-		$r = "<a href=\"javascript:popupMachine('" . $arg->{item} . "', '" . $arg->{slice} . "', '" . $p[0] . "', '" . $p[1] . "');\" style=\"color: #000000;\">" . $n . "</a>";
-	}
-
-	return $r;
 }
 
 sub tableMachineBriefSlice {
@@ -1725,8 +1255,7 @@ sub tableMachineDetailSlice {
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=addinfo\">Additional info</a></li>";
 
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=files\">Files</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=passwds\">Passwords</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=incs\" style=\"background: #735162;\">Inclusions</a></li>";
 
 	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Edit notes</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";
@@ -1761,8 +1290,7 @@ sub tableDMachineDetailSlice {
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=addinfo\">Additional info</a></li>";
 
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=files\">Files</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=passwds\">Passwords</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=incs\" style=\"background: #735162;\">Inclusions</a></li>";
 
 	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Notes</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";
@@ -1877,6 +1405,9 @@ sub tableMachineOS {
 		}
 		elsif($arg->{distro} =~ /Mandr/i) {
 			$p = "linux_mandriva";
+		}
+		elsif($arg->{distro} =~ /Mint/i) {
+			$p = "linux_mint";
 		}
 		elsif($arg->{distro} =~ /Red.*Hat/i) {
 			$p = "linux_redhat";

@@ -11,11 +11,56 @@ if($pack eq "" && $f eq "" && $line eq "") {
 require "chest.lib";
 require "network.lib";
 
+$GOTO = -1;
+$TERM = -1;
+$LIMIT = 1000;
+$DEBUG = "";
+$ERROR = "";
+$PRINT = "";
+$TELOUT = "";
+
+my %cmds = (
+	'pin' => 1,
+	'def' => 2, 'set' => 2, 'unset' => 2,
+	'echo' => 2, 'show' => 2,
+	'increment' => 2, 'subtract' => 2, 'multiply' => 2, 'divide' => 2, 'modulo' => 2, 'power' => 2,
+	'goto' => 2, 'if' => 2,
+	'terminate' => 2,
+	'query' => 2
+);
+
+my %cons = (
+	'equals' => '==',
+	'is_greater_than' => '>',
+	'is_greater_or_equals' => '>=',
+	'is_smaller_than' => '<',
+	'is_smaller_or_equals' => '<='
+);
+
+my %conv = (
+	'goto' => 1
+);
+
+my %defs = (
+	'VARdebug' => 'no',
+	'VARdelimiter' => '|',
+	'VARoutput' => 'here'
+);
+
+my %term = (
+	1 => 'succesfully',
+	2 => 'unsuccesfully',
+	3 => 'because pin limit exceeded'
+);
+
+my %pins = ();
+my %pinl = ();
+
 sub telConsole {
 	my ($arg) = @_;
 
 	my @r = ();
-	my @l = ('Tellu expression console');
+	my @l = ('TEL console');
 
 	if(!$q->param('leaf') || $q->param('leaf') == 0) {
 		$PAGE .= &htmlFormBegin({ name => "expressionForm", action => $SELF . "?action=expression&verb=execute", enctype => "application/x-www-form-urlencoded", method => "post" });
@@ -65,84 +110,129 @@ sub telConsole {
 		$PAGE .= "</tr>";
 
 		if($q->param('verb') && $q->param('verb') eq "execute" && $q->param('expression') ne "") {
-			my $k = 0;
-			my $v = "";
-			my @l = ("set");
+			#
+			# Preprocess expression
+			#
+
+			my $i = 0;
+			my @prog = ();
+
 			my @t = split(/\n/, $q->param('expression'));
 
 			foreach my $t (@t) {
-				$k++;
+				$t = &cleanParam({ string => $t });
 
-				$t =~ s/\r+$|\n+$//g;
+				next unless($t);
+				next if($t =~ /^#|^;|^%/);
 
-				next if($t eq "");
-				next if($t =~ /^#|^%|^;/);
+				my ($c, $p) = split(/\s+/, $t, 2);
 
-				my ($c, $d) = split(/\(/, $t, 2);
-				my $e = 0;
+				$c = &cleanParam({ string => $c });
+				$p = &cleanParam({ string => $p });
 
-				#
-				# Handle special commands
-				#
+				if($cmds{$c}) {
+					if($cmds{$c} == 1) {
+						#
+						# Run commands in preprocess phase
+						#
 
-				if($c && $c ne "" && $d && $d ne "") {
-					$c = cleanPart({ string => $c });
+						my $d = $c . "Syntax";
 
-					foreach my $l (@l) {
-						if($c eq $l) {
-							my ($d, $t) = split(/\)/, $d, 2);
+						if(&$d({ p => $p, l => $i }) != 0) {
+							$TELOUT .= "ERROR: Syntax error: " . $ERROR . $CONFIG_LINEFEED;
 
-							if($d && $d ne "" && $t && $t ne "") {
-								my ($i, $d) = split(/','|',\s+'/, $d, 2);
+							last;
+						}
 
-								$i = cleanPart({ string => $i });
-								$d = cleanPart({ string => $d });
+						$i++;
 
-								&telSetParam({ param => $i, value => $d });
+						if($defs{'VARdebug'} =~ /yes/i) {
+							$TELOUT .= "DEBUG: " . $DEBUG . $CONFIG_LINEFEED if($DEBUG ne "");
 
-								$e = 1;
+							$DEBUG = "";
+						}
+					}
+					else {
+						#
+						# Push command into script array to be run in postprocess phase
+						#
+
+						push @prog, $t;
+$PAGE .= "LINE: $i: $t " . "<br>";
+						$i++;
+					}
+				}
+				else {
+					$TELOUT .= "ERROR: Unknown command: " . $c . $CONFIG_LINEFEED;
+
+					last;
+				}
+			}
+
+			undef @t;
+
+			#
+			# Postprocess expression
+			#
+
+			for(my $j = 0; $j < $i; $j++) {
+				my $t = $prog[$j];
+
+				my ($c, $p) = split(/\s+/, $t, 2);
+
+				$c = &cleanParam({ string => $c });
+				$p = &cleanParam({ string => $p });
+
+				if($cmds{$c} == 2) {
+					my $d = $c . "Syntax";
+
+					if(&$d({ p => $p }) == 0) {
+						if($defs{'VARdebug'} =~ /yes/i) {
+							$TELOUT .= "DEBUG: " . $DEBUG . $CONFIG_LINEFEED if($DEBUG ne "");
+
+							$DEBUG = "";
+						}
+
+						#
+						# Print possible command output
+						#
+
+						if($PRINT ne "") {
+							$TELOUT .= $PRINT . $CONFIG_LINEFEED;
+
+							$PRINT = "";
+						}
+
+						#
+						# Terminate script if requested
+						#
+
+						if($TERM != -1) {
+							last;
+						}
+
+						#
+						# Jump to pin if requested
+						#
+
+						if($GOTO != -1) {
+							$pinl{$GOTO}++;
+
+							if($pinl{$GOTO} > $LIMIT) {
+								$TELOUT .= "Terminated " . $term{3} . $CONFIG_LINEFEED;
 
 								last;
 							}
+
+							$j = $GOTO;
+
+							$GOTO = -1;
 						}
 					}
-				}
+					else {
+						$TELOUT .= "ERROR: Syntax error: " . $ERROR . $CONFIG_LINEFEED;
 
-				#
-				# Handle server commands
-				#
-
-				if($e == 0) {
-					if($c && $c ne "") {
-						$r[0] = "00000002";
-						$r[1] = "00000001";
-						$r[2] = "00000001";
-						$r[3] = "Syntax error in line " . $k . ", correct usage is: command('param1', 'param2' [, ...]);";
-
-						my ($d, $t) = split(/\)/, $d, 2);
-
-						if($d && $d ne "" && $t && $t ne "") {
-							my ($i, $d, $p, $o) = split(/','|',\s+'/, $d, 4);
-
-							$c = cleanPart({ string => $c });
-							$i = cleanPart({ string => $i });
-							$d = cleanPart({ string => $d });
-							$p = cleanPart({ string => $p });
-							$o = cleanPart({ string => $o });
-
-							@r = &sendCommand({ command => $c, item => $i, domain => $d, param => $p, option => $o });
-						}
-					}
-
-					if(@r && $r[3] && $r[3] ne "") {
-						foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
-							$e =~ s/$ITEM_SEPARATOR$//;
-							$e =~ s/$ITEM_SEPARATOR/$CMD_DELIMITER/go;
-
-							$e =~ s/\r+$|\n+$//g;
-
-							$v .= $e . $CONFIG_LINEFEED;
-						}
+						last;
 					}
 				}
 			}
@@ -151,22 +241,22 @@ sub telConsole {
 			# Output result to required target
 			#
 
-			if($v && $v ne "") {
+			if($TELOUT && $TELOUT ne "") {
 				if($CMD_OUTPUT eq "here") {
 					$PAGE .= "<tr class=\"top\">";
 					$PAGE .= "<td align=\"right\">Result:</td>";
-					$PAGE .= "<td>" . &htmlInputField({ name => "result", value => $v, readonly => 1, flush => 1, columns => 60, rows => 25 }) . "</td>";
+					$PAGE .= "<td>" . &htmlInputField({ name => "result", value => $TELOUT, readonly => 1, flush => 1, columns => 60, rows => 25 }) . "</td>";
 					$PAGE .= "</tr>";
 				}
 				elsif($CMD_OUTPUT eq "file") {
 					print STDOUT "Cache-control: no-cache" . $CONFIG_LINEFEED;
 					print STDOUT "Content-disposition: attachment; filename=\"tellu_expression_output.txt\"" . $CONFIG_LINEFEED;
-					print STDOUT "Content-length: " . length($v) . $CONFIG_LINEFEED;
+					print STDOUT "Content-length: " . length($TELOUT) . $CONFIG_LINEFEED;
 					print STDOUT "Content-type: application/x-download" . $CONFIG_LINEFEED . $CONFIG_LINEFEED;
 
 					binmode(STDOUT);
 
-					print STDOUT $v;
+					print STDOUT $TELOUT;
 
 					exit(0);
 				}
@@ -186,15 +276,797 @@ sub telConsole {
 	}
 }
 
-sub telSetParam {
+sub cleanParam {
 	my ($arg) = @_;
 
-	if($arg->{param} =~ /delimiter/i) {
-		$CMD_DELIMITER = $arg->{value};
+	$arg->{string} =~ s/\r+|\n+//g;
+	$arg->{string} =~ s/\t+|  +/ /g;
+	$arg->{string} =~ s/^ +|^\t+| +$|\t+$//g;
+
+	return $arg->{string};
+}
+
+sub pinSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		if(defined $pins{"PIN" . $arg->{p}}) {
+			$ERROR .= "pin '" . $arg->{p} . "' is already defined";
+		}
+		else {
+			$pins{"PIN" . $arg->{p}} = $arg->{l};
+
+			if($defs{'VARdebug'} =~ /yes/i) {
+				$DEBUG .= "pin '" . $arg->{p} . "' (" . $arg->{l} . ")";
+			}
+
+			$r = 0;
+		}
 	}
-	elsif($arg->{param} =~ /output/i) {
-		$CMD_OUTPUT = $arg->{value};
+	else {
+		$ERROR .= "required parameter is missing";
 	}
+
+	return $r;
+}
+
+sub defSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if($c && $c ne "") {
+			if(defined $defs{"VAR" . $c}) {
+				$ERROR .= "variable '" . $c . "' is already defined";
+			}
+			else {
+				if($d eq "") {
+					$d = "NULL";
+				}
+
+				$defs{"VAR" . $c} = $d;
+
+				if($defs{'VARdebug'} =~ /yes/i) {
+					$DEBUG .= "def '" . $c . "' as '" . $d . "'";
+				}
+
+				$r = 0;
+			}
+		}
+		else {
+			$ERROR .= "variable name is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub setSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($d eq "") {
+				$d = "NULL";
+			}
+
+			$defs{"VAR" . $c} = $d;
+
+			if($defs{'VARdebug'} =~ /yes/i) {
+				$DEBUG .= "set '" . $c . "' as '" . $d . "'";
+			}
+
+			$r = 0;
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub unsetSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		if(defined $defs{"VAR" . $arg->{p}}) {
+			if($defs{'VARdebug'} =~ /yes/i) {
+				$DEBUG .= "unset '" . $arg->{p} . "'";
+			}
+
+			delete $defs{"VAR" . $arg->{p}};
+
+			$r = 0;
+		}
+		else {
+			$ERROR .= "variable '" . $arg->{p} . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub echoSyntax {
+	my ($arg) = @_;
+
+	$r = 0;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		$TELOUT .= $arg->{p} . $CONFIG_LINEFEED;
+	}
+	else {
+		$TELOUT .= $CONFIG_LINEFEED;
+	}
+
+	return $r;
+}
+
+sub showSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($rs, $rt) = &varHandle({ p => $arg->{p} });
+
+		if($rs == 0) {
+			if($defs{'VARdebug'} =~ /yes/i) {
+				$DEBUG .= "show '" . $arg->{p} . "'";
+			}
+
+			$PRINT .= $rt;
+
+			$r = 0;
+		}
+		else {
+			if(defined $defs{"VAR" . $arg->{p}}) {
+				if($defs{'VARdebug'} =~ /yes/i) {
+					$DEBUG .= "show '" . $arg->{p} . "'";
+				}
+
+				$PRINT .= $defs{"VAR" . $arg->{p}};
+
+				$r = 0;
+			}
+			else {
+				$ERROR .= "variable '" . $arg->{p} . "' is not defined";
+			}
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub incrementSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($d =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if($defs{'VARdebug'} =~ /yes/i) {
+						$DEBUG .= "increment '" . $c . "' by '" . $d . "'";
+					}
+
+					$defs{"VAR" . $c} += $d;
+
+					$r = 0;
+				}
+				else {
+					$ERROR .= "value '" . $d . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub subtractSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($d =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if($defs{'VARdebug'} =~ /yes/i) {
+						$DEBUG .= "subtract '" . $c . "' by '" . $d . "'";
+					}
+
+					$defs{"VAR" . $c} -= $d;
+
+					$r = 0;
+				}
+				else {
+					$ERROR .= "value '" . $d . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub multiplySyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($d =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if($defs{'VARdebug'} =~ /yes/i) {
+						$DEBUG .= "multiply '" . $c . "' by '" . $d . "'";
+					}
+
+					$defs{"VAR" . $c} *= $d;
+
+					$r = 0;
+				}
+				else {
+					$ERROR .= "value '" . $d . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub divideSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($d =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if($d != 0) {
+						if($defs{'VARdebug'} =~ /yes/i) {
+							$DEBUG .= "divide '" . $c . "' by '" . $d . "'";
+						}
+
+						$defs{"VAR" . $c} /= $d;
+
+						$r = 0;
+					}
+					else {
+						$ERROR .= "illegal division by zero";
+					}
+				}
+				else {
+					$ERROR .= "value '" . $d . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub moduloSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($d =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if($defs{'VARdebug'} =~ /yes/i) {
+						$DEBUG .= "modulo '" . $c . "' by '" . $d . "'";
+					}
+
+					$defs{"VAR" . $c} %= $d;
+
+					$r = 0;
+				}
+				else {
+					$ERROR .= "value '" . $d . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub powerSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($d =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if($defs{'VARdebug'} =~ /yes/i) {
+						$DEBUG .= "power '" . $c . "' by '" . $d . "'";
+					}
+
+					$r = 1;
+
+					while($d > 0) {
+						$r = $r * $defs{"VAR" . $c};
+
+						$d--;
+					}
+
+					$defs{"VAR" . $c} = $r;
+
+					$r = 0;
+				}
+				else {
+					$ERROR .= "value '" . $d . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub gotoSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		if(defined $pins{"PIN" . $arg->{p}}) {
+			if($defs{'VARdebug'} =~ /yes/i) {
+				$DEBUG .= "goto '" . $arg->{p} . "'";
+			}
+
+			$GOTO = $pins{"PIN" . $arg->{p}};
+
+			$r = 0;
+		}
+		else {
+			$ERROR .= "pin '" . $arg->{p} . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub ifSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d, $e, $f, $g) = split(/\s+/, $arg->{p}, 5);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+		$e = &cleanParam({ string => $e });
+		$f = &cleanParam({ string => $f });
+		$g = &cleanParam({ string => $g });
+
+		if($c && $c ne "" && $d && $d ne "" && $e && $e ne "" && $f && $f ne "" && $g && $g ne "") {
+			if($defs{"VAR" . $c} =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+				if($e =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) {
+					if(defined $defs{"VAR" . $c}) {
+						if(defined $cons{$d}) {
+							if(defined $conv{$f}) {
+								if(defined $pins{"PIN" . $g}) {
+									my $w = "\
+										if(" . $defs{"VAR" . $c} . " " . $cons{$d} . " " . $e . ") { \
+											return " . $pins{"PIN" . $g} . "; \
+										} \
+										else { \
+											return -1; \
+										}; \
+									";
+
+									$GOTO = eval $w;
+
+									if($GOTO != -1) {
+										if($defs{'VARdebug'} =~ /yes/i) {
+											$DEBUG .= $f . " '" . $g . "'";
+										}
+									}
+
+									$r = 0;
+								}
+								else {
+									$ERROR .= "pin '" . $g . "' is not defined";
+								}
+							}
+							else {
+								$ERROR .= "action '" . $f . "' is unknown";
+							}
+						}
+						else {
+							$ERROR .= "conditional '" . $d . "' is unknown";
+						}
+					}
+					else {
+						$ERROR .= "variable '" . $c . "' is not defined";
+					}
+				}
+				else {
+					$ERROR .= "value '" . $e . "' is not a number";
+				}
+			}
+			else {
+				$ERROR .= "variable '" . $c . "' is not a number";
+			}
+		}
+		else {
+			$ERROR .= "required parameter is missing";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub terminateSyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		if($arg->{p} =~ /^ok/i) {
+			$TERM = 1;
+
+			$PRINT .= "Terminated " . $term{$TERM};
+
+			$r = 0;
+		}
+		elsif($arg->{p} =~ /^fail/i) {
+			$TERM = 2;
+
+			$PRINT .= "Terminated " . $term{$TERM};
+
+			$r = 0;
+		}
+		else {
+			$ERROR .= "required parameter is unknown";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub querySyntax {
+	my ($arg) = @_;
+
+	my $r = -1;
+
+	if($arg->{p} && $arg->{p} ne "") {
+		my ($c, $d) = split(/,|,\s+|\s+/, $arg->{p}, 2);
+
+		$c = &cleanParam({ string => $c });
+		$d = &cleanParam({ string => $d });
+
+		if(($c && $c ne "") && $defs{"VAR" . $c}) {
+			my ($e, $f) = split(/\s+/, $d, 2);
+			my ($i, $d, $p, $o) = split(/'\s+'|"\s+"/, $f, 4);
+
+			$e = &cleanPart({ string => $e });
+			$i = &cleanPart({ string => $i });
+			$d = &cleanPart({ string => $d });
+			$p = &cleanPart({ string => $p });
+			$o = &cleanPart({ string => $o });
+
+			if($e && $e ne "") {
+				if($e =~ /^\$/) {
+					$e =~ s/^\$//;
+
+					if($defs{"VAR" . $e}) {
+						$e = $defs{"VAR" . $e};
+					}
+					else {
+						$ERROR .= "variable '" . $defs{$e} . "' is not defined";
+
+						return $r;
+					}
+				}
+
+				if($i =~ /^\$/) {
+					$i =~ s/^\$//;
+
+					if($defs{"VAR" . $i}) {
+						$i = $defs{"VAR" . $i};
+					}
+					else {
+						$ERROR .= "variable '" . $defs{$i} . "' is not defined";
+
+						return $r;
+					}
+				}
+
+				if($d =~ /^\$/) {
+					$d =~ s/^\$//;
+
+					if($defs{"VAR" . $d}) {
+						$d = $defs{"VAR" . $d};
+					}
+					else {
+						$ERROR .= "variable '" . $defs{$d} . "' is not defined";
+
+						return $r;
+					}
+				}
+
+				if($p =~ /^\$/) {
+					$p =~ s/^\$//;
+
+					if($defs{"VAR" . $p}) {
+						$p = $defs{"VAR" . $p};
+					}
+					else {
+						$ERROR .= "variable '" . $defs{$p} . "' is not defined";
+
+						return $r;
+					}
+				}
+
+				if($o =~ /^\$/) {
+					$o =~ s/^\$//;
+
+					if($defs{"VAR" . $o}) {
+						$o = $defs{"VAR" . $o};
+					}
+					else {
+						$ERROR .= "variable '" . $defs{$o} . "' is not defined";
+
+						return $r;
+					}
+				}
+
+				my @r = &sendCommand({ command => $e, item => $i, domain => $d, param => $p, option => $o });
+
+				if(checkError({ packet => \@r }) == 0) {
+					$defs{"VAR" . $c} = "";
+
+					foreach my $f (split(/$ITEM_DELIMITER/, $r[3])) {
+						$f =~ s/$ITEM_SEPARATOR$//;
+						$f =~ s/$ITEM_SEPARATOR/$CMD_DELIMITER/go;
+
+						$f =~ s/\r+$|\n+$//g;
+
+						$defs{"VAR" . $c} .= $f . $CONFIG_LINEFEED;
+					}
+
+					$r = 0;
+				}
+				else {
+					$ERROR .= $r[3];
+				}
+			}
+			else {
+				$ERROR .= "required command is missing";
+			}
+		}
+		else {
+			$ERROR .= "variable '" . $c . "' is not defined";
+		}
+	}
+	else {
+		$ERROR .= "required parameter is missing";
+	}
+
+	return $r;
+}
+
+sub varHandle {
+	my ($arg) = @_;
+
+	my $r = -1;
+	my $t = "";
+
+	if($arg->{p} =~ /\[.*\]\[.*\]/) {
+		my $n = $arg->{p};
+		my $m = $n;
+		my $o = $n;
+
+		$n =~ s/^.*?\[//;
+
+		$m = $n;
+
+		$n =~ s/\].*?$//;
+		$m =~ s/^.*?\[//;
+		$m =~ s/\].*?$//;
+		$o =~ s/\[.*?$//;
+
+		$n = &cleanParam({ string => $n });
+		$m = &cleanParam({ string => $m });
+		$o = &cleanParam({ string => $o });
+
+		if($n =~ /^\$/) {
+			$n =~ s/^\$//;
+
+			if($defs{"VAR" . $n}) {
+				$n = $defs{"VAR" . $n};
+			}
+			else {
+				$ERROR .= "variable '" . $defs{$n} . "' is not defined";
+
+				return $r;
+			}
+		}
+
+		if($m =~ /^\$/) {
+			$m =~ s/^\$//;
+
+			if($defs{"VAR" . $m}) {
+				$m = $defs{"VAR" . $m};
+			}
+			else {
+				$ERROR .= "variable '" . $defs{$m} . "' is not defined";
+
+				return $r;
+			}
+		}
+
+		my @s = split(/$CONFIG_LINEFEED/, $defs{"VAR" . $o});
+		my @t = split(/\|/, $s[$n]);			# !!!!! IF DELIMITER IS CHANGED, THIS DOES NOT WORK !!!!!
+
+		$t = $t[$m];
+		$r = 0;
+	}
+	elsif($arg->{p} =~ /\[.*\]/) {
+		my $n = $arg->{p};
+		my $o = $n;
+
+		$n =~ s/^.*?\[//;
+		$n =~ s/\].*?$//;
+		$o =~ s/\[.*?$//;
+
+		$n = &cleanParam({ string => $n });
+		$o = &cleanParam({ string => $o });
+
+		if($n =~ /^\$/) {
+			$n =~ s/^\$//;
+
+			if($defs{"VAR" . $n}) {
+				$n = $defs{"VAR" . $n};
+			}
+			else {
+				$ERROR .= "variable '" . $defs{$n} . "' is not defined";
+
+				return $r;
+			}
+		}
+
+		my @s = split(/$CONFIG_LINEFEED/, $defs{"VAR" . $o});
+
+		$t = $s[$n];
+		$r = 0;
+	}
+
+	return $r, $t;
 }
 
 sub tableConsoleSlice {
@@ -203,7 +1075,7 @@ sub tableConsoleSlice {
 	$MENU .= "<table class=\"plain\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
 	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/console/console.png\"></td>";
-	$MENU .= "<td class=\"c3\">Tellu<br />expression<br />console</td>";
+	$MENU .= "<td class=\"c3\">TEL<br />console</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 

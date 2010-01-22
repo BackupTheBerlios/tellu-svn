@@ -16,6 +16,6 @@ require "console.lib";
 &tableConsoleSlice();
 &telConsole();
 
-&htmlPage({ title => $WINDOW_TITLE . " - Tellu expression console", script => "", header => "Tellu expression console", content => $PAGE, slices => $MENU });
+&htmlPage({ title => $WINDOW_TITLE . " - TEL console", script => "", header => "TEL console", content => $PAGE, slices => $MENU });
 
 exit(0);

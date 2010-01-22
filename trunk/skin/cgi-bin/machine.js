@@ -45,6 +45,22 @@ sub machineModifyFuncs {
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Update';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+	$r .= "function toggleServiceFields(param) {" . $CONFIG_LINEFEED;
+	$r .= " if(document." . $arg->{form} . ".iis.checked) {" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".esd.disabled = 0;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".dosd_day.disabled = 0;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".dosd_month.disabled = 0;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".dosd_year.disabled = 0;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".mosd.disabled = 0;" . $CONFIG_LINEFEED;
+	$r .= " }" . $CONFIG_LINEFEED;
+	$r .= " else {" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".esd.disabled = 1;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".dosd_day.disabled = 1;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".dosd_month.disabled = 1;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".dosd_year.disabled = 1;" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".mosd.disabled = 1;" . $CONFIG_LINEFEED;
+	$r .= " }" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
 }

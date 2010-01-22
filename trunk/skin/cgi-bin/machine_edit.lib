@@ -789,29 +789,30 @@ sub editMachineNode {
 
 				$s[12] = cleanNull({ string => $s[12] });
 
+				my $ds = 0;
+
+				if($s[9] != 0) {
+					$ds = 1;
+				}
+
 				$PAGE .= "<tr class=\"top\">";
 				$PAGE .= "<td></td><td></td>";
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"middle\">";
 				$PAGE .= "<td align=\"right\" width=\"20%\">Service status:</td>";
-
-				if($s[9] != 0) {
-					$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "iis", label => "Machine is in service?", value => 1, select => 1 }) . "</td>";
-				}
-				else {
-					$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "iis", label => "Machine is in service?", value => 1 }) . "</td>";
-				}
-
+				$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "iis", label => "Machine is in service?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"top\">";
 				$PAGE .= "<td></td><td></td>";
 				$PAGE .= "</tr>";
 
+				$ds ^= 1;
+
 				$PAGE .= "<tr class=\"middle\">";
 				$PAGE .= "<td align=\"right\">Estimated service duration:</td>";
-				$PAGE .= "<td>" . &htmlSelectMenu({ name => "esd", value => \@es, label => \%el, select => $s[10] })  . "</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "esd", value => \@es, label => \%el, select => $s[10], disabled => $ds })  . "</td>";
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"middle\">";
@@ -823,21 +824,21 @@ sub editMachineNode {
 				my ($my, $mm, $md) = (int(substr($s[11], 0, 4)), int(substr($s[11], 4, 2)), int(substr($s[11], 6, 2)));
 
 				if($my == 0 && $mm == 0 && $md == 0) {
-					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $nd });
-					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $nm });
-					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $ny })  . "</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $nd, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $nm, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $ny, disabled => $ds })  . "</td>";
 				}
 				else {
-					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $md });
-					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $mm });
-					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $my })  . "</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $md, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $mm, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $my, disabled => $ds })  . "</td>";
 				}
 
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"middle\">";
 				$PAGE .= "<td align=\"right\">Method of service delivery:</td>";
-				$PAGE .= "<td>" . &htmlInputText({ name => "mosd", value => $s[12], style => "text" }) . "</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "mosd", value => $s[12], style => "text", disabled => $ds }) . "</td>";
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"top\">";
