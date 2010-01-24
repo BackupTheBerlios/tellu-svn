@@ -511,7 +511,13 @@ sub editMachineNode {
 
 	if($q->param('verb') && $q->param('verb') eq "update") {
 		my @r = ();
-		my @i = ('model', 'descr', 'sernum', 'secnum', 'location', 'addinfo');
+		my @i = ('model', 'descr', 'sernum', 'secnum', 'location', 'warranty', 'addinfo');
+
+		if($q->param('acq_day') && $q->param('acq_day') ne "" && $q->param('acq_month') && $q->param('acq_month') ne "" && $q->param('acq_year') && $q->param('acq_year') ne "") {
+			my $ac = $q->param('acq_year') . "-" . $q->param('acq_month') . "-" . $q->param('acq_day') . " 00:00:00";
+
+			@r = sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => 'acquired', option => $ac });
+		}
 
 		foreach my $i (@i) {
 			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => $i, option => cleanHtml({ string => $q->param($i) }) });
@@ -601,6 +607,52 @@ sub editMachineNode {
 	}
 	else {
 		if(!$q->param('leaf') || $q->param('leaf') == 0) {
+			my @oa = ();
+			my @od = ();
+			my @oy = ();
+			my @wa = ();
+			my %ol = ();
+			my %wl = ();
+
+			my ($nw, $nm, $nd, $nt, $ny) = split(/\s+/, localtime(time()), 5);
+			my $j = 0;
+
+			for(my $i = 1; $i < 32; $i++) {
+				$od[$j++] = $i;
+			}
+
+			$j = 0;
+
+			for(my $i = ($ny - 10); $i < ($ny + 2); $i++) {
+				$oy[$j++] = $i;
+			}
+
+			my @r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @oa, $p;
+					$ol{$p} = $m;
+				}
+			}
+
+			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "warranty", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @wa, $p;
+					$wl{$p} = $m;
+				}
+			}
+
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -624,7 +676,7 @@ sub editMachineNode {
 
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -676,7 +728,41 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"top\">";
-				$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Acquired:</td>";
+
+				$s[15] =~ s/\s+.*//;
+				$s[15] =~ s/\-//go;
+
+				my ($my, $mm, $md) = (int(substr($s[15], 0, 4)), int(substr($s[15], 4, 2)), int(substr($s[15], 6, 2)));
+
+				if($my == 0 && $mm == 0 && $md == 0) {
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "acq_day", value => \@od, select => $nd });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_month", value => \@oa, label => \%ol, select => $nm });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_year", value => \@oy, select => $ny })  . "</td>";
+				}
+				else {
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "acq_day", value => \@od, select => $md });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_month", value => \@oa, label => \%ol, select => $mm });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_year", value => \@oy, select => $my })  . "</td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Warranty:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "warranty", value => \@wa, label => \%wl, select => $s[16] })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 				$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => $s[17] }) . "</td>";
 				$PAGE .= "</tr>";
 

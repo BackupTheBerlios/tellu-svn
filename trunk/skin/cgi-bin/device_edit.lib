@@ -399,7 +399,7 @@ sub editDeviceNew {
 	$PAGE .= "</tr>";
 
 	$PAGE .= "<tr class=\"top\">";
-	$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+	$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 	$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => "" }) . "</td>";
 	$PAGE .= "</tr>";
 
@@ -1225,7 +1225,7 @@ sub editDeviceNode {
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"top\">";
-				$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+				$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 				$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => $s[24] }) . "</td>";
 				$PAGE .= "</tr>";
 

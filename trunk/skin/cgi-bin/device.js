@@ -20,6 +20,18 @@ sub deviceListingFuncs {
 	return $r;
 }
 
+sub deviceListingDisposedFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "function popupDevice(host, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('device_d_popup.pl?dev=' +host+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
 sub deviceModifyFuncs {
 	my ($arg) = @_;
 

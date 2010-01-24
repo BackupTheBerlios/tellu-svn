@@ -71,121 +71,45 @@ if($q->param('action')) {
 	}
 }
 elsif($q->param('slice')) {
-	if($d eq "Global summary") {
-		if(&menuMachineDomain({ select => $d }) == 0) {
-			&tableMachineBriefSlice({ system => "Summary", distro => "" });
+	$s = $q->param('slice');
 
-			if($q->param('slice') eq "addinfo" || $q->param('slice') eq "repair" || $q->param('slice') eq "security" || $q->param('slice') eq "warranty") {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => "node", option => "" });
-			}
-			else {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => $q->param('slice'), option => "" });
-			}
-
-			if(checkError({ packet => \@r }) == 0) {
-				&tableMachineBrief({ data => $r[3], slice => $q->param('slice'), sort => $q->param('sort'), order => $q->param('order') });
-			}
-
-			$c[0] = &headCookieSet({ name => "tellu_machine_slice", value => $q->param('slice') });
-
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $d, script => "", header => $d, content => $PAGE, slices => $MENU, cookie => \@c });
-		}
-		else {
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
-		}
+	if(!$s || $s eq "" || $s eq "incs") {
+		$s = "node";
 	}
-	elsif($d eq "Global listing") {
-		if(&menuMachineDomain({ select => $d }) == 0) {
-			&tableMachineListingSlice({ system => "Listing", distro => "" });
 
-			if($q->param('slice') eq "addinfo" || $q->param('slice') eq "repair" || $q->param('slice') eq "security" || $q->param('slice') eq "warranty") {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => "node", option => "" });
-			}
-			else {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => $q->param('slice'), option => "" });
-			}
-
-			if(checkError({ packet => \@r }) == 0) {
-				&tableMachineListing({ data => $r[3], slice => $q->param('slice'), sort => $q->param('sort'), order => $q->param('order') });
-			}
-
-			$c[0] = &headCookieSet({ name => "tellu_machine_slice", value => $q->param('slice') });
-
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $d, script => &machineListingFuncs(), header => $d, content => $PAGE, slices => $MENU, cookie => \@c });
-		}
-		else {
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
-		}
-	}
-	else {
+	if(&machineGlobal({ domain => $d, slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_machine_slice", value => $s }) == 0) {
 		my $f = $g;
 
 		if($q->param('leaf') && $q->param('leaf') ne "") {
 			$f = $q->param('leaf');
 		}
 
-		&machineThing({ node => $n, domain => $d, slice => $q->param('slice'), leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_machine_slice", value => $q->param('slice'), key => $q->param('key') });
+		if(!$f || $f eq "") {
+			$f = 1;
+		}
+
+		&machineThing({ node => $n, domain => $d, slice => $s, leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_machine_slice", value => $s, key => $q->param('key') });
 	}
 }
 elsif($q->param('machineNode')) {
-	&machineThing({ node => $q->param('machineNode'), domain => $d, slice => $s, leaf => $g, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_machine_node", value => $q->param('machineNode'), key => $q->param('key') });
+	my $f = $g;
+
+	if($q->param('leaf') && $q->param('leaf') ne "") {
+		$f = $q->param('leaf');
+	}
+
+	if(!$f || $f eq "") {
+		$f = 1;
+	}
+
+	&machineThing({ node => $q->param('machineNode'), domain => $d, slice => $s, leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_machine_node", value => $q->param('machineNode'), key => $q->param('key') });
 }
 elsif($q->param('machineDomain')) {
-	if($q->param('machineDomain') eq "Global summary") {
-		if(&menuMachineDomain({ select => $d }) == 0) {
-			&tableMachineBriefSlice({ system => "Summary", distro => "" });
-
-			if(!$s || $s eq "") {
-				$s = "node";
-			}
-
-			if($s eq "addinfo" || $s eq "repair" || $s eq "security" || $s eq "warranty") {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => "node", option => "" });
-			}
-			else {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => $s, option => "" });
-			}
-
-			if(checkError({ packet => \@r }) == 0) {
-				&tableMachineBrief({ data => $r[3], slice => $s, sort => $q->param('sort'), order => $q->param('order') });
-			}
-
-			$c[0] = &headCookieSet({ name => "tellu_machine_domain", value => $q->param('machineDomain') });
-
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $q->param('machineDomain'), script => "", header => $q->param('machineDomain'), content => $PAGE, slices => $MENU, cookie => \@c });
-		}
-		else {
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
-		}
+	if(!$s || $s eq "" || $s eq "incs") {
+		$s = "node";
 	}
-	elsif($q->param('machineDomain') eq "Global listing") {
-		if(&menuMachineDomain({ select => $d }) == 0) {
-			&tableMachineListingSlice({ system => "Listing", distro => "" });
 
-			if(!$s || $s eq "") {
-				$s = "node";
-			}
-
-			if($s eq "addinfo" || $s eq "repair" || $s eq "security" || $s eq "warranty") {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => "node", option => "" });
-			}
-			else {
-				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => $s, option => "" });
-			}
-
-			if(checkError({ packet => \@r }) == 0) {
-				&tableMachineListing({ data => $r[3], slice => $s, sort => $q->param('sort'), order => $q->param('order') });
-			}
-
-			$c[0] = &headCookieSet({ name => "tellu_machine_domain", value => $q->param('machineDomain') });
-
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $q->param('machineDomain'), script => &machineListingFuncs(), header => $q->param('machineDomain'), content => $PAGE, slices => $MENU, cookie => \@c });
-		}
-		else {
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
-		}
-	}
-	else {
+	if(&machineGlobal({ domain => $q->param('machineDomain'), slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_machine_domain", value => $q->param('machineDomain') }) == 0) {
 		&tableMachineDomainSlice();
 
 		if(&menuMachineNode({ select => $n, domain => $q->param('machineDomain') }) == 0) {
@@ -213,6 +137,74 @@ exit(0);
 
 
 
+sub machineGlobal {
+	my ($arg) = @_;
+
+	my @c = ();
+	my @r = ();
+
+	my $r = 0;
+
+	my $s = $q->param('slice');
+
+	if(!$s || $s eq "" || $s eq "incs") {
+		$s = "node";
+	}
+
+	if($arg->{domain} eq "Global summary") {
+		if(&menuMachineDomain({ select => $arg->{domain} }) == 0) {
+			&tableMachineBriefSlice({ system => "Summary", distro => "" });
+
+			if($s eq "addinfo" || $s eq "repair" || $s eq "security" || $s eq "warranty") {
+				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => "node", option => "" });
+			}
+			else {
+				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => $s, option => "" });
+			}
+
+			if(checkError({ packet => \@r }) == 0) {
+				&tableMachineBrief({ data => $r[3], slice => $s, sort => $arg->{sort}, order => $arg->{order} });
+			}
+
+			$c[0] = &headCookieSet({ name => $arg->{cookie}, value => $arg->{value} });
+
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $arg->{domain}, script => "", header => $arg->{domain}, content => $PAGE, slices => $MENU, cookie => \@c });
+		}
+		else {
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
+		}
+
+		$r++;
+	}
+	elsif($arg->{domain} eq "Global listing") {
+		if(&menuMachineDomain({ select => $arg->{domain} }) == 0) {
+			&tableMachineListingSlice({ system => "Listing", distro => "" });
+
+			if($s eq "addinfo" || $s eq "repair" || $s eq "security" || $s eq "warranty") {
+				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => "node", option => "" });
+			}
+			else {
+				@r = &sendCommand({ command => "pullMachine", item => "", domain => "", param => $s, option => "" });
+			}
+
+			if(checkError({ packet => \@r }) == 0) {
+				&tableMachineListing({ data => $r[3], slice => $s, sort => $arg->{sort}, order => $arg->{order} });
+			}
+
+			$c[0] = &headCookieSet({ name => $arg->{cookie}, value => $arg->{value} });
+
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $arg->{domain}, script => &machineListingFuncs(), header => $arg->{domain}, content => $PAGE, slices => $MENU, cookie => \@c });
+		}
+		else {
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
+		}
+
+		$r++;
+	}
+
+	return $r;
+}
+
 sub machineThing {
 	my ($arg) = @_;
 
@@ -223,7 +215,7 @@ sub machineThing {
 		if(&menuMachineNode({ select => $arg->{node}, domain => $arg->{domain} }) == 0) {
 			&tableMachineBriefSlice({ system => "Summary", distro => "" });
 
-			if(!$arg->{slice} || $arg->{slice} eq "") {
+			if(!$arg->{slice} || $arg->{slice} eq "" || $arg->{slice} eq "incs") {
 				$arg->{slice} = "node";
 			}
 
@@ -250,7 +242,7 @@ sub machineThing {
 		if(&menuMachineNode({ select => $arg->{node}, domain => $arg->{domain} }) == 0) {
 			&tableMachineListingSlice({ system => "Listing", distro => "" });
 
-			if(!$arg->{slice} || $arg->{slice} eq "") {
+			if(!$arg->{slice} || $arg->{slice} eq "" || $arg->{slice} eq "incs") {
 				$arg->{slice} = "node";
 			}
 
@@ -275,12 +267,12 @@ sub machineThing {
 	}
 	else {
 		if(&menuMachineNode({ select => $arg->{node}, domain => $arg->{domain} }) == 0) {
+			my $t = "";
+			my $u = "";
+
 			if(!$arg->{slice} || $arg->{slice} eq "") {
 				$arg->{slice} = "node";
 			}
-
-			my $t = "";
-			my $u = "";
 
 			if($arg->{slice} eq "addinfo" || $arg->{slice} eq "repair" || $arg->{slice} eq "security" || $arg->{slice} eq "warranty") {
 				@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });

@@ -100,7 +100,7 @@ option {
 
 #file:disabled {
 	background: #e8e8e8;
-	border: inset 2px #ffffff;
+	border: solid 2px #ffffff;
 	color: #808080;
 	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-style: italic;
@@ -126,7 +126,7 @@ option {
 
 #text:disabled {
 	background: #e8e8e8;
-	border: inset 2px #ffffff;
+	border: solid 2px #ffffff;
 	color: #808080;
 	font-style: italic;
 	padding: 6px;
@@ -151,7 +151,7 @@ option {
 
 #textreq:disabled {
 	background: #e8e8e8;
-	border: inset 2px #bb6666;
+	border: solid 2px #bb6666;
 	color: #808080;
 	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-style: italic;
@@ -177,7 +177,7 @@ option {
 
 #pwd:disabled {
 	background: #e8e8e8;
-	border: inset 2px #ffffff;
+	border: solid 2px #ffffff;
 	color: #808080;
 	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-style: italic;
@@ -203,7 +203,7 @@ option {
 
 #pwdreq:disabled {
 	background: #e8e8e8;
-	border: inset 2px #bb6666;
+	border: solid 2px #bb6666;
 	color: #808080;
 	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-style: italic;
@@ -240,7 +240,7 @@ option {
 
 #textarea:disabled {
 	background: #e8e8e8 url("/pics/paper.png") repeat;
-	border: inset 2px #ffffff;
+	border: solid 2px #ffffff;
 	color: #808080;
 	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
 	font-style: italic;

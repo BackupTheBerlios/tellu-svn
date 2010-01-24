@@ -16,7 +16,7 @@ require "device.lib";
 my @c = ();
 my @r = ();
 
-my $n = &headCookieGet({ name => "tellu_device_popup_node" });
+my $n = &headCookieGet({ name => "tellu_device_d_popup_node" });
 
 if($q->param('dev') && $q->param('dev') ne "") {
 	$n = $q->param('dev');
@@ -53,7 +53,7 @@ if(checkError({ packet => \@r }) == 0) {
 	}
 }
 
-$c[0] = &headCookieSet({ name => "tellu_device_popup_node", value => $n });
+$c[0] = &headCookieSet({ name => "tellu_device_d_popup_node", value => $n });
 
 &htmlPage({ template => "popup", title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
 

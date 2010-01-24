@@ -153,7 +153,7 @@ sub tableDeviceBrief {
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
-		my $t = "Additional information,Description";
+		my $t = "Additional info,Description";
 		my $m = "0,0";
 
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
@@ -300,8 +300,8 @@ sub tableDeviceBriefs {
 sub tableDeviceDetail {
 	my ($arg) = @_;
 
-	if($arg->{slice} eq "fle" || $arg->{slice} eq "files") {
-		my $t = "Owner,Name,Filename,Size,Public,Description,Additional information";
+	if($arg->{slice} eq "fle" || ($arg->{slice} eq "incs" && $arg->{leaf} == 1)){
+		my $t = "Owner,Name,Filename,Size,Public,Description,Additional info";
 		my $m = "0,0,14,3,9,0,0";
 
 		my @j = ();
@@ -318,11 +318,29 @@ sub tableDeviceDetail {
 
 		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
-	elsif($arg->{slice} eq "pwd" || $arg->{slice} eq "passwds") {
-		my $t = "Owner,Name,Service,Username,Password,Public,Description,Additional information";
+	elsif($arg->{slice} eq "pwd" || ($arg->{slice} eq "incs" && $arg->{leaf} == 2)) {
+		my $t = "Owner,Name,Service,Username,Password,Public,Description,Additional info";
 		my $m = "0,0,0,0,8,9,0,0";
 
 		&tableDeviceDetails({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 3) {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 4) {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 5) {
+		my $t = "Name,Street,Zip,Town,Country";
+		my $m = "0,0,0,0,0";
+
+		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "dev") {
 		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
@@ -375,7 +393,7 @@ sub tableDeviceDetail {
 		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
-		my $t = "Additional information,Description";
+		my $t = "Additional info,Description";
 		my $m = "0,0";
 
 		for(my $i = 0; $i < 23; $i++) {
@@ -503,37 +521,37 @@ sub tableDeviceListing {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Device,Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "21,0,0,0,0,23,22";
+		my $m = "24,0,0,0,0,23,22";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
 		my $t = "Device,Network support,IP address";
-		my $m = "21,9,0";
+		my $m = "24,9,0";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "security") {
 		my $t = "Device,Serial number,Security number,Location";
-		my $m = "21,0,0,0";
+		my $m = "24,0,0,0";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
 		my $t = "Device,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "21,9,18,20,0,17,20";
+		my $m = "24,9,18,20,0,17,20";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
 		my $t = "Device,Acquired,Warranty";
-		my $m = "21,20,19";
+		my $m = "24,20,19";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
-		my $t = "Device,Additional information,Description";
-		my $m = "21,0,0";
+		my $t = "Device,Additional info,Description";
+		my $m = "24,0,0";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
@@ -771,8 +789,7 @@ sub tableDeviceDetailSlice {
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
 
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=files\">Files</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=passwds\">Passwords</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=incs\" style=\"background: #735162;\">Inclusions</a></li>";
 
 	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Edit notes</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";
@@ -796,9 +813,6 @@ sub tableDDeviceDetailSlice {
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
-
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=files\">Files</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=passwds\">Passwords</a></li>";
 
 	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Notes</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";

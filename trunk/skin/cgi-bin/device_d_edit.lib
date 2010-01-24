@@ -8,39 +8,39 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
-sub editDisposedMachineNode {
+sub editDisposedDeviceNode {
 	my ($arg) = @_;
 
 	if($q->param('restore') == 1) {
-		my @r = &sendCommand({ command => "restoreDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
+		my @r = &sendCommand({ command => "restoreDisposedDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) != 0) {
-			$PAGE .= "<p class=\"warning\">Error occurred while trying to restore " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to restore device.</p>";
 
 			if($SESSION_ERR && $SESSION_ERR ne "") {
 				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 			}
 		}
 		else {
-			$PAGE .= $arg->{node} . "." . $arg->{domain} . " is restored.</p>";
+			$PAGE .= "Device is restored.</p>";
 		}
 	}
 	elsif($q->param('disposed') == 2) {
-		my @r = &sendCommand({ command => "deleteDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
+		my @r = &sendCommand({ command => "deleteDisposedDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) != 0) {
-			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose device.</p>";
 
 			if($SESSION_ERR && $SESSION_ERR ne "") {
 				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 			}
 		}
 		else {
-			$PAGE .= $arg->{node} . "." . $arg->{domain} . " is disposed permanently.</p>";
+			$PAGE .= "Device is disposed permanently.</p>";
 		}
 	}
 	else {
-		my @r = &sendCommand({ command => "pullDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+		my @r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
 			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
@@ -51,12 +51,12 @@ sub editDisposedMachineNode {
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td align=\"right\" width=\"20%\">&nbsp;</td>";
-			$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "restore", label => "Restore this machine?", value => 1, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
+			$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "restore", label => "Restore this device?", value => 1, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
 			$PAGE .= "</tr>";
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td align=\"right\">&nbsp;</td>";
-			$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this machine permanently?", value => 2, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
+			$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this device permanently?", value => 2, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
 			$PAGE .= "</tr>";
 
 			$PAGE .= "<tr class=\"top\">";
@@ -78,7 +78,7 @@ sub editDisposedMachineNode {
 	}
 }
 
-sub editDisposedMachineNote {
+sub editDisposedDeviceNote {
 	my ($arg) = @_;
 
 	my @l = ('Review existing notes', 'Add new note');
@@ -104,20 +104,20 @@ sub editDisposedMachineNote {
 
 	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-	my @r = &sendCommand({ command => "pullDisposedMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+	my @r = &sendCommand({ command => "pullDevice", item => $arg->{node}, domain => "", param => "", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-		$s[19] = cleanNull({ string => $s[19] });
+		$s[26] = cleanNull({ string => $s[26] });
 
-		if(!$s[19] || $s[19] eq "") {
-			$s[19] = "No notes are available for this node.";
+		if(!$s[26] || $s[26] eq "") {
+			$s[26] = "No notes are available for this device.";
 		}
 		else {
-			$s[19] =~ s/<DELIMBEG>/<h4>/go;
-			$s[19] =~ s/<DELIMEND>/<\/h4>/go;
-			$s[19] =~ s/<DELIMSEP>/ commented at /go;
+			$s[26] =~ s/<DELIMBEG>/<h4>/go;
+			$s[26] =~ s/<DELIMEND>/<\/h4>/go;
+			$s[26] =~ s/<DELIMSEP>/ commented at /go;
 		}
 
 		$PAGE .= "<tr class=\"top\">";
@@ -125,7 +125,7 @@ sub editDisposedMachineNote {
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
-		$PAGE .= "<td width=\"100%\">" . $s[19] . "</td>";
+		$PAGE .= "<td width=\"100%\">" . $s[26] . "</td>";
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";

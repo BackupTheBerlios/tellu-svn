@@ -204,7 +204,7 @@ sub editPersonalFile {
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
-		$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+		$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 		$PAGE .= "<td>" . &htmlInputField({ name => "note", value => "" }) . "</td>";
 		$PAGE .= "</tr>";
 
@@ -358,7 +358,7 @@ sub editPersonalFile {
 						$PAGE .= "</tr>";
 
 						$PAGE .= "<tr class=\"top\">";
-						$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+						$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 						$PAGE .= "<td>" . &htmlInputField({ name => "note", value => $s[7] }) . "</td>";
 						$PAGE .= "</tr>";
 
@@ -521,7 +521,7 @@ sub editPersonalFile {
 						$PAGE .= "</tr>";
 
 						$PAGE .= "<tr class=\"top\">";
-						$PAGE .= "<td align=\"right\">Additional&nbsp;information&nbsp;&sup3;:</td>";
+						$PAGE .= "<td align=\"right\">Additional&nbsp;info&nbsp;&sup3;:</td>";
 						$PAGE .= "<td>" . &htmlInputField({ name => "note", value => $s[7], readonly => 1 }) . "</td>";
 						$PAGE .= "</tr>";
 
@@ -788,7 +788,7 @@ sub editPersonalPwds {
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
-		$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+		$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 		$PAGE .= "<td>" . &htmlInputField({ name => "note", value => "" }) . "</td>";
 		$PAGE .= "</tr>";
 
@@ -978,7 +978,7 @@ sub editPersonalPwds {
 						$PAGE .= "</tr>";
 
 						$PAGE .= "<tr class=\"top\">";
-						$PAGE .= "<td align=\"right\">Additional&nbsp;information:</td>";
+						$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 						$PAGE .= "<td>" . &htmlInputField({ name => "note", value => $s[8] }) . "</td>";
 						$PAGE .= "</tr>";
 
@@ -1159,7 +1159,7 @@ sub editPersonalPwds {
 						$PAGE .= "</tr>";
 
 						$PAGE .= "<tr class=\"top\">";
-						$PAGE .= "<td align=\"right\">Additional&nbsp;information&nbsp;&sup3;:</td>";
+						$PAGE .= "<td align=\"right\">Additional&nbsp;info&nbsp;&sup3;:</td>";
 						$PAGE .= "<td>" . &htmlInputField({ name => "note", value => $s[8], readonly => 1 }) . "</td>";
 						$PAGE .= "</tr>";
 
