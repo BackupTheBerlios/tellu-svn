@@ -73,7 +73,7 @@ if($q->param('action')) {
 elsif($q->param('slice')) {
 	$s = $q->param('slice');
 
-	if(!$s || $s eq "" || $s eq "incs") {
+	if(!$s || $s eq "") {
 		$s = "node";
 	}
 
