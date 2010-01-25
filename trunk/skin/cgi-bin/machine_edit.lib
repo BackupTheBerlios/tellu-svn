@@ -8,6 +8,381 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
+sub editMachineNew {
+	my ($arg) = @_;
+
+	if($q->param('verb') && $q->param('verb') eq "create") {
+		my $nd = "";
+		my $dn = "";
+
+		if($q->param('node') && $q->param('node') ne "") {
+			$nd = $q->param('node');
+		}
+		elsif($q->param('ext_node') && $q->param('ext_node') ne "") {
+			$nd = $q->param('ext_node');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Host name cannot be empty.</p>";
+		}
+
+		if($q->param('domain') && $q->param('domain') ne "") {
+			$dn = $q->param('domain');
+		}
+		elsif($q->param('ext_domain') && $q->param('ext_domain') ne "") {
+			$dn = $q->param('ext_domain');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Domain name cannot be empty.</p>";
+		}
+
+		if($nd && $nd ne "" && $dn && $dn ne "") {
+			my @r = &sendCommand({ command => "newMachine", item => cleanHtml({ string => $nd }), domain => cleanHtml({ string => $dn }), param => "", option => "" });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to create new machine.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+			else {
+				my @i = ('sys', 'rel', 'dist', 'arch', 'model', 'descr', 'addinfo');
+
+				foreach my $i (@i) {
+					@r = &sendCommand({ command => "pushMachine", item => cleanHtml({ string => $nd }), domain => cleanHtml({ string => $dn }), param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to create new machine.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+
+				$PAGE .= "<p class=\"info\">" . $nd . "." . $dn . " is created.</p>";
+			}
+		}
+	}
+
+	my @nd = ();
+	my @dn = ();
+	my @sy = ();
+	my @re = ();
+	my @di = ();
+	my @pl = ();
+	my %nd = ();
+	my %dn = ();
+	my %sy = ();
+	my %re = ();
+	my %di = ();
+	my %pl = ();
+
+	my @r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "node", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+			$p[0] = cleanNull({ string => $p[0] });
+
+			$nd{$p[0]}++ if($p[0] ne "");
+		}
+	}
+
+	while((my $key, $val) = each %nd) {
+		push @nd, $key;
+	}
+
+	@nd = sort { uc($a) cmp uc($b) } @nd;
+
+	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+			$p[0] = cleanNull({ string => $p[0] });
+
+			$dn{$p[0]}++ if($p[0] ne "");
+		}
+	}
+
+	while((my $key, $val) = each %dn) {
+		push @dn, $key;
+	}
+
+	@dn = sort { uc($a) cmp uc($b) } @dn;
+
+	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "sys", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+			$p[0] = cleanNull({ string => $p[0] });
+
+			$sy{$p[0]}++ if($p[0] ne "");
+		}
+	}
+
+	while((my $key, $val) = each %sy) {
+		push @sy, $key;
+	}
+
+	@sy = sort { uc($a) cmp uc($b) } @sy;
+
+	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "rel", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+			$p[0] = cleanNull({ string => $p[0] });
+
+			$re{$p[0]}++ if($p[0] ne "");
+		}
+	}
+
+	while((my $key, $val) = each %re) {
+		push @re, $key;
+	}
+
+	@re = sort { uc($a) cmp uc($b) } @re;
+
+	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "dist", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+			$p[0] = cleanNull({ string => $p[0] });
+
+			$di{$p[0]}++ if($p[0] ne "");
+		}
+	}
+
+	while((my $key, $val) = each %di) {
+		push @di, $key;
+	}
+
+	@di = sort { uc($a) cmp uc($b) } @di;
+
+	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "arch", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+			$p[0] = cleanNull({ string => $p[0] });
+
+			$pl{$p[0]}++ if($p[0] ne "");
+		}
+	}
+
+	while((my $key, $val) = each %pl) {
+		push @pl, $key;
+	}
+
+	@pl = sort { uc($a) cmp uc($b) } @pl;
+
+	my @l = ('Create new machine');
+
+	$PAGE .= &htmlFormBegin({ name => "createForm", action => $SELF . "?action=modify&verb=create", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<p>&nbsp;</p>";
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	my $s = 0;
+
+	foreach my $l (@l) {
+		if($s == $q->param('leaf')) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\" width=\"20%\">Host name&nbsp;&sup1;:</td>";
+	$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "node", value => "", style => "textreq" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@nd) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing host name", -values => \@nd, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_node", value => \@t, onchange => "toggleNodeField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Domain name&nbsp;&sup1;:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "domain", value => "", style => "textreq" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@dn) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing domain name", -values => \@dn, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_domain", value => \@t, onchange => "toggleDomainField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">System:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "sys", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@sy) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing system", -values => \@sy, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_sys", value => \@t, onchange => "toggleSystemField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Release:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "rel", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@re) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing release", -values => \@re, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_rel", value => \@t, onchange => "toggleReleaseField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Distribution:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "dist", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@di) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing distribution", -values => \@di, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_dist", value => \@t, onchange => "toggleDistributionField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Platform:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "arch", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@pl) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing platform", -values => \@pl, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_arch", value => \@t, onchange => "togglePlatformField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Machine&nbsp;model:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "model", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Machine&nbsp;description:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+	$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Create" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+	$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+	$PAGE .= &htmlHiddenField({ name => "verb", value => "create" });
+
+	$PAGE .= &htmlFormEnd();
+}
+
 sub editMachineNode {
 	my ($arg) = @_;
 

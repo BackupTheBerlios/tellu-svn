@@ -50,8 +50,6 @@ sub editDeviceNew {
 			my $ns = 0;
 			my $ip = "";
 
-			my @i = ('size', 'memory', 'connection', 'sernum', 'secnum', 'location', 'warranty', 'addinfo', 'descr');
-
 			my @r = sendCommand({ command => "newDevice", item => cleanHtml({ string => $ca }), domain => "", param => cleanHtml({ string => $mo }), option => cleanHtml({ string => $ma }) });
 
 			if(checkError({ packet => \@r }) == 0) {
@@ -74,6 +72,8 @@ sub editDeviceNew {
 
 					@r = sendCommand({ command => "pushDevice", item => $s[0], domain => "", param => 'acquired', option => $ac });
 				}
+
+				my @i = ('size', 'memory', 'connection', 'sernum', 'secnum', 'location', 'warranty', 'addinfo', 'descr');
 
 				foreach my $i (@i) {
 					@r = sendCommand({ command => "pushDevice", item => $s[0], domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });

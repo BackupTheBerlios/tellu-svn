@@ -4,6 +4,7 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_READ, "listMachine", NULL, listMachine, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "pullMachine", NULL, pullMachine, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "pullMachineByID", NULL, pullMachineByID, replyFree },
+	{ PRIVILEGE_LEVEL_WRITE, "newMachine", NULL, newMachine, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "pushMachine", NULL, pushMachine, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "searchMachine", NULL, searchMachine, replyFree },
 	{ PRIVILEGE_LEVEL_DELETE, "deleteMachine", NULL, deleteMachine, replyFree },

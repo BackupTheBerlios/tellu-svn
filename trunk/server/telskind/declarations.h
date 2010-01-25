@@ -98,6 +98,7 @@ extern void pidRemove(void);
 
 // rand.c
 extern int randRandom(int, struct timeval *);
+extern unsigned long long randGetId(struct threadInfo *);
 
 // reply.c
 extern void replyPrepare(unsigned int, unsigned int, unsigned int, char *, struct threadInfo *);
@@ -213,6 +214,7 @@ extern char *fetchLog(int, int, struct threadInfo *);
 extern char *listMachine(struct threadInfo *);
 extern char *pullMachine(struct threadInfo *);
 extern char *pullMachineByID(struct threadInfo *);
+extern char *newMachine(struct threadInfo *);
 extern char *pushMachine(struct threadInfo *);
 extern char *searchMachine(struct threadInfo *);
 extern char *deleteMachine(struct threadInfo *);

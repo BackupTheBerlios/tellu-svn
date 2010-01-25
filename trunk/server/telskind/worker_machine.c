@@ -67,6 +67,22 @@ char *pullMachineByID(struct threadInfo * ti) {
 	return(fetchMachine(30, QUERY_TYPE_PULL, ti));
 }
 
+char *newMachine(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Create new machine
+	return(fetchMachine(32, QUERY_TYPE_PUSH, ti));
+}
+
 char *pushMachine(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
@@ -2265,6 +2281,21 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+
+				break;
+			case 32:
+				// Create new machine
+				ti->id = randGetId(ti);
+
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLECOL_MACHINE_NODE " (" TABLECOL_MACHINE_NID ", " TABLECOL_MACHINE_NODE ", " TABLECOL_MACHINE_DOMAIN ", " TABLECOL_MACHINE_DISPOSED ") VALUES('%llu', '%s', '%s', '0')%c",
+					ti->id,
+					ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
+					ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer,
+					0
+				);
 
 				break;
 			default:

@@ -129,6 +129,9 @@ struct threadInfo {
 	unsigned int o;								// Thread local variables
 	int threadSocket;							// Thread socket handle
 	unsigned int tmpSeconds;						// Thread timer temporary seconds
+	unsigned char *cc, *dd;							// Thread database id variables
+	unsigned long long v, w;						// Thread database id variables
+	unsigned long long id;							// Thread database id
 	char *dataPacket, *tmpPacket;						// Thread data packet pointer
 	char *dataDeflate;							// Thread data packet pointer for decompression
 	char *dataPointer, *dataString, *dataBuffer, *sendBuffer;		// Thread data pointers
@@ -149,6 +152,7 @@ struct threadInfo {
 	clock_t clockEnd;							// Thread end clock
 	struct tms beginClock;							// Thread begin clock structure
 	struct tms endClock;							// Thread end clock structure
+	struct timeval timeVal;							// Thread timeval structure
 
 	struct threadHandlerInfo handlerArrays[DATA_ARRAYS_COUNT];		// Thread client request structure
 
