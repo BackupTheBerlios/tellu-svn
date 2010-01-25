@@ -1128,7 +1128,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"middle\">";
-				$PAGE .= "<td align=\"right\">Warranty:</td>";
+				$PAGE .= "<td align=\"right\">Warranty period:</td>";
 				$PAGE .= "<td>" . &htmlSelectMenu({ name => "warranty", value => \@wa, label => \%wl, select => $s[16] })  . "</td>";
 				$PAGE .= "</tr>";
 

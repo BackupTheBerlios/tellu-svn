@@ -265,7 +265,7 @@ sub tableMachineBrief {
 		&tableMachineBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Acquired,Warranty";
+		my $t = "Acquired,Warranty period";
 		my $m = "20,19";
 
 		my @j = ();
@@ -561,7 +561,7 @@ sub tableMachineDetail {
 		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Acquired,Warranty";
+		my $t = "Acquired,Warranty period";
 		my $m = "20,19";
 
 		my @j = ();
@@ -890,7 +890,7 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Node,Acquired,Warranty";
+		my $t = "Node,Acquired,Warranty period";
 		my $m = "21,20,19";
 		my $id = 0;
 

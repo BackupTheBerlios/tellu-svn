@@ -147,7 +147,7 @@ sub tableDeviceBrief {
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Acquired,Warranty";
+		my $t = "Acquired,Warranty period";
 		my $m = "20,19";
 
 		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
@@ -383,7 +383,7 @@ sub tableDeviceDetail {
 		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Acquired,Warranty";
+		my $t = "Acquired,Warranty period";
 		my $m = "20,19";
 
 		for(my $i = 0; $i < 21; $i++) {
@@ -544,7 +544,7 @@ sub tableDeviceListing {
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
-		my $t = "Device,Acquired,Warranty";
+		my $t = "Device,Acquired,Warranty period";
 		my $m = "24,20,19";
 
 		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });

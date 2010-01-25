@@ -390,7 +390,7 @@ sub editDeviceNew {
 	$PAGE .= "</tr>";
 
 	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\">Warranty:</td>";
+	$PAGE .= "<td align=\"right\">Warranty period:</td>";
 	$PAGE .= "<td>" . &htmlSelectMenu({ name => "warranty", value => \@wa, label => \%wl })  . "</td>";
 	$PAGE .= "</tr>";
 
@@ -1216,7 +1216,7 @@ sub editDeviceNode {
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"middle\">";
-				$PAGE .= "<td align=\"right\">Warranty:</td>";
+				$PAGE .= "<td align=\"right\">Warranty period:</td>";
 				$PAGE .= "<td>" . &htmlSelectMenu({ name => "warranty", value => \@wa, label => \%wl, select => $s[23] })  . "</td>";
 				$PAGE .= "</tr>";
 
