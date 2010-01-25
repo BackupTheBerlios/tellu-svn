@@ -1,0 +1,850 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+require "chest.lib";
+require "network.lib";
+require "prefs.lib";
+require "item.lib";
+
+sub menuPeripheral {
+	my ($arg) = @_;
+
+	my @r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @o = ();
+		my @t = ();
+		my %l = ();
+
+		if($r[3] && $r[3] ne "") {
+			$t[0] = $q->optgroup( -name => "Peripheral Groups", -values => [ "Peripheral summary", "Peripheral listing" ], -class => "header" );
+
+			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+				my @s = split(/$ITEM_SEPARATOR/, $e);
+
+				push @o, $s[0];
+				$l{$s[0]} = $s[1] . " " . $s[2] . " (" . $s[3] . ")";
+			}
+
+			$t[1] = $q->optgroup( -name => "Peripherals", -values => \@o, -labels => \%l, -class => "header" );
+
+			$PAGE .= &htmlFormBegin({ name => "peripheralsForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= &htmlSelectMenu({ name => "peripheralNode", value => \@t, select => $arg->{select} });
+			$PAGE .= "&nbsp;";
+			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= "<p>&nbsp;</p>";
+		}
+		else {
+			@t[0] = 0;
+			$l{0} = "No items available";
+
+			$PAGE .= &htmlFormBegin({ name => "peripheralsForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= &htmlSelectMenu({ name => "peripheralNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
+			$PAGE .= "&nbsp;";
+			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>", disabled => 1 });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= "<p>&nbsp;</p>";
+		}
+
+		return(0);
+	}
+
+	return(-1);
+}
+
+sub menuDPeripheral {
+	my ($arg) = @_;
+
+	my @r = &sendCommand({ command => "listDisposedPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @o = ();
+		my @t = ();
+		my %l = ();
+
+		if($r[3] && $r[3] ne "") {
+			$t[0] = $q->optgroup( -name => "Peripheral Groups", -values => [ "Peripheral summary", "Peripheral listing" ], -class => "header" );
+
+			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+				my @s = split(/$ITEM_SEPARATOR/, $e);
+
+				push @o, $s[0];
+				$l{$s[0]} = $s[1] . " " . $s[2] . " (" . $s[3] . ")";
+			}
+
+			$t[1] = $q->optgroup( -name => "Peripherals", -values => \@o, -labels => \%l, -class => "header" );
+
+			$PAGE .= &htmlFormBegin({ name => "peripheralsDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= &htmlSelectMenu({ name => "peripheralNode", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= "&nbsp;";
+			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= "<p>&nbsp;</p>";
+		}
+		else {
+			@t[0] = 0;
+			$l{0} = "No items available";
+
+			$PAGE .= &htmlFormBegin({ name => "peripheralsDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= &htmlSelectMenu({ name => "peripheralNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
+			$PAGE .= "&nbsp;";
+			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>", disabled => 1 });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= "<p>&nbsp;</p>";
+		}
+
+		return(0);
+	}
+
+	return(-1);
+}
+
+sub tablePeripheralBrief {
+	my ($arg) = @_;
+
+	if($arg->{slice} eq "dev") {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tablePeripheralBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "net") {
+		my $t = "Network support,IP address";
+		my $m = "9,0";
+
+		&tablePeripheralBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "security") {
+		my $t = "Serial number,Security number,Location";
+		my $m = "0,0,0";
+
+		&tablePeripheralBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "repair") {
+		my $t = "Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
+		my $m = "9,18,20,0,17,20";
+
+		&tablePeripheralBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "warranty") {
+		my $t = "Acquired,Warranty period";
+		my $m = "20,19";
+
+		&tablePeripheralBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "add") {
+		my $t = "Additional info,Description";
+		my $m = "0,0";
+
+		&tablePeripheralBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+}
+
+sub tablePeripheralBriefs {
+	my ($arg) = @_;
+
+	my @t = split(/,/, $arg->{title});
+	my @m = split(/,/, $arg->{modifier});
+
+	my @i = split(/$ITEM_DELIMITER/, $arg->{data});
+
+	#
+	# Create item hashs
+	#
+
+	foreach my $i (@i) {
+		my @j = split(/$ITEM_SEPARATOR/, $i);
+
+		shift(@j);
+
+		for(my $k = 0; $k < @t; $k++) {
+			my $s = "h" . $k;
+
+			if($j[$k] && $j[$k] ne "" && $j[$k] ne "(null)") {
+				my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
+
+				if($r && $r ne "") {
+					$$s{$r}++;
+				}
+			}
+		}
+	}
+
+	#
+	# Create table header
+	#
+
+	$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
+	$PAGE .= "<tr class=\"top\">";
+
+	my $i = 1;
+
+	foreach my $t (@t) {
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=d" . "\">" . $t . "</a></td>";
+		}
+		else {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=a" . "\">" . $t . "</a></td>";
+		}
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr class=\"top\">";
+
+	#
+	# Display and sort briefing in requested order
+	#
+
+	my $ev = 0;
+
+	for(my $k = 0; $k < @t; $k++) {
+		if($ev == 0) {
+			$PAGE .= "<td class=\"c1\"><ul class=\"tight\">";
+		}
+		else {
+			$PAGE .= "<td class=\"c2\"><ul class=\"tight\">";
+		}
+
+		$ev ^= 1;
+
+		my $s = "h" . $k;
+		my @v = ();
+
+		while((my $l, $v) = each %$s) {
+			push @v, $v . " " . $l;
+		}
+
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			@v = sort { $b <=> $a } @v;
+		}
+		else {
+			@v = sort { $a <=> $b } @v;
+		}
+
+		#
+		# Sort also individual items in briefing
+		#
+
+		my @of = ();
+		my ($oe) = split(/\s+/, $v[0]);
+
+		for(my $v = 0; $v < @v; $v++) {
+			my ($e, $f) = split(/\s+/, $v[$v], 2);
+
+			if($e == $oe) {
+				push @of, $f;
+			}
+
+			if($e != $oe) {
+				if(!$arg->{order} || $arg->{order} eq "a") {
+					@of = sort { uc($a) cmp uc($b) } @of;
+				}
+				else {
+					@of = sort { uc($b) cmp uc($a) } @of;
+				}
+
+				foreach my $o (@of) {
+					$PAGE .= "<li>" . $oe . "&nbsp;pcs&nbsp;" . $o . "</li>";
+				}
+
+				$oe = $e;
+				@of = ();
+
+				push @of, $f;
+			}
+		}
+
+		if(@of) {
+			if(!$arg->{order} || $arg->{order} eq "a") {
+				@of = sort { uc($a) cmp uc($b) } @of;
+			}
+			else {
+				@of = sort { uc($b) cmp uc($a) } @of;
+			}
+
+			foreach my $o (@of) {
+				$PAGE .= "<li>" . $oe . "&nbsp;pcs&nbsp;" . $o . "</li>";
+			}
+		}
+		else {
+			$PAGE .= "n/a";
+		}
+
+		$PAGE .= "</ul></td>";
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+}
+
+sub tablePeripheralDetail {
+	my ($arg) = @_;
+
+	if($arg->{slice} eq "fle" || ($arg->{slice} eq "incs" && $arg->{leaf} == 1)){
+		my $t = "Owner,Name,Filename,Size,Public,Description,Additional info";
+		my $m = "0,0,14,3,9,0,0";
+
+		my @j = ();
+		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
+
+		foreach my $i (@i) {
+			my @s = split(/$ITEM_SEPARATOR/, $i);
+
+			$s[3] .= "|" . $s[8];
+			$i = join($ITEM_SEPARATOR, @s);
+
+			push @j, $i;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "pwd" || ($arg->{slice} eq "incs" && $arg->{leaf} == 2)) {
+		my $t = "Owner,Name,Service,Username,Password,Public,Description,Additional info";
+		my $m = "0,0,0,0,8,9,0,0";
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 3) {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 4) {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 5) {
+		my $t = "Name,Street,Zip,Town,Country";
+		my $m = "0,0,0,0,0";
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "dev") {
+		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "0,0,0,0,23,22";
+
+		for(my $i = 0; $i < 4; $i++) {
+			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "net") {
+		my $t = "Network support,IP address";
+		my $m = "9,0";
+
+		for(my $i = 0; $i < 10; $i++) {
+			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "security") {
+		my $t = "Serial number,Security number,Location";
+		my $m = "0,0,0";
+
+		for(my $i = 0; $i < 12; $i++) {
+			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "repair") {
+		my $t = "Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
+		my $m = "9,18,20,0,17,20";
+
+		for(my $i = 0; $i < 15; $i++) {
+			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "warranty") {
+		my $t = "Acquired,Warranty period";
+		my $m = "20,19";
+
+		for(my $i = 0; $i < 21; $i++) {
+			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "add") {
+		my $t = "Additional info,Description";
+		my $m = "0,0";
+
+		for(my $i = 0; $i < 23; $i++) {
+			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
+		}
+
+		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+}
+
+sub tablePeripheralDetails {
+	my ($arg) = @_;
+
+	my @t = split(/,/, $arg->{title});
+	my @m = split(/,/, $arg->{modifier});
+
+	#
+	# Create table header
+	#
+
+	$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
+	$PAGE .= "<tr class=\"top\">";
+
+	my $i = 1;
+
+	foreach my $t (@t) {
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=d" . "\">" . $t . "</a></td>";
+		}
+		else {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=a" . "\">" . $t . "</a></td>";
+		}
+	}
+
+	$PAGE .= "</tr>";
+
+	#
+	# Display and sort items in requested order
+	#
+
+	my @i = split(/$ITEM_DELIMITER/, $arg->{data});
+
+	if($arg->{sort}) {
+		my @k = ();
+
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+
+			$j[0] = $j[$arg->{sort}];
+
+			push @k, join($ITEM_SEPARATOR, @j);
+		}
+
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			@i = sort { uc($a) cmp uc($b) } @k;
+		}
+		else {
+			@i = sort { uc($b) cmp uc($a) } @k;
+		}
+	}
+
+	if(@i) {
+		foreach my $i (@i) {
+			my $ev = 0;
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+
+			shift(@j);
+
+			$PAGE .= "<tr class=\"top\">";
+
+			for(my $k = 0; $k < @t; $k++) {
+				if($ev == 0) {
+					$PAGE .= "<td class=\"c1\">";
+				}
+				else {
+					$PAGE .= "<td class=\"c2\">";
+				}
+
+				$ev ^= 1;
+
+				if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
+					$PAGE .= "n/a";
+				}
+				else {
+					my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key} });
+
+					if(!$r || $r eq "") {
+						$PAGE .= "n/a";
+					}
+					else {
+						$PAGE .= $r;
+					}
+				}
+
+				$PAGE .= "</td>";
+			}
+
+			$PAGE .= "</tr>";
+		}
+	}
+	else {
+		my $ev = 0;
+
+		$PAGE .= "<tr class=\"top\">";
+
+		foreach my $t (@t) {
+			if($ev == 0) {
+				$PAGE .= "<td class=\"c1\">n/a</td>";
+			}
+			else {
+				$PAGE .= "<td class=\"c2\">n/a</td>";
+			}
+
+			$ev ^= 1;
+		}
+
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "</table>";
+}
+
+sub tablePeripheralListing {
+	my ($arg) = @_;
+
+	if($arg->{slice} eq "dev") {
+		my $t = "Peripheral,Model,Category,Manufacturer,Size,Memory,Connection";
+		my $m = "24,0,0,0,0,23,22";
+
+		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "net") {
+		my $t = "Peripheral,Network support,IP address";
+		my $m = "24,9,0";
+
+		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "security") {
+		my $t = "Peripheral,Serial number,Security number,Location";
+		my $m = "24,0,0,0";
+
+		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "repair") {
+		my $t = "Peripheral,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
+		my $m = "24,9,18,20,0,17,20";
+
+		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "warranty") {
+		my $t = "Peripheral,Acquired,Warranty period";
+		my $m = "24,20,19";
+
+		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "add") {
+		my $t = "Peripheral,Additional info,Description";
+		my $m = "24,0,0";
+
+		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+}
+
+sub tablePeripheralListings {
+	my ($arg) = @_;
+
+	my @t = split(/,/, $arg->{title});
+	my @m = split(/,/, $arg->{modifier});
+
+	#
+	# Create table header
+	#
+
+	$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
+	$PAGE .= "<tr class=\"top\">";
+
+	my $i = 0;
+
+	foreach my $t (@t) {
+		if($i < 1) {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"#\">" . $t . "</a></td>";
+
+			$i++;
+		}
+		else {
+			if(!$arg->{order} || $arg->{order} eq "a") {
+				$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=d" . "\">" . $t . "</a></td>";
+			}
+			else {
+				$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&" . "sort=" . $i++ . "&" . "order=a" . "\">" . $t . "</a></td>";
+			}
+		}
+	}
+
+	$PAGE .= "</tr>";
+
+	#
+	# Display and sort items in requested order
+	#
+
+	my @i = split(/$ITEM_DELIMITER/, $arg->{data});
+
+	if($arg->{sort}) {
+		my @k = ();
+
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+			my $t = $j[0];
+
+			$j[0] = $j[$arg->{sort}];
+
+			push @j, $t;
+			push @k, join($ITEM_SEPARATOR, @j);
+		}
+
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			@i = sort { uc($a) cmp uc($b) } @k;
+		}
+		else {
+			@i = sort { uc($b) cmp uc($a) } @k;
+		}
+
+		@k = ();
+
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+
+			$j[0] = pop(@j);
+
+			push @k, join($ITEM_SEPARATOR, @j);
+		}
+
+		@i = @k;
+	}
+
+	if(@i) {
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+			my $id = shift(@j);
+
+			if(!$id || $id == 0 || $id eq "" || $id eq "(null)") {
+				my $ev = 0;
+
+				$PAGE .= "<tr class=\"top\">";
+
+				foreach my $t (@t) {
+					if($ev == 0) {
+						$PAGE .= "<td class=\"c1\">n/a</td>";
+					}
+					else {
+						$PAGE .= "<td class=\"c2\">n/a</td>";
+					}
+
+					$ev ^= 1;
+				}
+
+				$PAGE .= "</tr>";
+
+				last;
+			}
+
+			my $nd = "";
+			my $ev = 0;
+
+			if($SESSION_CACHE{"node" . $id} && $SESSION_CACHE{"node" . $id} ne "") {
+				$nd = $SESSION_CACHE{"node" . $id};
+			}
+			else {
+				my @r = &sendCommand({ command => "pullPeripheral", item => $id, domain => "", param => "name", option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					@r = split(/$ITEM_SEPARATOR/, $r[3]);
+
+					$nd = $id . "|" . $r[7] . " " . $r[5] . " (" . $r[6] . ")";
+
+					$SESSION_CACHE{"node" . $id} = $nd;
+				}
+			}
+
+			if($nd ne "") {
+				unshift(@j, $nd);
+
+				$PAGE .= "<tr class=\"top\">";
+
+				for(my $k = 0; $k < @t; $k++) {
+					if($ev == 0) {
+						$PAGE .= "<td class=\"c1\">";
+					}
+					else {
+						$PAGE .= "<td class=\"c2\">";
+					}
+
+					$ev ^= 1;
+
+					if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
+						$PAGE .= "n/a";
+					}
+					else {
+						my $u = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
+
+						if(!$u || $u eq "") {
+							$PAGE .= "n/a";
+						}
+						else {
+							$PAGE .= $u;
+						}
+					}
+
+					$PAGE .= "</td>";
+				}
+
+				$PAGE .= "</tr>";
+			}
+		}
+	}
+	else {
+		my $ev = 0;
+
+		$PAGE .= "<tr class=\"top\">";
+
+		foreach my $t (@t) {
+			if($ev == 0) {
+				$PAGE .= "<td class=\"c1\">n/a</td>";
+			}
+			else {
+				$PAGE .= "<td class=\"c2\">n/a</td>";
+			}
+
+			$ev ^= 1;
+		}
+
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "</table>";
+}
+
+sub tablePeripheralBriefSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/summary.png\"></td>";
+	$MENU .= "<td class=\"c3\">Summary</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Peripheral</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
+	$MENU .= "</ul>";
+}
+
+sub tablePeripheralListingSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/listing.png\"></td>";
+	$MENU .= "<td class=\"c3\">Listing</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Peripheral</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
+	$MENU .= "</ul>";
+}
+
+sub tablePeripheralDetailSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral.png\"></td>";
+	$MENU .= "<td class=\"c3\">Active<br />peripherals</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Peripheral</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
+
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=incs\" style=\"background: #735162;\">Inclusions</a></li>";
+
+	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Edit notes</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";
+	$MENU .= "</ul>";
+}
+
+sub tableDPeripheralDetailSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral_d.png\"></td>";
+	$MENU .= "<td class=\"c3\">Disposed<br />peripherals</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Peripheral</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
+
+	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Notes</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";
+	$MENU .= "</ul>";
+}
+
+sub tablePeripheralSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral.png\"></td>";
+	$MENU .= "<td class=\"c3\">Active<br />peripherals</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "</ul>";
+}
+
+sub tableDPeripheralSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral_d.png\"></td>";
+	$MENU .= "<td class=\"c3\">Disposed<br />peripherals</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "</ul>";
+}
+
+1;

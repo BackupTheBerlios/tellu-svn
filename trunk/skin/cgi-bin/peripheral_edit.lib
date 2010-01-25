@@ -1,0 +1,2414 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub editPeripheralNew {
+	my ($arg) = @_;
+
+	if($q->param('verb') && $q->param('verb') eq "create") {
+		my $ca = "";
+		my $ma = "";
+		my $mo = "";
+
+		if($q->param('category') && $q->param('category') ne "") {
+			$ca = $q->param('category');
+		}
+		elsif($q->param('ext_category') && $q->param('ext_category') ne "") {
+			$ca = $q->param('ext_category');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Peripheral category cannot be empty.</p>";
+		}
+
+		if($q->param('manufacturer') && $q->param('manufacturer') ne "") {
+			$ma = $q->param('manufacturer');
+		}
+		elsif($q->param('ext_manufacturer') && $q->param('ext_manufacturer') ne "") {
+			$ma = $q->param('ext_manufacturer');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Peripheral manufacturer cannot be empty.</p>";
+		}
+
+		if($q->param('model') && $q->param('model') ne "") {
+			$mo = $q->param('model');
+		}
+		elsif($q->param('ext_model') && $q->param('ext_model') ne "") {
+			$mo = $q->param('ext_model');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Peripheral model cannot be empty.</p>";
+		}
+
+		if($ca && $ca ne "" && $ma && $ma ne "" && $mo && $mo ne "") {
+			my $ns = 0;
+			my $ip = "";
+
+			my @r = sendCommand({ command => "newPeripheral", item => cleanHtml({ string => $ca }), domain => "", param => cleanHtml({ string => $mo }), option => cleanHtml({ string => $ma }) });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if($q->param('dhcp') && $q->param('dhcp') == 1) {
+					$ns = 1;
+					$ip = "Dynamic";
+				}
+				elsif($q->param('ipaddress') && $q->param('ipaddress') ne "") {
+					$ns = 1;
+					$ip = $q->param('ipaddress');
+				}
+
+				@r = sendCommand({ command => "pushPeripheral", item => $s[0], domain => "", param => 'netsupport', option => $ns });
+				@r = sendCommand({ command => "pushPeripheral", item => $s[0], domain => "", param => 'ipaddress', option => cleanHtml({ string => $ip }) });
+
+				if($q->param('acq_day') && $q->param('acq_day') ne "" && $q->param('acq_month') && $q->param('acq_month') ne "" && $q->param('acq_year') && $q->param('acq_year') ne "") {
+					my $ac = $q->param('acq_year') . "-" . $q->param('acq_month') . "-" . $q->param('acq_day') . " 00:00:00";
+
+					@r = sendCommand({ command => "pushPeripheral", item => $s[0], domain => "", param => 'acquired', option => $ac });
+				}
+
+				my @i = ('size', 'memory', 'connection', 'sernum', 'secnum', 'location', 'warranty', 'addinfo', 'descr');
+
+				foreach my $i (@i) {
+					@r = sendCommand({ command => "pushPeripheral", item => $s[0], domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to create new peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+
+				$PAGE .= "<p class=\"info\">New " . $ca . " '" . $ma . "/" . $mo . "' created.</p>";
+			}
+			else {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to create new peripheral.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+		}
+	}
+
+	my @ca = ();
+	my @ma = ();
+	my @oa = ();
+	my @wa = ();
+	my %cl = ();
+	my %ml = ();
+	my %ol = ();
+	my %wl = ();
+
+	my @od = ();
+	my @oy = ();
+
+	my ($nw, $nm, $nd, $nt, $ny) = split(/\s+/, localtime(time()), 5);
+	my $j = 0;
+
+	for(my $i = 1; $i < 32; $i++) {
+		$od[$j++] = $i;
+	}
+
+	$j = 0;
+
+	for(my $i = ($ny - 10); $i < ($ny + 2); $i++) {
+		$oy[$j++] = $i;
+	}
+
+	my @r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "connection", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			push @ca, $p;
+			$cl{$p} = $m;
+		}
+	}
+
+	@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "memory", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			push @ma, $p;
+			$ml{$p} = $m;
+		}
+	}
+
+	@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			push @oa, $p;
+			$ol{$p} = $m;
+		}
+	}
+
+	@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "warranty", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			push @wa, $p;
+			$wl{$p} = $m;
+		}
+	}
+
+	my @dc = ();
+	my @dm = ();
+	my @do = ();
+	my %dc = ();
+	my %dm = ();
+	my %do = ();
+
+	@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "category", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$dc{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %dc) {
+		push @dc, $key;
+	}
+
+	@dc = sort { uc($a) cmp uc($b) } @dc;
+
+	@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$dm{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %dm) {
+		push @dm, $key;
+	}
+
+	@dm = sort { uc($a) cmp uc($b) } @dm;
+
+	@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "model", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$do{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %do) {
+		push @do, $key;
+	}
+
+	@do = sort { uc($a) cmp uc($b) } @do;
+
+	my @l = ('Create new peripheral');
+
+	$PAGE .= &htmlFormBegin({ name => "createForm", action => $SELF . "?action=modify&verb=create", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<p>&nbsp;</p>";
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	my $s = 0;
+
+	foreach my $l (@l) {
+		if($s == $q->param('leaf')) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\" width=\"20%\">Peripheral&nbsp;category&nbsp;&sup1;:</td>";
+	$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "category", value => "", style => "textreq" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@dc) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing category", -values => \@dc, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_category", value => \@t, onchange => "toggleCategoryField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Peripheral&nbsp;manufacturer&nbsp;&sup1;:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "manufacturer", value => "", style => "textreq" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@dm) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing manufacturer", -values => \@dm, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_manufacturer", value => \@t, onchange => "toggleManufacturerField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Peripheral&nbsp;model&nbsp;&sup1;:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "model", value => "", style => "textreq" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@do) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing model", -values => \@do, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_model", value => \@t, onchange => "toggleModelField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Peripheral&nbsp;description:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Peripheral&nbsp;size/capacity:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "size", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Memory/storage:</td>";
+	$PAGE .= "<td>" . &htmlSelectMenu({ name => "memory", value => \@ma, label => \%ml })  . "</td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Primary&nbsp;connection:</td>";
+	$PAGE .= "<td>" . &htmlSelectMenu({ name => "connection", value => \@ca, label => \%cl })  . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">IP address:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "ipaddress", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td>" . &htmlSelectTick({ name => "dhcp", label => "IP address is dynamic (DHCP) or not known?", value => 1, onclick => "toggleNetworkField('createForm'); return true;" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Serial&nbsp;number:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "sernum", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Security&nbsp;number:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "secnum", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Location:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "location", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Acquired:</td>";
+	$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "acq_day", value => \@od, select => $nd });
+	$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_month", value => \@oa, label => \%ol, select => $MONTHCON{$nm} });
+	$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_year", value => \@oy, select => $ny })  . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Warranty period:</td>";
+	$PAGE .= "<td>" . &htmlSelectMenu({ name => "warranty", value => \@wa, label => \%wl })  . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+	$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Create" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+	$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+	$PAGE .= &htmlHiddenField({ name => "verb", value => "create" });
+
+	$PAGE .= &htmlFormEnd();
+}
+
+sub editPeripheralNode {
+	my ($arg) = @_;
+
+	my @l = ('Peripheral info', 'Service info', 'Peripherals', 'Peripherals', 'Services', 'Passwords', 'Attachments');
+
+	if($q->param('verb')) {
+		@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			if($q->param('verb') eq "attdev") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "attachGlobalPeripheralToPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is attached to all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "attachPeripheralToPeripheral", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is attached to " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "remdev") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "removeGlobalPeripheralFromPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is detached from all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "removePeripheralFromPeripheral", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is detached from " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "attper") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "attachGlobalPeripheralToPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is attached to all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "attachPeripheralToPeripheral", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is attached to " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "remper") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "removeGlobalPeripheralFromPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is detached from all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "removePeripheralFromPeripheral", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Peripheral is detached from " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "attser") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "attachGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Service is attached to all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "attachProvider", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Service is attached to " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "remser") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "removeGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Service is detached from all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "removeProvider", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Service is detached from " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "attpwd") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "attachGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach password.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Password is attached to all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "attachPassword", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach password.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Password is attached to " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "rempwd") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "removeGlobalPassword", item => $q->param('attr'), domain => "", param => "", option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach password.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Password is detached from all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "removePassword", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach password.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Password is detached from " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "attatt") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "attachGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach attachment.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Attachment is attached to all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "attachFile", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach attachment.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Attachment is attached to " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+			elsif($q->param('verb') eq "rematt") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "removeGlobalFile", item => $q->param('attr'), domain => "", param => "", option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach attachment.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Attachment is detached from all peripherals globally.</p>";
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "removeFile", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "peripheral" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach attachment.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+					}
+					else {
+						$PAGE .= "<p class=\"info\">Attachment is detached fom " . $s[7] . " " . $s[5] . ".</p>";
+					}
+				}
+			}
+		}
+	}
+
+	if($q->param('verb') && $q->param('verb') eq "update") {
+		my $ca = "";
+		my $ma = "";
+		my $mo = "";
+
+		if($q->param('category') && $q->param('category') ne "") {
+			$ca = $q->param('category');
+		}
+		elsif($q->param('ext_category') && $q->param('ext_category') ne "") {
+			$ca = $q->param('ext_category');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Peripheral category cannot be empty.</p>";
+		}
+
+		if($q->param('manufacturer') && $q->param('manufacturer') ne "") {
+			$ma = $q->param('manufacturer');
+		}
+		elsif($q->param('ext_manufacturer') && $q->param('ext_manufacturer') ne "") {
+			$ma = $q->param('ext_manufacturer');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Peripheral manufacturer cannot be empty.</p>";
+		}
+
+		if($q->param('model') && $q->param('model') ne "") {
+			$mo = $q->param('model');
+		}
+		elsif($q->param('ext_model') && $q->param('ext_model') ne "") {
+			$mo = $q->param('ext_model');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Peripheral model cannot be empty.</p>";
+		}
+
+		if($ca && $ca ne "" && $ma && $ma ne "" && $mo && $mo ne "") {
+			my $ns = 0;
+			my $ip = "";
+
+			my @r = ();
+			my @i = ('model', 'category', 'manufacturer', 'size', 'memory', 'connection', 'sernum', 'secnum', 'location', 'warranty', 'addinfo', 'descr');
+
+			if($q->param('dhcp') && $q->param('dhcp') == 1) {
+				$ns = 1;
+				$ip = "Dynamic";
+			}
+			elsif($q->param('ipaddress') && $q->param('ipaddress') ne "") {
+				$ns = 1;
+				$ip = $q->param('ipaddress');
+			}
+
+			@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => 'netsupport', option => $ns });
+			@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => 'ipaddress', option => cleanHtml({ string => $ip }) });
+
+			if($q->param('acq_day') && $q->param('acq_day') ne "" && $q->param('acq_month') && $q->param('acq_month') ne "" && $q->param('acq_year') && $q->param('acq_year') ne "") {
+				my $ac = $q->param('acq_year') . "-" . $q->param('acq_month') . "-" . $q->param('acq_day') . " 00:00:00";
+
+				@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => "acquired", option => $ac });
+			}
+
+			foreach my $i (@i) {
+				@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to update peripheral.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Peripheral " . $ca . " '" . $ma . "/" . $mo . "' is updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "service") {
+		my @r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			if($q->param('iis') && $q->param('iis') == 1) {
+				my @i = ('iis', 'esd', 'mosd');
+
+				if($q->param('dosd_day') && $q->param('dosd_day') ne "" && $q->param('dosd_month') && $q->param('dosd_month') ne "" && $q->param('dosd_year') && $q->param('dosd_year') ne "") {
+					my $ac = $q->param('dosd_year') . "-" . $q->param('dosd_month') . "-" . $q->param('dosd_day') . " 00:00:00";
+
+					@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => "dosd", option => $ac });
+					@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => "lastrepair", option => $ac });
+				}
+
+				$s[20]++;
+
+				@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => "totrepairs", option => $s[20] });
+
+				foreach my $i (@i) {
+					@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to update peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+			}
+			else {
+				my @i = ('iis', 'esd', 'dosd', 'mosd');
+
+				foreach my $i (@i) {
+					@r = sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => $i, option => "" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to update peripheral.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Peripheral " . $s[6] . " '" . $s[7] . "/" . $s[5] . "' is updated.</p>";
+		}
+	}
+
+	if($q->param('disposed') == 1) {
+		my @r = &sendCommand({ command => "deletePeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose peripheral.</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= "<p class=\"info\">Peripheral is disposed.</p>";
+		}
+	}
+	else {
+		if(!$q->param('leaf') || $q->param('leaf') == 0) {
+			my @ca = ();
+			my @ma = ();
+			my @oa = ();
+			my @wa = ();
+			my %cl = ();
+			my %ml = ();
+			my %ol = ();
+			my %wl = ();
+
+			my @od = ();
+			my @oy = ();
+
+			my ($nw, $nm, $nd, $nt, $ny) = split(/\s+/, localtime(time()), 5);
+			my $j = 0;
+
+			for(my $i = 1; $i < 32; $i++) {
+				$od[$j++] = $i;
+			}
+
+			$j = 0;
+
+			for(my $i = ($ny - 10); $i < ($ny + 2); $i++) {
+				$oy[$j++] = $i;
+			}
+
+			my @r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "connection", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @ca, $p;
+					$cl{$p} = $m;
+				}
+			}
+
+			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "memory", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @ma, $p;
+					$ml{$p} = $m;
+				}
+			}
+
+			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @oa, $p;
+					$ol{$p} = $m;
+				}
+			}
+
+			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "warranty", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @wa, $p;
+					$wl{$p} = $m;
+				}
+			}
+
+			my @dc = ();
+			my @dm = ();
+			my @do = ();
+			my %dc = ();
+			my %dm = ();
+			my %do = ();
+
+			@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "category", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$dc{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %dc) {
+				push @dc, $key;
+			}
+
+			@dc = sort { uc($a) cmp uc($b) } @dc;
+
+			@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$dm{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %dm) {
+				push @dm, $key;
+			}
+
+			@dm = sort { uc($a) cmp uc($b) } @dm;
+
+			@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "model", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$do{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %do) {
+				push @do, $key;
+			}
+
+			@do = sort { uc($a) cmp uc($b) } @do;
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				$s[5] = cleanNull({ string => $s[5] });
+				$s[6] = cleanNull({ string => $s[6] });
+				$s[7] = cleanNull({ string => $s[7] });
+				$s[8] = cleanNull({ string => $s[8] });
+				$s[12] = cleanNull({ string => $s[12] });
+				$s[13] = cleanNull({ string => $s[13] });
+				$s[14] = cleanNull({ string => $s[14] });
+				$s[15] = cleanNull({ string => $s[15] });
+				$s[24] = cleanNull({ string => $s[24] });
+				$s[25] = cleanNull({ string => $s[25] });
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Peripheral&nbsp;category&nbsp;&sup1;:</td>";
+				$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "category", value => $s[6], style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@dc) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing category", -values => \@dc, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_category", value => \@t, select => $s[6], onchange => "toggleCategoryField('createForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Peripheral&nbsp;manufacturer&nbsp;&sup1;:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "manufacturer", value => $s[7], style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@dm) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing manufacturer", -values => \@dm, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_manufacturer", value => \@t, select => $s[7], onchange => "toggleManufacturerField('createForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Peripheral&nbsp;model&nbsp;&sup1;:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "model", value => $s[5], style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@do) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing model", -values => \@do, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_model", value => \@t, select => $s[5], onchange => "toggleModelField('createForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Peripheral&nbsp;description:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => $s[25] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Peripheral&nbsp;size/capacity:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "size", value => $s[8] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Memory/storage:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "memory", value => \@ma, label => \%ml, select => $s[9] })  . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Primary&nbsp;connection:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "connection", value => \@ca, label => \%cl, select => $s[10] })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				if($s[12] eq "Dynamic") {
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">IP address:</td>";
+					$PAGE .= "<td>" . &htmlInputText({ name => "ipaddress", value => $s[12], disabled => 1 }) . "</td>";
+					$PAGE .= "</tr>";
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectTick({ name => "dhcp", label => "IP address is dynamic (DHCP) or not known?", value => 1, select => 1, onclick => "toggleNetworkField('createForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+				else {
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">IP address:</td>";
+					$PAGE .= "<td>" . &htmlInputText({ name => "ipaddress", value => $s[12] }) . "</td>";
+					$PAGE .= "</tr>";
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectTick({ name => "dhcp", label => "IP address is dynamic (DHCP) or not known?", value => 1, onclick => "toggleNetworkField('createForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Serial&nbsp;number:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "sernum", value => $s[13] }) . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Security&nbsp;number:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "secnum", value => $s[14] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Location:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "location", value => $s[15] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$s[22] =~ s/\s+.*//;
+				$s[22] =~ s/\-//go;
+
+				($ny, $nm, $nd) = (int(substr($s[22], 0, 4)), int(substr($s[22], 4, 2)), int(substr($s[22], 6, 2)));
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Acquired:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "acq_day", value => \@od, select => $nd });
+				$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_month", value => \@oa, label => \%ol, select => $nm });
+				$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_year", value => \@oy, select => $ny })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Warranty period:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "warranty", value => \@wa, label => \%wl, select => $s[23] })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+				$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => $s[24] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this peripheral?", value => 1, onclick => "toggleUpdateButton('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 1) {
+			my @es = ();
+			my @oa = ();
+			my %el = ();
+			my %ol = ();
+
+			my @od = ();
+			my @oy = ();
+
+			my ($nw, $nm, $nd, $nt, $ny) = split(/\s+/, localtime(time()), 5);
+			my $j = 0;
+
+			for(my $i = 1; $i < 32; $i++) {
+				$od[$j++] = $i;
+			}
+
+			$j = 0;
+
+			for(my $i = ($ny - 10); $i < ($ny + 2); $i++) {
+				$oy[$j++] = $i;
+			}
+
+			my @r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "esd", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @es, $p;
+					$el{$p} = $m;
+				}
+			}
+
+			@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @oa, $p;
+					$ol{$p} = $m;
+				}
+			}
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=service", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				$s[19] = cleanNull({ string => $s[19] });
+
+				my $ds = 0;
+
+				if($s[16] != 0) {
+					$ds = 1;
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Service status:</td>";
+				$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "iis", label => "Peripheral is in service?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$ds ^= 1;
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Estimated service duration:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "esd", value => \@es, label => \%el, select => $s[17], disabled => $ds })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Date of service delivery:</td>";
+
+				$s[18] =~ s/\s+.*//;
+				$s[18] =~ s/\-//go;
+
+				my ($my, $mm, $md) = (int(substr($s[18], 0, 4)), int(substr($s[18], 4, 2)), int(substr($s[18], 6, 2)));
+
+				if($my == 0 && $mm == 0 && $md == 0) {
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $nd, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $nm, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $ny, disabled => $ds })  . "</td>";
+				}
+				else {
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $md, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $mm, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $my, disabled => $ds })  . "</td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Method of service delivery:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "mosd", value => $s[19], style => "text", disabled => $ds }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "service" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 2) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attdev", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[1] . " " . $i[2] . " (" . $i[3] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No peripherals available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new peripheral:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editPeripheralAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attdev" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remdev", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedPeripheralPeripheral", item => "", domain => "", param => $arg->{node}, option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullPeripheral", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[7] . " " . $u[5] . " (" . $u[6] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No peripherals attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached peripheral:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editPeripheralAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remdev" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 3) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attper", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[1] . " " . $i[2] . " (" . $i[3] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No peripherals available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new peripheral:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editPeripheralAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attper" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remper", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedPeripheralPeripheral", item => "", domain => "", param => $arg->{node}, option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullPeripheral", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[7] . " " . $u[5] . " (" . $u[6] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No peripherals attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached peripheral:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editPeripheralAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remper" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 4) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attser", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[1];
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No services available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new service:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editPeripheralAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attser" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remser", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedProvider", item => "", domain => "", param => $arg->{node}, option => "peripheral" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullProvider", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[6];
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No services attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached service:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editPeripheralAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remser" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 5) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attpwd", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[2] . " for " . $i[3] . " (" . $i[1] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No passwords available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new password:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editPeripheralAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attpwd" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=rempwd", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedPassword", item => "", domain => "", param => $arg->{node}, option => "peripheral" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullPassword", item => $s, domain => "", param => "id", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[2] . " for " . $u[3] . " (" . $u[1] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No passwords attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached password:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editPeripheralAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "rempwd" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 6) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attatt", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my @r = &sendCommand({ command => "listFile", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[2] . ", " . $i[3] . " (" . $i[1] . ")";
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No attachments available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new attachment:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editPeripheralAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attatt" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=rematt", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedFile", item => "", domain => "", param => $arg->{node}, option => "peripheral" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullFile", item => $s, domain => "", param => "id", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+								$l{$s} = $u[2] . ", " . $u[3] . " (" . $u[1] . ")";
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No attachments attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached attachment:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editPeripheralAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "rematt" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+	}
+}
+
+sub editPeripheralNote {
+	my ($arg) = @_;
+
+	my @l = ('Review existing notes', 'Add new note');
+
+	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
+		my @r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			my $w = $s[26] . "<DELIMBEG>" . $SESSION_UID . "<DELIMSEP>" . localtime(time()) . "<DELIMEND>";
+
+			$w .= cleanHtml({ string => $q->param('note') });
+
+			@r = &sendCommand({ command => "pushPeripheral", item => $arg->{node}, domain => "", param => "note", option => $w });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+		}
+	}
+
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		my @r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			$s[26] = cleanNull({ string => $s[26] });
+
+			if(!$s[26] || $s[26] eq "") {
+				$s[26] = "No notes are available for this node.";
+			}
+			else {
+				$s[26] =~ s/<DELIMBEG>/<h4>/go;
+				$s[26] =~ s/<DELIMEND>/<\/h4>/go;
+				$s[26] =~ s/<DELIMSEP>/ commented at /go;
+			}
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td width=\"100%\">" . $s[26] . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+		}
+
+		$PAGE .= "</table>";
+	}
+	elsif($q->param('leaf') && $q->param('leaf') == 1) {
+		$PAGE .= &htmlFormBegin({ name => "noteForm", action => $SELF . "?action=note&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Add&nbsp;new&nbsp;note:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlInputField({ name => "note", value => "" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Add note" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "note" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+		$PAGE .= &htmlFormEnd();
+	}
+}
+
+sub editPeripheralAffect {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	my @t = ('this', 'global');
+
+	my %l = (
+		'this' => 'only on this peripheral,',
+		'global' => 'all peripherals globally?'
+	);
+
+	$r .= "<tr class=\"middle\">";
+	$r .= "<td align=\"right\">Affect modifications:</td>";
+	$r .= "<td>";
+	$r .= &htmlSelectRadio({ name => "where", value => \@t, label => \%l, select => $t[0] }) . "</td>";
+	$r .= "</tr>";
+
+	return $r;
+}
+
+1;
