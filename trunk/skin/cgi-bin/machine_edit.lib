@@ -267,14 +267,14 @@ sub editMachineNew {
 	$PAGE .= "</tr>";
 
 	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\">System:</td>";
+	$PAGE .= "<td align=\"right\">Operating system:</td>";
 	$PAGE .= "<td>" . &htmlInputText({ name => "sys", value => "" }) . "</td>";
 	$PAGE .= "</tr>";
 
 	if(@sy) {
 		my @t = ();
 
-		$t[0] = $q->optgroup( -name => "Pick existing system", -values => \@sy, -class => "header" );
+		$t[0] = $q->optgroup( -name => "Pick existing operating system", -values => \@sy, -class => "header" );
 
 		$PAGE .= "<tr class=\"middle\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
@@ -283,14 +283,14 @@ sub editMachineNew {
 	}
 
 	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\">Release:</td>";
+	$PAGE .= "<td align=\"right\">Operating system release:</td>";
 	$PAGE .= "<td>" . &htmlInputText({ name => "rel", value => "" }) . "</td>";
 	$PAGE .= "</tr>";
 
 	if(@re) {
 		my @t = ();
 
-		$t[0] = $q->optgroup( -name => "Pick existing release", -values => \@re, -class => "header" );
+		$t[0] = $q->optgroup( -name => "Pick existing operating system release", -values => \@re, -class => "header" );
 
 		$PAGE .= "<tr class=\"middle\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
@@ -299,14 +299,14 @@ sub editMachineNew {
 	}
 
 	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\">Distribution:</td>";
+	$PAGE .= "<td align=\"right\">Operating system distribution:</td>";
 	$PAGE .= "<td>" . &htmlInputText({ name => "dist", value => "" }) . "</td>";
 	$PAGE .= "</tr>";
 
 	if(@di) {
 		my @t = ();
 
-		$t[0] = $q->optgroup( -name => "Pick existing distribution", -values => \@di, -class => "header" );
+		$t[0] = $q->optgroup( -name => "Pick existing operating system distribution", -values => \@di, -class => "header" );
 
 		$PAGE .= "<tr class=\"middle\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
@@ -315,14 +315,14 @@ sub editMachineNew {
 	}
 
 	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\">Platform:</td>";
+	$PAGE .= "<td align=\"right\">Operating system platform:</td>";
 	$PAGE .= "<td>" . &htmlInputText({ name => "arch", value => "" }) . "</td>";
 	$PAGE .= "</tr>";
 
 	if(@pl) {
 		my @t = ();
 
-		$t[0] = $q->optgroup( -name => "Pick existing platform", -values => \@pl, -class => "header" );
+		$t[0] = $q->optgroup( -name => "Pick existing operating system platform", -values => \@pl, -class => "header" );
 
 		$PAGE .= "<tr class=\"middle\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
