@@ -521,37 +521,37 @@ sub tablePeripheralListing {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Peripheral,Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "24,0,0,0,0,23,22";
+		my $m = "25,0,0,0,0,23,22";
 
 		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
 		my $t = "Peripheral,Network support,IP address";
-		my $m = "24,9,0";
+		my $m = "25,9,0";
 
 		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "security") {
 		my $t = "Peripheral,Serial number,Security number,Location";
-		my $m = "24,0,0,0";
+		my $m = "25,0,0,0";
 
 		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
 		my $t = "Peripheral,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "24,9,18,20,0,17,20";
+		my $m = "25,9,18,20,0,17,20";
 
 		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "warranty") {
 		my $t = "Peripheral,Acquired,Warranty period";
-		my $m = "24,20,19";
+		my $m = "25,20,19";
 
 		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
 		my $t = "Peripheral,Additional info,Description";
-		my $m = "24,0,0";
+		my $m = "25,0,0";
 
 		&tablePeripheralListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}

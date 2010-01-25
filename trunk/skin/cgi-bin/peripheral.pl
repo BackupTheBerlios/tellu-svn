@@ -210,7 +210,7 @@ sub peripheralThing {
 			}
 
 			if($arg->{slice} eq "incs") {
-				my @l = ('Files', 'Passwords', 'Peripherals', 'Peripherals', 'Services');
+				my @l = ('Files', 'Passwords', 'Devices', 'Peripherals', 'Services');
 				my @w = ();
 
 				$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -294,13 +294,13 @@ sub peripheralThing {
 					if(checkError({ packet => \@r }) == 0) {
 						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-						@r = &sendCommand({ command => "attachedPeripheralPeripheral", item => "", domain => "", param => $arg->{node}, option => "peripheral" });
+						@r = &sendCommand({ command => "attachedPeripheralDevice", item => "", domain => "", param => $arg->{node}, option => "peripheral" });
 
 						if(checkError({ packet => \@r }) == 0) {
 							@s = split(/$ITEM_DELIMITER/, $r[3]);
 
 							foreach my $s (@s) {
-								@r = &sendCommand({ command => "pullPeripheral", item => $s, domain => "", param => "", option => "" });
+								@r = &sendCommand({ command => "pullDevice", item => $s, domain => "", param => "", option => "" });
 
 								if(checkError({ packet => \@r }) == 0) {
 									if($r[3] && $r[3] ne "") {

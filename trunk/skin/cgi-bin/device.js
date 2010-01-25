@@ -25,8 +25,8 @@ sub deviceListingDisposedFuncs {
 
 	my $r = "";
 
-	$r .= "function popupDevice(host, slice, width, height) {" . $CONFIG_LINEFEED;
-	$r .= " window.open('device_d_popup.pl?dev=' +host+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "function popupDevice(dev, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('device_d_popup.pl?dev=' +dev+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;

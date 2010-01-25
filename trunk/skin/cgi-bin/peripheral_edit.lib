@@ -437,7 +437,7 @@ sub editPeripheralNew {
 sub editPeripheralNode {
 	my ($arg) = @_;
 
-	my @l = ('Peripheral info', 'Service info', 'Peripherals', 'Peripherals', 'Services', 'Passwords', 'Attachments');
+	my @l = ('Peripheral info', 'Service info', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments');
 
 	if($q->param('verb')) {
 		@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
@@ -447,7 +447,7 @@ sub editPeripheralNode {
 
 			if($q->param('verb') eq "attdev") {
 				if($q->param('where') && $q->param('where') eq "global") {
-					@r = &sendCommand({ command => "attachGlobalPeripheralToPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+					@r = &sendCommand({ command => "attachGlobalPeripheralToDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
 
 					if(checkError({ packet => \@r }) != 0) {
 						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
@@ -461,7 +461,7 @@ sub editPeripheralNode {
 					}
 				}
 				else {
-					@r = &sendCommand({ command => "attachPeripheralToPeripheral", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+					@r = &sendCommand({ command => "attachPeripheralToDevice", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
 
 					if(checkError({ packet => \@r }) != 0) {
 						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach peripheral.</p>";
@@ -477,7 +477,7 @@ sub editPeripheralNode {
 			}
 			elsif($q->param('verb') eq "remdev") {
 				if($q->param('where') && $q->param('where') eq "global") {
-					@r = &sendCommand({ command => "removeGlobalPeripheralFromPeripheral", item => $q->param('attr'), domain => "", param => "", option => "" });
+					@r = &sendCommand({ command => "removeGlobalPeripheralFromDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
 
 					if(checkError({ packet => \@r }) != 0) {
 						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
@@ -491,7 +491,7 @@ sub editPeripheralNode {
 					}
 				}
 				else {
-					@r = &sendCommand({ command => "removePeripheralFromPeripheral", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
+					@r = &sendCommand({ command => "removePeripheralFromDevice", item => $arg->{node}, domain => "", param => $q->param('attr'), option => "" });
 
 					if(checkError({ packet => \@r }) != 0) {
 						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach peripheral.</p>";
@@ -1445,7 +1445,7 @@ sub editPeripheralNode {
 
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			my @r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+			my @r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my %l = ();
@@ -1463,7 +1463,7 @@ sub editPeripheralNode {
 				}
 				else {
 					$t[0] = "0";
-					$l{0} = "No peripherals available";
+					$l{0} = "No devices available";
 				}
 
 				$PAGE .= "<tr class=\"top\">";
@@ -1471,7 +1471,7 @@ sub editPeripheralNode {
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"middle\">";
-				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new peripheral:</td>";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new device:</td>";
 
 				if($t[0] == 0) {
 					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
@@ -1519,7 +1519,7 @@ sub editPeripheralNode {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-				@r = &sendCommand({ command => "attachedPeripheralPeripheral", item => "", domain => "", param => $arg->{node}, option => "" });
+				@r = &sendCommand({ command => "attachedPeripheralDevice", item => "", domain => "", param => $arg->{node}, option => "" });
 
 				if(checkError({ packet => \@r }) == 0) {
 					my %l = ();
@@ -1528,7 +1528,7 @@ sub editPeripheralNode {
 					@s = split(/$ITEM_DELIMITER/, $r[3]);
 
 					foreach my $s (@s) {
-						@r = &sendCommand({ command => "pullPeripheral", item => $s, domain => "", param => "", option => "" });
+						@r = &sendCommand({ command => "pullDevice", item => $s, domain => "", param => "", option => "" });
 
 						if(checkError({ packet => \@r }) == 0) {
 							if($r[3] && $r[3] ne "") {
@@ -1542,7 +1542,7 @@ sub editPeripheralNode {
 
 					if(!@t) {
 						$t[0] = "0";
-						$l{0} = "No peripherals attached";
+						$l{0} = "No devices attached";
 					}
 
 					$PAGE .= "<tr class=\"top\">";
@@ -1550,7 +1550,7 @@ sub editPeripheralNode {
 					$PAGE .= "</tr>";
 
 					$PAGE .= "<tr class=\"middle\">";
-					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached peripheral:</td>";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached device:</td>";
 
 					if($t[0] == 0) {
 						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
