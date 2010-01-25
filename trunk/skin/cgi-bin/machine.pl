@@ -480,7 +480,7 @@ sub machineThing {
 
 			$c[0] = &headCookieSet({ name => $arg->{cookie}, value => $arg->{value} });
 
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $arg->{node} . "." . $arg->{domain}, script => &passwordFuncs({ slice => "passwds" }), header => $arg->{node} . "." . $arg->{domain} . $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $arg->{node} . "." . $arg->{domain}, script => &passwordFuncs({ slice => "incs", leaf => "2" }), header => $arg->{node} . "." . $arg->{domain} . $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
 		}
 		else {
 			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });

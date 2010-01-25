@@ -42,7 +42,14 @@ sub passwordFuncs {
 	$r .= "function promptPasswordKey(param) {" . $CONFIG_LINEFEED;
 	$r .= " var key = prompt('Please enter decryption key for this password:', '');" . $CONFIG_LINEFEED;
 	$r .= " if(key != null && key != '') {" . $CONFIG_LINEFEED;
-	$r .= "  window.location='" . $SELF . "?slice=" . $arg->{slice} . "&key=' + key + '';" . $CONFIG_LINEFEED;
+
+	if($arg->{leaf} && $arg->{leaf} ne "") {
+		$r .= "  window.location='" . $SELF . "?slice=" . $arg->{slice} . "&leaf=" . $arg->{leaf} . "&key=' + key + '';" . $CONFIG_LINEFEED;
+	}
+	else {
+		$r .= "  window.location='" . $SELF . "?slice=" . $arg->{slice} . "&key=' + key + '';" . $CONFIG_LINEFEED;
+	}
+
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 

@@ -404,7 +404,7 @@ sub deviceThing {
 
 			$c[0] = &headCookieSet({ name => $arg->{cookie}, value => $arg->{value} });
 
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &passwordFuncs({ slice => "passwds" }), header => $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &passwordFuncs({ slice => "incs", leaf => "2" }), header => $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
 		}
 		else {
 			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
