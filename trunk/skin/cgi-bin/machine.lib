@@ -842,16 +842,24 @@ sub tableMachineListing {
 	if($arg->{slice} eq "security") {
 		my $t = "Node,Serial number,Security number,Location";
 		my $m = "21,0,0,0";
+		my $id = 0;
 
 		my @j = ();
+		my @k = ();
 		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
 
 		foreach my $i (@i) {
+			@k = split(/$ITEM_SEPARATOR/, $i);
+
+			$id = shift(@k);
+
 			for(my $j = 0; $j < 5; $j++) {
-				$i =~ s/^.*?$ITEM_SEPARATOR//;
+				shift(@k);
 			}
 
-			push @j, $i;
+			unshift(@k, $id);
+
+			push @j, join($ITEM_SEPARATOR, @k);
 		}
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
@@ -859,16 +867,24 @@ sub tableMachineListing {
 	elsif($arg->{slice} eq "repair") {
 		my $t = "Node,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
 		my $m = "21,9,18,20,0,17,20";
+		my $id = 0;
 
 		my @j = ();
+		my @k = ();
 		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
 
 		foreach my $i (@i) {
+			@k = split(/$ITEM_SEPARATOR/, $i);
+
+			$id = shift(@k);
+
 			for(my $j = 0; $j < 8; $j++) {
-				$i =~ s/^.*?$ITEM_SEPARATOR//;
+				shift(@k);
 			}
 
-			push @j, $i;
+			unshift(@k, $id);
+
+			push @j, join($ITEM_SEPARATOR, @k);
 		}
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
@@ -876,16 +892,24 @@ sub tableMachineListing {
 	elsif($arg->{slice} eq "warranty") {
 		my $t = "Node,Acquired,Warranty";
 		my $m = "21,20,19";
+		my $id = 0;
 
 		my @j = ();
+		my @k = ();
 		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
 
 		foreach my $i (@i) {
+			@k = split(/$ITEM_SEPARATOR/, $i);
+
+			$id = shift(@k);
+
 			for(my $j = 0; $j < 14; $j++) {
-				$i =~ s/^.*?$ITEM_SEPARATOR//;
+				shift(@k);
 			}
 
-			push @j, $i;
+			unshift(@k, $id);
+
+			push @j, join($ITEM_SEPARATOR, @k);
 		}
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
@@ -893,16 +917,24 @@ sub tableMachineListing {
 	elsif($arg->{slice} eq "addinfo") {
 		my $t = "Node,Additional info,Description";
 		my $m = "21,0,0";
+		my $id = 0;
 
 		my @j = ();
+		my @k = ();
 		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
 
 		foreach my $i (@i) {
+			@k = split(/$ITEM_SEPARATOR/, $i);
+
+			$id = shift(@k);
+
 			for(my $j = 0; $j < 16; $j++) {
-				$i =~ s/^.*?$ITEM_SEPARATOR//;
+				shift(@k);
 			}
 
-			push @j, $i;
+			unshift(@k, $id);
+
+			push @j, join($ITEM_SEPARATOR, @k);
 		}
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
