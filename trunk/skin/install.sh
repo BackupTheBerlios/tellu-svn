@@ -247,7 +247,7 @@ echo "telskind is running."
 
 SKINH=""
 
-for i in /etc /usr/etc /usr/local/etc /opt/tellu/etc /opt/tellu3/etc /home/salojan/source/tellu/current/src/server/telskind; do
+for i in /etc /usr/etc /usr/local/etc /usr/local/tellu/etc /usr/local/tellu3/etc /opt/etc /opt/tellu/etc /opt/tellu3/etc; do
 	if [ -r "$i/telskind.conf" ]; then
 		echo ""
 		echo "Installed has detected that there is '$i/telskind.conf', so"
