@@ -7,28 +7,28 @@ GRANT ALL ON tellu3.* TO 'tellu'@'%' IDENTIFIED BY 'tellu';
 
 FLUSH PRIVILEGES;
 
-CREATE TABLE tellu3.agent (
+CREATE TABLE IF NOT EXISTS tellu3.agent (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	name		VARCHAR(64),
 
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.agentbusiness (
+CREATE TABLE IF NOT EXISTS tellu3.agentbusiness (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	business	VARCHAR(64),
 
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.agentversion (
+CREATE TABLE IF NOT EXISTS tellu3.agentversion (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	version		VARCHAR(64),
 
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.cpu (
+CREATE TABLE IF NOT EXISTS tellu3.cpu (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	cpus		BIGINT UNSIGNED DEFAULT 0,
 	cores		BIGINT UNSIGNED DEFAULT 0,
@@ -40,7 +40,7 @@ CREATE TABLE tellu3.cpu (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.daemon (
+CREATE TABLE IF NOT EXISTS tellu3.daemon (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	cmdline		VARCHAR(255),
 	name		VARCHAR(64),
@@ -69,7 +69,7 @@ CREATE TABLE tellu3.daemon (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.dev (
+CREATE TABLE IF NOT EXISTS tellu3.dev (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	category	VARCHAR(64),
 	product		VARCHAR(255),
@@ -81,7 +81,7 @@ CREATE TABLE tellu3.dev (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.disk (
+CREATE TABLE IF NOT EXISTS tellu3.disk (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	dev		VARCHAR(64),
 	path		VARCHAR(255),
@@ -94,7 +94,7 @@ CREATE TABLE tellu3.disk (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.mem (
+CREATE TABLE IF NOT EXISTS tellu3.mem (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	totalram	BIGINT UNSIGNED DEFAULT 0,
 	availram	BIGINT UNSIGNED DEFAULT 0,
@@ -106,7 +106,7 @@ CREATE TABLE tellu3.mem (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.nic (
+CREATE TABLE IF NOT EXISTS tellu3.nic (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	name		VARCHAR(64),
 	ip4		VARCHAR(16),
@@ -120,7 +120,7 @@ CREATE TABLE tellu3.nic (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.node (
+CREATE TABLE IF NOT EXISTS tellu3.node (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	node		VARCHAR(64),
 	domain		VARCHAR(64),
@@ -152,7 +152,7 @@ CREATE TABLE tellu3.node (
 	INDEX		(sys)
 );
 
-CREATE TABLE tellu3.port (
+CREATE TABLE IF NOT EXISTS tellu3.port (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	tcp		TEXT NOT NULL,
 	udp		TEXT NOT NULL,
@@ -160,7 +160,7 @@ CREATE TABLE tellu3.port (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.proc (
+CREATE TABLE IF NOT EXISTS tellu3.proc (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	cmdline		VARCHAR(255),
 	name		VARCHAR(64),
@@ -189,7 +189,7 @@ CREATE TABLE tellu3.proc (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.run (
+CREATE TABLE IF NOT EXISTS tellu3.run (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	procs		INT UNSIGNED,
 	threads		INT UNSIGNED,
@@ -197,7 +197,7 @@ CREATE TABLE tellu3.run (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.software (
+CREATE TABLE IF NOT EXISTS tellu3.software (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	type		INT UNSIGNED,
 	name		VARCHAR(255),
@@ -208,7 +208,7 @@ CREATE TABLE tellu3.software (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.system (
+CREATE TABLE IF NOT EXISTS tellu3.system (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	bbmanufacturer	VARCHAR(255),
 	bbproduct	VARCHAR(255),
@@ -221,7 +221,7 @@ CREATE TABLE tellu3.system (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.user (
+CREATE TABLE IF NOT EXISTS tellu3.user (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	uid		VARCHAR(64),
 	grp		VARCHAR(64),
@@ -231,7 +231,7 @@ CREATE TABLE tellu3.user (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.util (
+CREATE TABLE IF NOT EXISTS tellu3.util (
 	node_id		BIGINT UNSIGNED NOT NULL,
 	load1		INT UNSIGNED,
 	load2		INT UNSIGNED,
@@ -242,7 +242,7 @@ CREATE TABLE tellu3.util (
 	INDEX		(node_id)
 );
 
-CREATE TABLE tellu3.log (
+CREATE TABLE IF NOT EXISTS tellu3.log (
 	time		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	level		INT UNSIGNED,
 	node		VARCHAR(64),
@@ -261,7 +261,7 @@ CREATE TABLE tellu3.log (
 	INDEX		(proc, procver)
 );
 
-CREATE TABLE tellu3.history (
+CREATE TABLE IF NOT EXISTS tellu3.history (
 	time		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	node		VARCHAR(64),
 	domain		VARCHAR(64),
@@ -278,7 +278,7 @@ CREATE TABLE tellu3.history (
 	INDEX		(proc, procver)
 );
 
-CREATE TABLE tellu3.machine (
+CREATE TABLE IF NOT EXISTS tellu3.machine (
 	node_id		BIGINT UNSIGNED NOT NULL,				# machine id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# machine creation time
 	creator		VARCHAR(64),						# machine created by
@@ -289,7 +289,7 @@ CREATE TABLE tellu3.machine (
 	INDEX		n_id (node_id), FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_devices (
+CREATE TABLE IF NOT EXISTS tellu3.skin_devices (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# device id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# device creation time
 	creator		VARCHAR(64),						# device created by
@@ -326,7 +326,7 @@ CREATE TABLE tellu3.skin_devices (
 	INDEX		(manufacturer)
 );
 
-CREATE TABLE tellu3.skin_devices_map (
+CREATE TABLE IF NOT EXISTS tellu3.skin_devices_map (
 	device_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
 	machine_id	BIGINT UNSIGNED NOT NULL,				# id to machines table
 	devices_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
@@ -338,7 +338,7 @@ CREATE TABLE tellu3.skin_devices_map (
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_files (
+CREATE TABLE IF NOT EXISTS tellu3.skin_files (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# file id
 	owner		VARCHAR(64),						# file owner
 	name		VARCHAR(64),						# file name
@@ -354,7 +354,7 @@ CREATE TABLE tellu3.skin_files (
 	INDEX		(name)
 );
 
-CREATE TABLE tellu3.skin_files_map (
+CREATE TABLE IF NOT EXISTS tellu3.skin_files_map (
 	file_id		BIGINT UNSIGNED NOT NULL,				# id to skin_files table
 	node_id		BIGINT UNSIGNED NOT NULL,				# id to machine table
 	devices_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
@@ -366,7 +366,7 @@ CREATE TABLE tellu3.skin_files_map (
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_groups (
+CREATE TABLE IF NOT EXISTS tellu3.skin_groups (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# group id
 	name		VARCHAR(64),						# group name
 	descr		TEXT NOT NULL,						# group description
@@ -381,7 +381,7 @@ INSERT INTO skin_groups (name, descr) VALUES('admins', 'Administrators');
 INSERT INTO skin_groups (name, descr) VALUES('guests', 'Guests');
 INSERT INTO skin_groups (name, descr) VALUES('users', 'Users');
 
-CREATE TABLE tellu3.skin_groups_map (
+CREATE TABLE IF NOT EXISTS tellu3.skin_groups_map (
 	user_id		BIGINT UNSIGNED NOT NULL,				# id to skin_users table
 	group_id	BIGINT UNSIGNED NOT NULL,				# id to skin_groups table
 
@@ -389,7 +389,7 @@ CREATE TABLE tellu3.skin_groups_map (
 	INDEX		g_id (group_id), FOREIGN KEY (group_id) REFERENCES skin_groups(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_help (
+CREATE TABLE IF NOT EXISTS tellu3.skin_help (
 	name		VARCHAR(64),						# page name
 	title		VARCHAR(255),						# page title
 	help		LONGTEXT NOT NULL,					# page help text
@@ -411,7 +411,7 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY Jani Salonen &lt;jani@lasipalatsi.fi&gt; \'\'AS IS\'\' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Jani Salonen &lt;jani@lasipalatsi.fi&gt; BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.', '', '');
 INSERT INTO skin_help (name, title, help, descr, note) VALUES('version', 'Tellu version', 'This is Tellu Release 3, version 0.0', '', '');
 
-CREATE TABLE tellu3.skin_misc (
+CREATE TABLE IF NOT EXISTS tellu3.skin_misc (
 	class		VARCHAR(64),						# item class
 	value		VARCHAR(64),						# item value
 	place		BIGINT UNSIGNED NOT NULL,				# item place in class
@@ -13728,7 +13728,7 @@ INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '12', '12'
 INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '13', '13', 'Ten years or more');
 INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '14', '14', 'Lifetime');
 
-CREATE TABLE tellu3.skin_passwords (
+CREATE TABLE IF NOT EXISTS tellu3.skin_passwords (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# password id
 	owner		VARCHAR(64),						# password owner
 	name		VARCHAR(64),						# password name
@@ -13744,7 +13744,7 @@ CREATE TABLE tellu3.skin_passwords (
 	INDEX		(name)
 );
 
-CREATE TABLE tellu3.skin_passwords_map (
+CREATE TABLE IF NOT EXISTS tellu3.skin_passwords_map (
 	pwd_id		BIGINT UNSIGNED NOT NULL,				# id to skin_passwords table
 	node_id		BIGINT UNSIGNED NOT NULL,				# id to machine table
 	devices_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
@@ -13756,7 +13756,7 @@ CREATE TABLE tellu3.skin_passwords_map (
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_peripherals (
+CREATE TABLE IF NOT EXISTS tellu3.skin_peripherals (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# peripheral id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# peripheral creation time
 	creator		VARCHAR(64),						# peripheral created by
@@ -13793,7 +13793,7 @@ CREATE TABLE tellu3.skin_peripherals (
 	INDEX		(manufacturer)
 );
 
-CREATE TABLE tellu3.skin_peripherals_map (
+CREATE TABLE IF NOT EXISTS tellu3.skin_peripherals_map (
 	peripheral_id	BIGINT UNSIGNED NOT NULL,				# id to skin_peripherals table
 	machine_id	BIGINT UNSIGNED NOT NULL,				# id to machine table
 	devices_id	BIGINT UNSIGNED NOT NULL,				# id to devices table
@@ -13805,7 +13805,7 @@ CREATE TABLE tellu3.skin_peripherals_map (
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_perm (
+CREATE TABLE IF NOT EXISTS tellu3.skin_perm (
 	perm		BIGINT UNSIGNED NOT NULL,				# permission bit
 	name		VARCHAR(64),						# permission name
 	descr		TEXT NOT NULL,						# permission description
@@ -13821,7 +13821,7 @@ INSERT INTO skin_perm (perm, name) VALUES('16', 'Restore');
 INSERT INTO skin_perm (perm, name) VALUES('32', 'Supervisor');
 INSERT INTO skin_perm (perm, name) VALUES('64', 'Admin');
 
-CREATE TABLE tellu3.skin_perm_nodes (
+CREATE TABLE IF NOT EXISTS tellu3.skin_perm_nodes (
 	user_id		BIGINT UNSIGNED NOT NULL,				# user id
 	node		VARCHAR(64),						# node name
 	domain		VARCHAR(64),						# domain name
@@ -13834,7 +13834,7 @@ CREATE TABLE tellu3.skin_perm_nodes (
 	INDEX		(grp)
 );
 
-CREATE TABLE tellu3.skin_port_tcp (
+CREATE TABLE IF NOT EXISTS tellu3.skin_port_tcp (
 	port		INT UNSIGNED DEFAULT 0,					# tcp port number
 	name		VARCHAR(64),						# tcp port name
 	descr		TEXT NOT NULL,						# tcp port description
@@ -19180,7 +19180,7 @@ INSERT INTO skin_port_tcp (port, name, descr) VALUES('48129', 'blp5', 'Bloomberg
 INSERT INTO skin_port_tcp (port, name, descr) VALUES('48556', 'com-bardac-dw', 'com-bardac-dw');
 INSERT INTO skin_port_tcp (port, name, descr) VALUES('48619', 'iqobject', 'iqobject');
 
-CREATE TABLE tellu3.skin_port_udp (
+CREATE TABLE IF NOT EXISTS tellu3.skin_port_udp (
 	port		INT UNSIGNED DEFAULT 0,					# udp port number
 	name		VARCHAR(64),						# udp port name
 	descr		TEXT NOT NULL,						# udp port description
@@ -24420,7 +24420,7 @@ INSERT INTO skin_port_udp (port, name, descr) VALUES('48129', 'blp5', 'Bloomberg
 INSERT INTO skin_port_udp (port, name, descr) VALUES('48556', 'com-bardac-dw', 'com-bardac-dw');
 INSERT INTO skin_port_udp (port, name, descr) VALUES('48619', 'iqobject', 'iqobject');
 
-CREATE TABLE tellu3.skin_rgb (
+CREATE TABLE IF NOT EXISTS tellu3.skin_rgb (
 	red		INT UNSIGNED DEFAULT 0,					# red component
 	green		INT UNSIGNED DEFAULT 0,					# green component
 	blue		INT UNSIGNED DEFAULT 0,					# blue component
@@ -24870,7 +24870,7 @@ INSERT INTO skin_rgb (red, green, blue, name) VALUES('205', '205', '0', 'Yellow3
 INSERT INTO skin_rgb (red, green, blue, name) VALUES('139', '139', '0', 'Yellow4');
 INSERT INTO skin_rgb (red, green, blue, name) VALUES('154', '205', '50', 'Yellow Green');
 
-CREATE TABLE tellu3.skin_services (
+CREATE TABLE IF NOT EXISTS tellu3.skin_services (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# service id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# service creation time
 	creator		VARCHAR(64),						# service created by
@@ -24893,7 +24893,7 @@ INSERT INTO skin_services (name, creator, descr, note) VALUES('Maintenance', 'te
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Owner', 'tellud 3.0.0-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Repair', 'tellud 3.0.0-unix', '', '');
 
-CREATE TABLE tellu3.skin_services_data (
+CREATE TABLE IF NOT EXISTS tellu3.skin_services_data (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# service id
 	type_id		BIGINT UNSIGNED DEFAULT 0,				# service type
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# service creation time
@@ -24928,7 +24928,7 @@ CREATE TABLE tellu3.skin_services_data (
 	INDEX		t_id (type_id), FOREIGN KEY (type_id) REFERENCES skin_services(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_services_map (
+CREATE TABLE IF NOT EXISTS tellu3.skin_services_map (
 	service_id	BIGINT UNSIGNED NOT NULL,				# id to skin_service_data table
 	machine_id	BIGINT UNSIGNED NOT NULL,				# id to machine table
 	device_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
@@ -24940,7 +24940,7 @@ CREATE TABLE tellu3.skin_services_map (
 	INDEX		a_id (peripheral_id), FOREIGN KEY (peripheral_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tellu3.skin_sessions (
+CREATE TABLE IF NOT EXISTS tellu3.skin_sessions (
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# user first access timestamp
 	access		TIMESTAMP,						# user last access timestamp
 	count		BIGINT UNSIGNED DEFAULT 0,				# user command count by session
@@ -24951,7 +24951,7 @@ CREATE TABLE tellu3.skin_sessions (
 	INDEX		(cookie)
 );
 
-CREATE TABLE tellu3.skin_temp (
+CREATE TABLE IF NOT EXISTS tellu3.skin_temp (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# temp id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# temp creation time
 	creator		VARCHAR(64),						# temp created by
@@ -24961,7 +24961,7 @@ CREATE TABLE tellu3.skin_temp (
 	INDEX		(id)
 );
 
-CREATE TABLE tellu3.skin_users (
+CREATE TABLE IF NOT EXISTS tellu3.skin_users (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# user id
 	name		VARCHAR(64),						# user logon name
 	gecos		VARCHAR(64),						# user real name
