@@ -146,10 +146,8 @@ sub itemClean {
 		if($arg->{item} > 31536000) {
 			$r .= int(int($arg->{item}) / 31536000) . " years";
 			$arg->{item} %= 31536000;
+
 			$d++;
-		}
-		else {
-			$d = 0;
 		}
 
 		if($arg->{item} > 2592000) {
@@ -159,10 +157,8 @@ sub itemClean {
 
 			$r .= int(int($arg->{item}) / 2592000) . " months";
 			$arg->{item} %= 2592000;
+
 			$d++;
-		}
-		else {
-			$d = 0;
 		}
 
 		if($arg->{item} > 604800) {
@@ -172,10 +168,8 @@ sub itemClean {
 
 			$r .= int(int($arg->{item}) / 604800) . " weeks";
 			$arg->{item} %= 604800;
+
 			$d++;
-		}
-		else {
-			$d = 0;
 		}
 
 		if($arg->{item} > 86400) {
@@ -185,10 +179,8 @@ sub itemClean {
 
 			$r .= int(int($arg->{item}) / 86400) . " days";
 			$arg->{item} %= 86400;
+
 			$d++;
-		}
-		else {
-			$d = 0;
 		}
 
 		if($arg->{item} > 3600) {
@@ -198,22 +190,20 @@ sub itemClean {
 
 			$r .= int(int($arg->{item}) / 3600) . " hours";
 			$arg->{item} %= 3600;
+
 			$d++;
-		}
-		else {
-			$d = 0;
 		}
 
 		if($arg->{item} > 60) {
 			if($d != 0) {
-				$r .= ", ";
+				$r .= " and ";
 			}
 
 			$r .= int(int($arg->{item}) / 60) . " minutes";
 		}
 		else {
 			if($d != 0) {
-				$r .= ", ";
+				$r .= " and ";
 			}
 
 			$r .= int($arg->{item}) . " seconds";
