@@ -181,6 +181,23 @@ extern char *attachedDevicePeripheral(struct threadInfo *);
 extern char *listDisposedDevice(struct threadInfo *);
 extern char *fetchDevice(int, int, struct threadInfo *);
 
+// worker_faction.c
+extern char *listFaction(struct threadInfo *);
+extern char *listMyFaction(struct threadInfo *);
+extern char *pullFaction(struct threadInfo *);
+extern char *newFaction(struct threadInfo *);
+extern char *pushFaction(struct threadInfo *);
+extern char *searchFaction(struct threadInfo *);
+extern char *deleteFaction(struct threadInfo *);
+extern char *attachFaction(struct threadInfo *);
+extern char *attachDomainFaction(struct threadInfo *);
+extern char *attachGlobalFaction(struct threadInfo *);
+extern char *removeFaction(struct threadInfo *);
+extern char *removeDomainFaction(struct threadInfo *);
+extern char *removeGlobalFaction(struct threadInfo *);
+extern char *attachedFaction(struct threadInfo *);
+extern char *fetchFaction(int, int, struct threadInfo *);
+
 // worker_file.c
 extern char *listFile(struct threadInfo *);
 extern char *listMyFile(struct threadInfo *);

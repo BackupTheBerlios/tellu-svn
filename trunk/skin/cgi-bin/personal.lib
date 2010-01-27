@@ -11,6 +11,528 @@ if($pack eq "" && $f eq "" && $line eq "") {
 require "chest.lib";
 require "network.lib";
 
+sub editPersonalFaction {
+	my ($arg) = @_;
+
+	my @l = ('Add new faction', 'Modify existing faction', 'Delete existing faction');
+
+	if($q->param('verb') && $q->param('verb') eq "update") {
+		my @r = &sendCommand({ command => "listFaction", item => "", domain => "", param => "name", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my $e = 0;
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				my @i = split(/$ITEM_SEPARATOR/, $s);
+
+				if($i[2] eq $q->param('name')) {
+					$e++;
+
+					last;
+				}
+			}
+
+			if($e != 0) {
+				$PAGE .= "<p class=\"warning\">Faction '" . $q->param('name') . "' already exists. Please pick another name for this faction.</p>";
+			}
+			else {
+				if(!$q->param('name') || $q->param('name') eq "") {
+					$PAGE .= "<p class=\"warning\">Faction name cannot be empty.</p>";
+				}
+				else {
+					my $pub = 0;
+					my $tmp = 0;
+
+					if($q->param('public')) {
+						$pub = 1;
+					}
+
+					if($q->param('type')) {
+						$tmp = 1;
+					}
+
+					@r = &sendCommand({ command => "newFaction", item => $q->param('name'), domain => "", param => $tmp, option => $pub });
+
+					if($q->param('descr') && $q->param('descr') ne "") {
+						@r = &sendCommand({ command => "pushFaction", item => $q->param('name'), domain => "", param => "descr", option => cleanHtml({ string => $q->param('descr') }) });
+					}
+
+					if($q->param('note') && $q->param('note') ne "") {
+						@r = &sendCommand({ command => "pushFaction", item => $q->param('name'), domain => "", param => "note", option => cleanHtml({ string => $q->param('note') }) });
+					}
+
+					$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' added.</p>";
+				}
+			}
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "modify") {
+		if(!$q->param('name') || $q->param('name') eq "") {
+			$PAGE .= "<p class=\"warning\">Faction name cannot be empty.</p>";
+		}
+		else {
+			my @i = ('type', 'public', 'descr', 'note');
+
+			foreach my $i (@i) {
+				@r = &sendCommand({ command => "pushFaction", item => $q->param('name'), domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to update faction.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' is updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "delete") {
+		if(!$q->param('name') || $q->param('name') eq "") {
+			$PAGE .= "<p class=\"warning\">Faction name cannot be empty.</p>";
+		}
+		else {
+			@r = &sendCommand({ command => "deleteFaction", item => $q->param('name'), domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to delete faction.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+			else {
+				$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' is deleted.</p>";
+			}
+		}
+	}
+
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=editg&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+		$PAGE .= "<p>&nbsp;</p>";
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=editg&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=editg&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Unique faction name&nbsp;&sup1;:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "name", value => "", style => "textreq" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">Description:</td>";
+		$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => "" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+		$PAGE .= "<td>" . &htmlInputField({ name => "note", value => "" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary?", value => 1, onclick => "toggleFactionButton('modifyForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectTick({ name => "public", label => "Faction is public?", value => 1, onclick => "toggleFactionButton('modifyForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Add private faction" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "editg" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+		$PAGE .= &htmlFormEnd();
+	}
+	elsif($q->param('leaf') && $q->param('leaf') == 1) {
+		my @r = &sendCommand({ command => "listMyFaction", item => "", domain => "", param => "name", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=editg&verb=modify", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=editg&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=editg&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			if(!@s) {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td>No factions available.</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+			else {
+				if(!$q->param('grp') && $q->param('grp') eq "") {
+					my %l = ();
+					my @t = ();
+
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[2];
+						$l{$i[2]} = $i[2] . " (" . $i[1] . ")";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Faction:</td>";
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "grp", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Modify >>" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+				else {
+					@r = &sendCommand({ command => "pullFaction", item => $q->param('grp'), domain => "", param => "name", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						$s[1] = cleanNull({ string => $s[1] });
+						$s[2] = cleanNull({ string => $s[2] });
+						$s[5] = cleanNull({ string => $s[5] });
+						$s[6] = cleanNull({ string => $s[6] });
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\" width=\"20%\">Faction name&nbsp;&sup2;:</td>";
+						$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "name", value => $s[2], style => "textreq", readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">Faction owner&nbsp;&sup2;:</td>";
+						$PAGE .= "<td>" . &htmlInputText({ name => "owner", value => $s[1], style => "textreq", readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">Description:</td>";
+						$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => $s[5] }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+						$PAGE .= "<td>" . &htmlInputField({ name => "note", value => $s[6] }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+						$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+						$PAGE .= "</tr>";
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+						$PAGE .= "<td><i>&sup2;&nbsp;denotes readonly field which value cannot be changed.</i></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+
+						if($s[3] && $s[3] == 1) {
+							$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary?", value => 1, select => 1 }) . "</td>";
+						}
+						else {
+							$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary?", value => 1 }) . "</td>";
+						}
+
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+
+						if($s[4] && $s[4] == 1) {
+							$PAGE .= "<td>" . &htmlSelectTick({ name => "public", label => "Faction is public?", value => 1, select => 1 }) . "</td>";
+						}
+						else {
+							$PAGE .= "<td>" . &htmlSelectTick({ name => "public", label => "Faction is public?", value => 1 }) . "</td>";
+						}
+
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+						$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Modify faction" }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &htmlHiddenField({ name => "verb", value => "modify" });
+					}
+				}
+
+				$PAGE .= &htmlHiddenField({ name => "action", value => "editg" });
+				$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+
+				$PAGE .= &htmlFormEnd();
+			}
+
+			$PAGE .= "</table>";
+		}
+	}
+	elsif($q->param('leaf') && $q->param('leaf') == 2) {
+		my @r = &sendCommand({ command => "listMyFaction", item => "", domain => "", param => "name", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=editg&verb=delete", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=editg&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=editg&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			if(!@s) {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td>No factions available.</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+			else {
+				if(!$q->param('grp') && $q->param('grp') eq "") {
+					my %l = ();
+					my @t = ();
+
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[2];
+						$l{$i[2]} = $i[2] . " (" . $i[1] . ")";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Faction:</td>";
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "grp", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Delete >>" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+				else {
+					@r = &sendCommand({ command => "pullFaction", item => $q->param('grp'), domain => "", param => "name", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						$s[1] = cleanNull({ string => $s[1] });
+						$s[2] = cleanNull({ string => $s[2] });
+						$s[5] = cleanNull({ string => $s[5] });
+						$s[6] = cleanNull({ string => $s[6] });
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\" width=\"20%\">Faction name&nbsp;&sup2;:</td>";
+						$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "name", value => $s[2], style => "textreq", readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">Faction owner&nbsp;&sup2;:</td>";
+						$PAGE .= "<td>" . &htmlInputText({ name => "owner", value => $s[1], style => "textreq", readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">Description&nbsp;&sup2;:</td>";
+						$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => $s[5], readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td align=\"right\">Additional&nbsp;info&nbsp;&sup2;:</td>";
+						$PAGE .= "<td>" . &htmlInputField({ name => "note", value => $s[6], readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+						$PAGE .= "<td><i>&sup2;&nbsp;denotes readonly field which value cannot be changed.</i></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+						$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Delete faction" }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &htmlHiddenField({ name => "verb", value => "delete" });
+					}
+				}
+
+				$PAGE .= &htmlHiddenField({ name => "action", value => "editg" });
+				$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+
+				$PAGE .= &htmlFormEnd();
+			}
+
+			$PAGE .= "</table>";
+		}
+	}
+}
+
 sub editPersonalFile {
 	my ($arg) = @_;
 
@@ -568,9 +1090,7 @@ sub editPersonalPwds {
 	my @l = ('Add new password', 'Modify existing password', 'Delete existing password');
 
 	if($q->param('verb') && $q->param('verb') eq "update") {
-		my @r = ();
-
-		@r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
+		my @r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
 			my $e = 0;

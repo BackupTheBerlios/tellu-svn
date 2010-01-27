@@ -19,17 +19,39 @@ if($q->param('action') || $q->param('slice')) {
 
 	&tablePersonalSlice();
 
-	if($q->param('action') eq "editf") {
+	if($q->param('action') eq "editg") {
+		$t = "Edit my factions";
+
+		&editPersonalFaction();
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &modifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('action') eq "editf") {
 		$t = "Edit my files";
 
-		&editPersonalFile({ node => $n, domain => $d });
+		&editPersonalFile();
 
 		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &modifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}
 	elsif($q->param('action') eq "editp") {
 		$t = "Edit my passwords";
 
-		&editPersonalPwds({ node => $n, domain => $d });
+		&editPersonalPwds();
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &modifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('action') eq "listg" || $q->param('slice') eq "grp") {
+		require "machine.lib";
+
+		$t = "My factions";
+
+		my @r = &sendCommand({ command => "listFaction", item => "", domain => "", param => "name", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			$PAGE .= "<p>&nbsp;</p>";
+
+			&tableMachineDetail({ data => $r[3], slice => "grp", sort => $q->param('sort'), order => $q->param('order') });
+		}
 
 		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &modifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}

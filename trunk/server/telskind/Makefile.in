@@ -2,7 +2,7 @@ C = @CC@
 LN = @LN@
 RM = @RM@
 
-SRC = ../common/cmdline.c ../common/config.c ../common/jip.c ../common/network.c ../common/node.c ../common/pid.c ../common/shm.c ../common/thread.c ../common/timer.c ../common/uid.c application.c db_ldap.c db_mysql.c db_plain.c messages.c network.c rand.c reply.c telskind.c terminate.c worker.c worker_access.c worker_device.c worker_file.c worker_help.c worker_log.c worker_machine.c worker_misc.c worker_password.c worker_peripheral.c worker_port.c worker_rgb.c worker_service.c worker_skingroup.c worker_skinuser.c worker_temp.c
+SRC = ../common/cmdline.c ../common/config.c ../common/jip.c ../common/network.c ../common/node.c ../common/pid.c ../common/shm.c ../common/thread.c ../common/timer.c ../common/uid.c application.c db_ldap.c db_mysql.c db_plain.c messages.c network.c rand.c reply.c telskind.c terminate.c worker.c worker_access.c worker_device.c worker_faction.c worker_file.c worker_help.c worker_log.c worker_machine.c worker_misc.c worker_password.c worker_peripheral.c worker_port.c worker_rgb.c worker_service.c worker_skingroup.c worker_skinuser.c worker_temp.c
 DEP = ../common/banner.h ../common/cmdline.h ../common/config.h ../common/globines.h ../common/jip.h ../common/node.h ../common/shm.h declarations.h defines.h structures.h telskind.h worker.h
 
 ARC = `@UNAME@ -m 2>/dev/null`

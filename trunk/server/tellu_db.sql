@@ -338,6 +338,38 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_devices_map (
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS tellu3.skin_factions (
+	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# faction id
+	owner		VARCHAR(64),						# faction owner
+	name		VARCHAR(64),						# faction name
+	type		BOOL DEFAULT TRUE,					# faction is permanent or runtime
+	public		BOOL DEFAULT TRUE,					# faction is public or not
+	descr		TEXT NOT NULL,						# faction description
+	note		LONGTEXT NOT NULL,					# notes of this faction
+
+	PRIMARY KEY	(id),
+	INDEX		(id),
+	INDEX		(name)
+);
+
+CREATE TABLE IF NOT EXISTS tellu3.skin_factions_map (
+	faction_id	BIGINT UNSIGNED NOT NULL,				# id to skin_factions table
+	node_id		BIGINT UNSIGNED NOT NULL,				# id to node table
+	devices_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
+	peripherals_id	BIGINT UNSIGNED NOT NULL,				# id to skin_peripherals table
+	services_id	BIGINT UNSIGNED NOT NULL,				# id to skin_services_data table
+	files_id	BIGINT UNSIGNED NOT NULL,				# id to skin_files table
+	passwords_id	BIGINT UNSIGNED NOT NULL,				# id to skin_passwords table
+
+	INDEX		g_id (faction_id), FOREIGN KEY (faction_id) REFERENCES skin_factions(id) ON DELETE CASCADE,
+	INDEX		n_id (node_id), FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE,
+	INDEX		d_id (devices_id), FOREIGN KEY (devices_id) REFERENCES skin_devices(id) ON DELETE CASCADE,
+	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE,
+	INDEX		s_id (services_id), FOREIGN KEY (services_id) REFERENCES skin_services_data(id) ON DELETE CASCADE,
+	INDEX		f_id (files_id), FOREIGN KEY (files_id) REFERENCES skin_files(id) ON DELETE CASCADE,
+	INDEX		w_id (passwords_id), FOREIGN KEY (passwords_id) REFERENCES skin_passwords(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS tellu3.skin_files (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# file id
 	owner		VARCHAR(64),						# file owner

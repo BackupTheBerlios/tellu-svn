@@ -21,7 +21,24 @@ sub modifyFuncs {
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Add private file';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
-
+	$r .= "function toggleFactionButton(param) {" . $CONFIG_LINEFEED;
+	$r .= " if(document." . $arg->{form} . ".public.checked) {" . $CONFIG_LINEFEED;
+	$r .= "  if(document." . $arg->{form} . ".type.checked) {" . $CONFIG_LINEFEED;
+	$r .= "   document." . $arg->{form} . ".submit.value = 'Add pub/temp faction';" . $CONFIG_LINEFEED;
+	$r .= "  }" . $CONFIG_LINEFEED;
+	$r .= "  else {" . $CONFIG_LINEFEED;
+	$r .= "   document." . $arg->{form} . ".submit.value = 'Add public faction';" . $CONFIG_LINEFEED;
+	$r .= "  }" . $CONFIG_LINEFEED;
+	$r .= " }" . $CONFIG_LINEFEED;
+	$r .= " else {" . $CONFIG_LINEFEED;
+	$r .= "  if(document." . $arg->{form} . ".type.checked) {" . $CONFIG_LINEFEED;
+	$r .= "   document." . $arg->{form} . ".submit.value = 'Add priv/temp faction';" . $CONFIG_LINEFEED;
+	$r .= "  }" . $CONFIG_LINEFEED;
+	$r .= "  else {" . $CONFIG_LINEFEED;
+	$r .= "   document." . $arg->{form} . ".submit.value = 'Add private faction';" . $CONFIG_LINEFEED;
+	$r .= "  }" . $CONFIG_LINEFEED;
+	$r .= " }" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
 	$r .= "function togglePasswordButton(param) {" . $CONFIG_LINEFEED;
 	$r .= " if(document." . $arg->{form} . ".public.checked) {" . $CONFIG_LINEFEED;
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Add public password';" . $CONFIG_LINEFEED;

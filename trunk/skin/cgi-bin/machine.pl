@@ -282,7 +282,7 @@ sub machineThing {
 				}
 			}
 			elsif($arg->{slice} eq "incs") {
-				my @l = ('Files', 'Passwords', 'Devices', 'Peripherals', 'Services');
+				my @l = ('Files', 'Passwords', 'Devices', 'Peripherals', 'Services', 'Factions');
 				my @w = ();
 
 				$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
