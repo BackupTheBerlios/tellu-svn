@@ -337,8 +337,8 @@ sub tablePeripheralDetail {
 		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 5) {
-		my $t = "Name,Street,Zip,Town,Country";
-		my $m = "0,0,0,0,0";
+		my $t = "Service class,Name,Street,Postal code,Town,Country";
+		my $m = "26,0,0,0,0,0";
 
 		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}

@@ -362,11 +362,9 @@ sub deviceThing {
 
 								if(checkError({ packet => \@r }) == 0) {
 									if($r[3] && $r[3] ne "") {
-										for(my $i = 0; $i < 5; $i++) {
-											$r[3] =~ s/^.*?$ITEM_SEPARATOR//;
-										}
+										my @ss = split(/$ITEM_SEPARATOR/, $r[3]);
 
-										push @w, $r[3];
+										push @w, join($ITEM_SEPARATOR, $s, $ss[0], $ss[6], $ss[7], $ss[8], $ss[9], $ss[10]);
 									}
 								}
 							}

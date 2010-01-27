@@ -1,0 +1,1100 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub editProviderNew {
+	my ($arg) = @_;
+
+	if($q->param('verb') && $q->param('verb') eq "create") {
+		my $na = "";
+		my $st = "";
+		my $zi = "";
+		my $ci = "";
+		my $co = "";
+
+		if($q->param('name') && $q->param('name') ne "") {
+			$na = $q->param('name');
+		}
+		elsif($q->param('ext_name') && $q->param('ext_name') ne "") {
+			$na = $q->param('ext_name');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Service provider name cannot be empty.</p>";
+		}
+
+		if($q->param('street') && $q->param('street') ne "") {
+			$st = $q->param('street');
+		}
+		elsif($q->param('ext_street') && $q->param('ext_street') ne "") {
+			$st = $q->param('ext_street');
+		}
+
+		if($q->param('zip') && $q->param('zip') ne "") {
+			$zi = $q->param('zip');
+		}
+		elsif($q->param('ext_zip') && $q->param('ext_zip') ne "") {
+			$zi = $q->param('ext_zip');
+		}
+
+		if($q->param('city') && $q->param('city') ne "") {
+			$ci = $q->param('city');
+		}
+		elsif($q->param('ext_city') && $q->param('ext_city') ne "") {
+			$ci = $q->param('ext_city');
+		}
+
+		if($q->param('country') && $q->param('country') ne "") {
+			$co = $q->param('country');
+		}
+		elsif($q->param('ext_country') && $q->param('ext_country') ne "") {
+			$co = $q->param('ext_country');
+		}
+
+		if($na && $na ne "") {
+			my @r = sendCommand({ command => "newProvider", item => cleanHtml({ string => $na }), domain => "", param => $q->param('type_id'), option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				@r = sendCommand({ command => "pushProvider", item => $s[0], domain => "", param => "street", option => cleanHtml({ string => $st }) });
+				@r = sendCommand({ command => "pushProvider", item => $s[0], domain => "", param => "zip", option => cleanHtml({ string => $zi }) });
+				@r = sendCommand({ command => "pushProvider", item => $s[0], domain => "", param => "city", option => cleanHtml({ string => $ci }) });
+				@r = sendCommand({ command => "pushProvider", item => $s[0], domain => "", param => "country", option => cleanHtml({ string => $co }) });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my @i = ('telephone1', 'telephone2', 'fax1', 'fax2', 'cont_person', 'cont_telephone1', 'cont_telephone2', 'cont_fax1', 'cont_fax2', 'cont_email1', 'cont_email2', 'brands', 'addinfo', 'descr');
+
+					foreach my $i (@i) {
+						@r = sendCommand({ command => "pushProvider", item => $s[0], domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to create new service.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+
+							last;
+						}
+					}
+
+					$PAGE .= "<p class=\"info\">New service provider '" . $na . "' created.</p>";
+				}
+				else {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to create new service provider.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+				}
+			}
+			else {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to create new service provider.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+		}
+	}
+
+	my @ti = ();
+	my %ti = ();
+
+	my @r = &sendCommand({ command => "listService", item => "", domain => "", param => "name", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			push @ti, $p;
+			$ti{$p} = $m;
+		}
+	}
+
+	my @na = ();
+	my @st = ();
+	my @zi = ();
+	my @ci = ();
+	my @co = ();
+	my %na = ();
+	my %st = ();
+	my %zi = ();
+	my %ci = ();
+	my %co = ();
+
+	@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$na{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %na) {
+		push @na, $key;
+	}
+
+	@na = sort { uc($a) cmp uc($b) } @na;
+
+	@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "street", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$st{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %st) {
+		push @st, $key;
+	}
+
+	@st = sort { uc($a) cmp uc($b) } @st;
+
+	@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "zip", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$zi{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %zi) {
+		push @zi, $key;
+	}
+
+	@zi = sort { uc($a) cmp uc($b) } @zi;
+
+	@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "city", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$ci{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %ci) {
+		push @ci, $key;
+	}
+
+	@ci = sort { uc($a) cmp uc($b) } @ci;
+
+	@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "country", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+			$co{$m}++;
+		}
+	}
+
+	while((my $key, $val) = each %co) {
+		push @co, $key;
+	}
+
+	@co = sort { uc($a) cmp uc($b) } @co;
+
+	my @l = ('Create new service provider');
+
+	$PAGE .= &htmlFormBegin({ name => "createForm", action => $SELF . "?action=modify&verb=create", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<p>&nbsp;</p>";
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	my $s = 0;
+
+	foreach my $l (@l) {
+		if($s == $q->param('leaf')) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Service provider class:</td>";
+	$PAGE .= "<td>" . &htmlSelectMenu({ name => "type_id", value => \@ti, label => \%ti })  . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\" width=\"20%\">Service provider name&nbsp;&sup1;:</td>";
+	$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "name", value => "", style => "textreq" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@na) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing name", -values => \@na, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_name", value => \@t, onchange => "toggleNameField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Service provider description:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Street address:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "street", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@st) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing street address", -values => \@st, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_street", value => \@t, onchange => "toggleStreetField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Postal code:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "zip", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@zi) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing zip code", -values => \@zi, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_zip", value => \@t, onchange => "toggleZipField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Town:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "city", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@ci) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing town", -values => \@ci, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_city", value => \@t, onchange => "toggleCityField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Country:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "country", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	if(@co) {
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "Pick existing country", -values => \@co, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_country", value => \@t, onchange => "toggleCountryField('createForm'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Telephone:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "telephone1", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Alternate telephone:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "telephone2", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Telefax:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "fax1", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Alternate telefax:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "fax2", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Contact agent:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_person", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Agent telephone:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_telephone1", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Agent alternate telephone:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_telephone2", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Agent telefax:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_fax1", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Agent alternate telefax:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_fax2", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Agent email:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_email1", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">Agent alternate email:</td>";
+	$PAGE .= "<td>" . &htmlInputText({ name => "cont_email2", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td align=\"right\">Service provided for brands:<br />(<i>One per line</i>)&nbsp;</td>";
+	$PAGE .= "<td>" . &htmlInputField({ name => "brands", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+	$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => "" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"middle\">";
+	$PAGE .= "<td align=\"right\">&nbsp;</td>";
+	$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Create" }) . "</td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "<tr class=\"top\">";
+	$PAGE .= "<td></td><td></td>";
+	$PAGE .= "</tr>";
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+	$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+	$PAGE .= &htmlHiddenField({ name => "verb", value => "create" });
+
+	$PAGE .= &htmlFormEnd();
+}
+
+sub editProviderNode {
+	my ($arg) = @_;
+
+	my @l = ('Service provider info');
+
+	if($q->param('verb') && $q->param('verb') eq "update") {
+		my $na = "";
+		my $st = "";
+		my $zi = "";
+		my $ci = "";
+		my $co = "";
+
+		if($q->param('name') && $q->param('name') ne "") {
+			$na = $q->param('name');
+		}
+		elsif($q->param('ext_name') && $q->param('ext_name') ne "") {
+			$na = $q->param('ext_name');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Service provider name cannot be empty.</p>";
+		}
+
+		if($q->param('street') && $q->param('street') ne "") {
+			$st = $q->param('street');
+		}
+		elsif($q->param('ext_street') && $q->param('ext_street') ne "") {
+			$st = $q->param('ext_street');
+		}
+
+		if($q->param('zip') && $q->param('zip') ne "") {
+			$zi = $q->param('zip');
+		}
+		elsif($q->param('ext_zip') && $q->param('ext_zip') ne "") {
+			$zi = $q->param('ext_zip');
+		}
+
+		if($q->param('city') && $q->param('city') ne "") {
+			$ci = $q->param('city');
+		}
+		elsif($q->param('ext_city') && $q->param('ext_city') ne "") {
+			$ci = $q->param('ext_city');
+		}
+
+		if($q->param('country') && $q->param('country') ne "") {
+			$co = $q->param('country');
+		}
+		elsif($q->param('ext_country') && $q->param('ext_country') ne "") {
+			$co = $q->param('ext_country');
+		}
+
+		if($na && $na ne "") {
+			@r = sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "name", option => cleanHtml({ string => $na }) });
+			@r = sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "street", option => cleanHtml({ string => $st }) });
+			@r = sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "zip", option => cleanHtml({ string => $zi }) });
+			@r = sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "city", option => cleanHtml({ string => $ci }) });
+			@r = sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "country", option => cleanHtml({ string => $co }) });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @i = ('type_id', 'telephone1', 'telephone2', 'fax1', 'fax2', 'cont_person', 'cont_telephone1', 'cont_telephone2', 'cont_fax1', 'cont_fax2', 'cont_email1', 'cont_email2', 'brands', 'addinfo', 'descr');
+
+				foreach my $i (@i) {
+					@r = sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to update service provider.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						last;
+					}
+				}
+
+				$PAGE .= "<p class=\"info\">Service provider '" . $na . "' is updated.</p>";
+			}
+			else {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to update service provider.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+		}
+	}
+
+	if($q->param('disposed') == 1) {
+		my @r = &sendCommand({ command => "deleteProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose service provider.</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= "<p class=\"info\">Service provider is disposed.</p>";
+		}
+	}
+	else {
+		if(!$q->param('leaf') || $q->param('leaf') == 0) {
+			my @ti = ();
+			my %ti = ();
+
+			my @r = &sendCommand({ command => "listService", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					push @ti, $p;
+					$ti{$p} = $m;
+				}
+			}
+
+			my @na = ();
+			my @st = ();
+			my @zi = ();
+			my @ci = ();
+			my @co = ();
+			my %na = ();
+			my %st = ();
+			my %zi = ();
+			my %ci = ();
+			my %co = ();
+
+			@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$na{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %na) {
+				push @na, $key;
+			}
+
+			@na = sort { uc($a) cmp uc($b) } @na;
+
+			@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "street", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$st{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %st) {
+				push @st, $key;
+			}
+
+			@st = sort { uc($a) cmp uc($b) } @st;
+
+			@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "zip", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$zi{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %zi) {
+				push @zi, $key;
+			}
+
+			@zi = sort { uc($a) cmp uc($b) } @zi;
+
+			@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "city", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$ci{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %ci) {
+				push @ci, $key;
+			}
+
+			@ci = sort { uc($a) cmp uc($b) } @ci;
+
+			@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "country", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+					$co{$m}++;
+				}
+			}
+
+			while((my $key, $val) = each %co) {
+				push @co, $key;
+			}
+
+			@co = sort { uc($a) cmp uc($b) } @co;
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=create", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				$s[6] = cleanNull({ string => $s[6] });
+				$s[7] = cleanNull({ string => $s[7] });
+				$s[8] = cleanNull({ string => $s[8] });
+				$s[9] = cleanNull({ string => $s[9] });
+				$s[10] = cleanNull({ string => $s[10] });
+				$s[11] = cleanNull({ string => $s[11] });
+				$s[12] = cleanNull({ string => $s[12] });
+				$s[13] = cleanNull({ string => $s[13] });
+				$s[14] = cleanNull({ string => $s[14] });
+				$s[15] = cleanNull({ string => $s[15] });
+				$s[16] = cleanNull({ string => $s[16] });
+				$s[17] = cleanNull({ string => $s[17] });
+				$s[18] = cleanNull({ string => $s[18] });
+				$s[19] = cleanNull({ string => $s[19] });
+				$s[20] = cleanNull({ string => $s[20] });
+				$s[21] = cleanNull({ string => $s[21] });
+				$s[22] = cleanNull({ string => $s[22] });
+				$s[23] = cleanNull({ string => $s[23] });
+				$s[24] = cleanNull({ string => $s[24] });
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Service provider class:</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ name => "type_id", value => \@ti, label => \%ti, select => $s[0] })  . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Service provider name&nbsp;&sup1;:</td>";
+				$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "name", value => $s[6], style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@na) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing name", -values => \@na, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_name", value => \@t, onchange => "toggleNameField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Service provider description:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "descr", value => $s[24] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Street address:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "street", value => $s[7] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@st) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing street address", -values => \@st, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_street", value => \@t, onchange => "toggleStreetField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Postal code:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "zip", value => $s[8] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@zi) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing zip code", -values => \@zi, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_zip", value => \@t, onchange => "toggleZipField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Town:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "city", value => $s[9] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@ci) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing town", -values => \@ci, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_city", value => \@t, onchange => "toggleCityField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Country:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "country", value => $s[10] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@co) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing country", -values => \@co, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ name => "ext_country", value => \@t, onchange => "toggleCountryField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Telephone:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "telephone1", value => $s[11] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Alternate telephone:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "telephone2", value => $s[12] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Telefax:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "fax1", value => $s[13] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Alternate telefax:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "fax2", value => $s[14] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Contact agent:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_person", value => $s[15] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Agent telephone:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_telephone1", value => $s[16] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Agent alternate telephone:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_telephone2", value => $s[17] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Agent telefax:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_fax1", value => $s[18] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Agent alternate telefax:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_fax2", value => $s[19] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Agent email:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_email1", value => $s[20] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Agent alternate email:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "cont_email2", value => $s[21] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">Service provided for brands:<br />(<i>One per line</i>)&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlInputField({ name => "brands", value => $s[22] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
+				$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => $s[23] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this service provider?", value => 1, onclick => "toggleUpdateButton('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+	}
+}
+
+sub editProviderNote {
+	my ($arg) = @_;
+
+	my @l = ('Review existing notes', 'Add new note');
+
+	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
+		my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			my $w = $s[25] . "<DELIMBEG>" . $SESSION_UID . "<DELIMSEP>" . localtime(time()) . "<DELIMEND>";
+
+			$w .= cleanHtml({ string => $q->param('note') });
+
+			@r = &sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "note", option => $w });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
+
+				if($SESSION_ERR && $SESSION_ERR ne "") {
+					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+				}
+			}
+		}
+	}
+
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			$s[25] = cleanNull({ string => $s[25] });
+
+			if(!$s[25] || $s[25] eq "") {
+				$s[25] = "No notes are available for this node.";
+			}
+			else {
+				$s[25] =~ s/<DELIMBEG>/<h4>/go;
+				$s[25] =~ s/<DELIMEND>/<\/h4>/go;
+				$s[25] =~ s/<DELIMSEP>/ commented at /go;
+			}
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td width=\"100%\">" . $s[25] . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+		}
+
+		$PAGE .= "</table>";
+	}
+	elsif($q->param('leaf') && $q->param('leaf') == 1) {
+		$PAGE .= &htmlFormBegin({ name => "noteForm", action => $SELF . "?action=note&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+		$PAGE .= "<tr class=\"middle\">";
+
+		my $s = 0;
+
+		foreach my $l (@l) {
+			if($s == $q->param('leaf')) {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+			}
+			else {
+				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+			}
+
+			$s++;
+		}
+
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Add&nbsp;new&nbsp;note:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlInputField({ name => "note", value => "" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Add note" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "note" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+		$PAGE .= &htmlFormEnd();
+	}
+}
+
+1;

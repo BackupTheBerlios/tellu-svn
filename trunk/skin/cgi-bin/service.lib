@@ -13,10 +13,10 @@ require "network.lib";
 require "prefs.lib";
 require "item.lib";
 
-sub menuDevice {
+sub menuProvider {
 	my ($arg) = @_;
 
-	my @r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+	my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @o = ();
@@ -24,20 +24,20 @@ sub menuDevice {
 		my %l = ();
 
 		if($r[3] && $r[3] ne "") {
-			$t[0] = $q->optgroup( -name => "Device Groups", -values => [ "Device summary", "Device listing" ], -class => "header" );
+			$t[0] = $q->optgroup( -name => "Service Provider Groups", -values => [ "Service provider summary", "Service provider listing" ], -class => "header" );
 
 			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
 				my @s = split(/$ITEM_SEPARATOR/, $e);
 
 				push @o, $s[0];
-				$l{$s[0]} = $s[1] . " " . $s[2] . " (" . $s[3] . ")";
+				$l{$s[0]} = $s[1];
 			}
 
-			$t[1] = $q->optgroup( -name => "Devices", -values => \@o, -labels => \%l, -class => "header" );
+			$t[1] = $q->optgroup( -name => "Service Providers", -values => \@o, -labels => \%l, -class => "header" );
 
-			$PAGE .= &htmlFormBegin({ name => "devicesForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+			$PAGE .= &htmlFormBegin({ name => "servicesForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "deviceNode", value => \@t, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "serviceNode", value => \@t, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -49,9 +49,9 @@ sub menuDevice {
 			@t[0] = 0;
 			$l{0} = "No items available";
 
-			$PAGE .= &htmlFormBegin({ name => "devicesForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+			$PAGE .= &htmlFormBegin({ name => "servicesForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "deviceNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
+			$PAGE .= &htmlSelectMenu({ name => "serviceNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>", disabled => 1 });
 
@@ -66,10 +66,10 @@ sub menuDevice {
 	return(-1);
 }
 
-sub menuDDevice {
+sub menuDProvider {
 	my ($arg) = @_;
 
-	my @r = &sendCommand({ command => "listDisposedDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+	my @r = &sendCommand({ command => "listDisposedProvider", item => "", domain => "", param => "name", option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @o = ();
@@ -77,20 +77,20 @@ sub menuDDevice {
 		my %l = ();
 
 		if($r[3] && $r[3] ne "") {
-			$t[0] = $q->optgroup( -name => "Device Groups", -values => [ "Device summary", "Device listing" ], -class => "header" );
+			$t[0] = $q->optgroup( -name => "Service Provider Groups", -values => [ "Service provider summary", "Service provider listing" ], -class => "header" );
 
 			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
 				my @s = split(/$ITEM_SEPARATOR/, $e);
 
 				push @o, $s[0];
-				$l{$s[0]} = $s[1] . " " . $s[2] . " (" . $s[3] . ")";
+				$l{$s[0]} = $s[1];
 			}
 
-			$t[1] = $q->optgroup( -name => "Devices", -values => \@o, -labels => \%l, -class => "header" );
+			$t[1] = $q->optgroup( -name => "Service Providers", -values => \@o, -labels => \%l, -class => "header" );
 
-			$PAGE .= &htmlFormBegin({ name => "devicesDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+			$PAGE .= &htmlFormBegin({ name => "servicesDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "deviceNode", value => \@t, label => \%l, select => $arg->{select} });
+			$PAGE .= &htmlSelectMenu({ name => "serviceNode", value => \@t, label => \%l, select => $arg->{select} });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
 
@@ -102,9 +102,9 @@ sub menuDDevice {
 			@t[0] = 0;
 			$l{0} = "No items available";
 
-			$PAGE .= &htmlFormBegin({ name => "devicesDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+			$PAGE .= &htmlFormBegin({ name => "servicesDisposedForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
 
-			$PAGE .= &htmlSelectMenu({ name => "deviceNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
+			$PAGE .= &htmlSelectMenu({ name => "serviceNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
 			$PAGE .= "&nbsp;";
 			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>", disabled => 1 });
 
@@ -119,48 +119,42 @@ sub menuDDevice {
 	return(-1);
 }
 
-sub tableDeviceBrief {
+sub tableProviderBrief {
 	my ($arg) = @_;
 
 	if($arg->{slice} eq "dev") {
-		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "0,0,0,0,23,22";
+		my $t = "Service class,Name,Street,Postal code,Town,Country";
+		my $m = "26,0,0,0,0,0";
 
-		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
-		my $t = "Network support,IP address";
-		my $m = "9,0";
+		my $t = "Telephone,Alternate telephone,Fax,Alternate fax";
+		my $m = "0,0,0,0";
 
-		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "security") {
-		my $t = "Serial number,Security number,Location";
-		my $m = "0,0,0";
+		my $t = "Contact person,Direct telephone,Alternate telephone,Direct fax,Alternate fax,Direct email,Alternate email";
+		my $m = "0,0,0,0,0,29,29";
 
-		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
-		my $t = "Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "9,18,20,0,17,20";
+		my $t = "Brands";
+		my $m = "27";
 
-		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "warranty") {
-		my $t = "Acquired,Warranty period";
-		my $m = "20,19";
-
-		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
 		my $t = "Additional info,Description";
 		my $m = "0,0";
 
-		&tableDeviceBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 }
 
-sub tableDeviceBriefs {
+sub tableProviderBriefs {
 	my ($arg) = @_;
 
 	my @t = split(/,/, $arg->{title});
@@ -297,114 +291,60 @@ sub tableDeviceBriefs {
 	$PAGE .= "</table>";
 }
 
-sub tableDeviceDetail {
+sub tableProviderDetail {
 	my ($arg) = @_;
 
-	if($arg->{slice} eq "fle" || ($arg->{slice} eq "incs" && $arg->{leaf} == 1)){
-		my $t = "Owner,Name,Filename,Size,Public,Description,Additional info";
-		my $m = "0,0,14,3,9,0,0";
-
-		my @j = ();
-		my @i = split(/$ITEM_DELIMITER/, $arg->{data});
-
-		foreach my $i (@i) {
-			my @s = split(/$ITEM_SEPARATOR/, $i);
-
-			$s[3] .= "|" . $s[8];
-			$i = join($ITEM_SEPARATOR, @s);
-
-			push @j, $i;
-		}
-
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @j), title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "pwd" || ($arg->{slice} eq "incs" && $arg->{leaf} == 2)) {
-		my $t = "Owner,Name,Service,Username,Password,Public,Description,Additional info";
-		my $m = "0,0,0,0,8,9,0,0";
-
-		&tableDeviceDetails({ slice => $arg->{slice}, key => $arg->{key}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 3) {
-		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "0,0,0,0,23,22";
-
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 4) {
-		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "0,0,0,0,23,22";
-
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "incs" && $arg->{leaf} == 5) {
+	if($arg->{slice} eq "dev") {
 		my $t = "Service class,Name,Street,Postal code,Town,Country";
 		my $m = "26,0,0,0,0,0";
 
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "dev") {
-		my $t = "Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "0,0,0,0,23,22";
+		my @ss = split(/$ITEM_SEPARATOR/, $arg->{data});
 
-		for(my $i = 0; $i < 4; $i++) {
-			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
-		}
-
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_SEPARATOR, $s, $ss[0], $ss[6], $ss[7], $ss[8], $ss[9], $ss[10]), title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
-		my $t = "Network support,IP address";
-		my $m = "9,0";
+		my $t = "Telephone,Alternate telephone,Fax,Alternate fax";
+		my $m = "0,0,0,0";
 
 		for(my $i = 0; $i < 10; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
 		}
 
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "security") {
-		my $t = "Serial number,Security number,Location";
-		my $m = "0,0,0";
+		my $t = "Contact person,Direct telephone,Alternate telephone,Direct fax,Alternate fax,Direct email,Alternate email";
+		my $m = "0,0,0,0,0,29,29";
 
-		for(my $i = 0; $i < 12; $i++) {
+		for(my $i = 0; $i < 14; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
 		}
 
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
-		my $t = "Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "9,18,20,0,17,20";
-
-		for(my $i = 0; $i < 15; $i++) {
-			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
-		}
-
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "warranty") {
-		my $t = "Acquired,Warranty period";
-		my $m = "20,19";
+		my $t = "Brands";
+		my $m = "27";
 
 		for(my $i = 0; $i < 21; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
 		}
 
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
 		my $t = "Additional info,Description";
 		my $m = "0,0";
 
-		for(my $i = 0; $i < 23; $i++) {
+		for(my $i = 0; $i < 22; $i++) {
 			$arg->{data} =~ s/^.*?$ITEM_SEPARATOR//;
 		}
 
-		&tableDeviceDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 }
 
-sub tableDeviceDetails {
+sub tableProviderDetails {
 	my ($arg) = @_;
 
 	my @t = split(/,/, $arg->{title});
@@ -516,48 +456,42 @@ sub tableDeviceDetails {
 	$PAGE .= "</table>";
 }
 
-sub tableDeviceListing {
+sub tableProviderListing {
 	my ($arg) = @_;
 
 	if($arg->{slice} eq "dev") {
-		my $t = "Device,Model,Category,Manufacturer,Size,Memory,Connection";
-		my $m = "24,0,0,0,0,23,22";
+		my $t = "Provider,Service class,Name,Street,Postal code,Town,Country";
+		my $m = "28,26,0,0,0,0,0";
 
-		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "net") {
-		my $t = "Device,Network support,IP address";
-		my $m = "24,9,0";
+		my $t = "Provider,Telephone,Alternate telephone,Fax,Alternate fax";
+		my $m = "28,0,0,0,0";
 
-		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "security") {
-		my $t = "Device,Serial number,Security number,Location";
-		my $m = "24,0,0,0";
+		my $t = "Provider,Contact person,Direct telephone,Alternate telephone,Direct fax,Alternate fax,Direct email,Alternate email";
+		my $m = "28,0,0,0,0,0,29,29";
 
-		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "repair") {
-		my $t = "Device,Is in service,Estimated service duration,Date of service delivery,Method of service delivery,Repaired,Last repair date";
-		my $m = "24,9,18,20,0,17,20";
+		my $t = "Provider,Brands";
+		my $m = "28,27";
 
-		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
-	}
-	elsif($arg->{slice} eq "warranty") {
-		my $t = "Device,Acquired,Warranty period";
-		my $m = "24,20,19";
-
-		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "add") {
-		my $t = "Device,Additional info,Description";
-		my $m = "24,0,0";
+		my $t = "Provider,Additional info,Description";
+		my $m = "28,0,0";
 
-		&tableDeviceListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+		&tableProviderListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 }
 
-sub tableDeviceListings {
+sub tableProviderListings {
 	my ($arg) = @_;
 
 	my @t = split(/,/, $arg->{title});
@@ -662,12 +596,12 @@ sub tableDeviceListings {
 				$nd = $SESSION_CACHE{"node" . $id};
 			}
 			else {
-				my @r = &sendCommand({ command => "pullDevice", item => $id, domain => "", param => "name", option => "" });
+				my @r = &sendCommand({ command => "pullProvider", item => $id, domain => "", param => "name", option => "" });
 
 				if(checkError({ packet => \@r }) == 0) {
 					@r = split(/$ITEM_SEPARATOR/, $r[3]);
 
-					$nd = $id . "|" . $r[7] . " " . $r[5] . " (" . $r[6] . ")";
+					$nd = $id . "|" . $r[6];
 
 					$SESSION_CACHE{"node" . $id} = $nd;
 				}
@@ -731,87 +665,81 @@ sub tableDeviceListings {
 	$PAGE .= "</table>";
 }
 
-sub tableDeviceBriefSlice {
+sub tableProviderBriefSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/summary.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/service/summary.png\"></td>";
 	$MENU .= "<td class=\"c3\">Summary</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Device</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
 	$MENU .= "</ul>";
 }
 
-sub tableDeviceListingSlice {
+sub tableProviderListingSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/listing.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/service/listing.png\"></td>";
 	$MENU .= "<td class=\"c3\">Listing</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Device</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
 	$MENU .= "</ul>";
 }
 
-sub tableDeviceDetailSlice {
+sub tableProviderDetailSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/device.png\"></td>";
-	$MENU .= "<td class=\"c3\">Active<br />devices</td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/service/service.png\"></td>";
+	$MENU .= "<td class=\"c3\">Active<br />services</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Device</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
-
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=incs\" style=\"background: #735162;\">Inclusions</a></li>";
 
 	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Edit notes</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?action=modify\" style=\"background: #407362;\">Edit attributes</a></li>";
 	$MENU .= "</ul>";
 }
 
-sub tableDDeviceDetailSlice {
+sub tableDProviderDetailSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/device_d.png\"></td>";
-	$MENU .= "<td class=\"c3\">Disposed<br />devices</td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/service/service_d.png\"></td>";
+	$MENU .= "<td class=\"c3\">Disposed<br />services</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Device</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Network</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Security</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Repair</a></li>";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=warranty\">Warranty</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=add\">Additional info</a></li>";
 
 	$MENU .= "<li><a href=\"" . $SELF . "?action=note\" style=\"background: #405173;\">Notes</a></li>";
@@ -819,13 +747,13 @@ sub tableDDeviceDetailSlice {
 	$MENU .= "</ul>";
 }
 
-sub tableDeviceSlice {
+sub tableProviderSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/device.png\"></td>";
-	$MENU .= "<td class=\"c3\">Active<br />devices</td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/service/service.png\"></td>";
+	$MENU .= "<td class=\"c3\">Active<br />services</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 
@@ -833,13 +761,13 @@ sub tableDeviceSlice {
 	$MENU .= "</ul>";
 }
 
-sub tableDDeviceSlice {
+sub tableDProviderSlice {
 	my ($arg) = @_;
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/device/device_d.png\"></td>";
-	$MENU .= "<td class=\"c3\">Disposed<br />devices</td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/service/service_d.png\"></td>";
+	$MENU .= "<td class=\"c3\">Disposed<br />services</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 

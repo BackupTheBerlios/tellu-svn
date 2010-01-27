@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+sub editDisposedProviderNode {
+	my ($arg) = @_;
+
+	if($q->param('restore') == 1) {
+		my @r = &sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "disposed", option => "0" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to restore service provider.</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= "Service provider is restored.</p>";
+		}
+	}
+	elsif($q->param('disposed') == 2) {
+		my @r = &sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "disposed", option => "2" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose service provider.</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+		}
+		else {
+			$PAGE .= "Service provider is disposed permanently.</p>";
+		}
+	}
+	else {
+		my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			$PAGE .= &htmlFormBegin({ name => "modifyDisposedForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td align=\"right\" width=\"20%\">&nbsp;</td>";
+			$PAGE .= "<td width=\"80%\">" . &htmlSelectTick({ name => "restore", label => "Restore this service provider?", value => 1, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this service provider permanently?", value => 2, onclick => "toggleUpdateButtons('modifyDisposedForm'); return true;" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"middle\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+
+			$PAGE .= &htmlFormEnd();
+		}
+	}
+}
+
+sub editDisposedProviderNote {
+	my ($arg) = @_;
+
+	my @l = ('Review existing notes', 'Add new note');
+
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	my $s = 0;
+
+	foreach my $l (@l) {
+		if($s == $q->param('leaf')) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\">" . $l . "</td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+	my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+		$s[25] = cleanNull({ string => $s[25] });
+
+		if(!$s[25] || $s[25] eq "") {
+			$s[25] = "No notes are available for this node.";
+		}
+		else {
+			$s[25] =~ s/<DELIMBEG>/<h4>/go;
+			$s[25] =~ s/<DELIMEND>/<\/h4>/go;
+			$s[25] =~ s/<DELIMSEP>/ commented at /go;
+		}
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td width=\"100%\">" . $s[25] . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "</table>";
+}
+
+1;
