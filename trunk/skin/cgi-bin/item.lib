@@ -602,6 +602,9 @@ sub itemClean {
 	elsif($arg->{flag} == 29) {
 		$r = "<a href=\"mailto:" . $arg->{item} . "\" target=\"_blank\" style=\"color: #000000;\">" . $arg->{item} . "</a>";
 	}
+	elsif($arg->{flag} == 30) {
+		$r = "<a href=\"http://maps.google.com/?q=" . $arg->{item} . "\" target=\"_blank\" style=\"color: #000000;\">" . $arg->{item} . "</a>";
+	}
 
 	return $r;
 }

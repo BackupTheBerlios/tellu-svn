@@ -124,7 +124,7 @@ sub tableProviderBrief {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Service class,Name,Street,Postal code,Town,Country";
-		my $m = "26,0,0,0,0,0";
+		my $m = "26,0,30,0,0,0";
 
 		&tableProviderBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
@@ -296,7 +296,7 @@ sub tableProviderDetail {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Service class,Name,Street,Postal code,Town,Country";
-		my $m = "26,0,0,0,0,0";
+		my $m = "26,0,30,0,0,0";
 
 		my @ss = split(/$ITEM_SEPARATOR/, $arg->{data});
 
@@ -461,7 +461,7 @@ sub tableProviderListing {
 
 	if($arg->{slice} eq "dev") {
 		my $t = "Provider,Service class,Name,Street,Postal code,Town,Country";
-		my $m = "28,26,0,0,0,0,0";
+		my $m = "28,26,0,30,0,0,0";
 
 		&tableProviderListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
