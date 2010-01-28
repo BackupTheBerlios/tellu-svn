@@ -304,3 +304,28 @@ option {
 	color: #f0f0f0;
 	font-style: normal;
 }
+
+#button {
+	background: #444444;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	text-align: center;
+	width: 60px;
+}
+
+#button:focus {
+	background: #2580a2;
+	border: inset 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
+
+#button:hover {
+	background: #2580a2;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}

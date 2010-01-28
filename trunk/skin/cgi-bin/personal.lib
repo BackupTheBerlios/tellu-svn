@@ -14,7 +14,7 @@ require "network.lib";
 sub editPersonalFaction {
 	my ($arg) = @_;
 
-	my @l = ('Add new faction', 'Modify existing faction', 'Delete existing faction');
+	my @l = ('Add new faction', 'Modify existing faction', 'Delete existing faction', 'Faction members');
 
 	if($q->param('verb') && $q->param('verb') eq "update") {
 		my @r = &sendCommand({ command => "listFaction", item => "", domain => "", param => "name", option => "" });
@@ -108,6 +108,138 @@ sub editPersonalFaction {
 			else {
 				$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' is deleted.</p>";
 			}
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "attmac") {
+		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "machine" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "removeFaction", item => $q->param('grp'), domain => "", param => $s, option => "machine" });
+				}
+			}
+
+			@s = $q->param('faction');
+
+			foreach my $s (@s) {
+				@r = &sendCommand({ command => "attachFaction", item => $q->param('grp'), domain => "", param => $s, option => "machine" });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to set faction members.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "attdev") {
+		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "device" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "removeFaction", item => $q->param('grp'), domain => "", param => $s, option => "device" });
+				}
+			}
+
+			@s = $q->param('faction');
+
+			foreach my $s (@s) {
+				@r = &sendCommand({ command => "attachFaction", item => $q->param('grp'), domain => "", param => $s, option => "device" });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to set faction members.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "attper") {
+		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "peripheral" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "removeFaction", item => $q->param('grp'), domain => "", param => $s, option => "peripheral" });
+				}
+			}
+
+			@s = $q->param('faction');
+
+			foreach my $s (@s) {
+				@r = &sendCommand({ command => "attachFaction", item => $q->param('grp'), domain => "", param => $s, option => "peripheral" });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to set faction members.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "attser") {
+		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "service" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "removeFaction", item => $q->param('grp'), domain => "", param => $s, option => "service" });
+				}
+			}
+
+			@s = $q->param('faction');
+
+			foreach my $s (@s) {
+				@r = &sendCommand({ command => "attachFaction", item => $q->param('grp'), domain => "", param => $s, option => "service" });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to set faction members.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
 		}
 	}
 
@@ -524,6 +656,278 @@ sub editPersonalFaction {
 
 				$PAGE .= &htmlHiddenField({ name => "action", value => "editg" });
 				$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+
+				$PAGE .= &htmlFormEnd();
+			}
+
+			$PAGE .= "</table>";
+		}
+	}
+	elsif($q->param('leaf') && $q->param('leaf') == 3) {
+		my @r = &sendCommand({ command => "listMyFaction", item => "", domain => "", param => "name", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td>";
+			$PAGE .= "<td class=\"leaf\"><a href=\"" . $SELF . "?action=editg\">&lt;&lt; My factions</a></td>";
+			$PAGE .= "<td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+
+			my @ll = ('Machines', 'Devices', 'Peripherals', 'Services');
+
+			my $s = 0;
+
+			foreach my $l (@ll) {
+				if($s == $q->param('subleaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			if(!@s) {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td>No factions available.</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+			else {
+				my @u = ();
+				my @t = ();
+				my %l = ();
+
+				if(!$q->param('grp') && $q->param('grp') eq "") {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+						$l{$i[0]} = $i[2] . " (" . $i[1] . ")";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Faction:</td>";
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "grp", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Select >>" }) . "</td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+				else {
+					@r = &sendCommand({ command => "pullFaction", item => $q->param('grp'), domain => "", param => "id", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						$s[1] = cleanNull({ string => $s[1] });
+						$s[2] = cleanNull({ string => $s[2] });
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\" width=\"20%\">Faction:</td>";
+						$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "name", value => $s[2], readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">Owner:</td>";
+						$PAGE .= "<td>" . &htmlInputText({ name => "owner", value => $s[1], readonly => 1 }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td align=\"right\">Faction members:</td>";
+						$PAGE .= "<td>";
+
+						$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+						$PAGE .= "<tr valign=\"top\">";
+						$PAGE .= "<td align=\"left\">";
+
+						if(!$q->param('subleaf') || $q->param('subleaf') == 0) {
+							@r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "machine" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									$s =~ s/$ITEM_SEPARATOR$//;
+
+									push @u, $s if($s != 0);
+								}
+							}
+
+							@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "node,domain,node_id", option => "" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									my ($p, $m, $d) = split(/$ITEM_SEPARATOR/, $s);
+
+									push @t, $d;
+									$l{$d} = $p . "." . $m;
+								}
+
+								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
+								$PAGE .= &htmlHiddenField({ name => "verb", value => "attmac" });
+							}
+						}
+						elsif($q->param('subleaf') && $q->param('subleaf') == 1) {
+							@r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "device" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									$s =~ s/$ITEM_SEPARATOR$//;
+
+									push @u, $s if($s != 0);
+								}
+							}
+
+							@r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									my ($p, $m, $d, $c) = split(/$ITEM_SEPARATOR/, $s);
+
+									push @t, $p;
+									$l{$p} = $m . " " . $d . " (" . $c . ")";
+								}
+
+								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
+								$PAGE .= &htmlHiddenField({ name => "verb", value => "attdev" });
+							}
+						}
+						elsif($q->param('subleaf') && $q->param('subleaf') == 2) {
+							@r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "peripheral" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									$s =~ s/$ITEM_SEPARATOR$//;
+
+									push @u, $s if($s != 0);
+								}
+							}
+
+							@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									my ($p, $m, $d, $c) = split(/$ITEM_SEPARATOR/, $s);
+
+									push @t, $p;
+									$l{$p} = $m . " " . $d . " (" . $c . ")";
+								}
+
+								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
+								$PAGE .= &htmlHiddenField({ name => "verb", value => "attper" });
+							}
+						}
+						elsif($q->param('subleaf') && $q->param('subleaf') == 3) {
+							@r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "service" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									$s =~ s/$ITEM_SEPARATOR$//;
+
+									push @u, $s if($s != 0);
+								}
+							}
+
+							@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+									push @t, $p;
+									$l{$p} = $m;
+								}
+
+								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
+								$PAGE .= &htmlHiddenField({ name => "verb", value => "attser" });
+							}
+						}
+
+						$PAGE .= "</td><td align=\"left\">";
+						$PAGE .= "&nbsp;";
+						$PAGE .= "</td><td align=\"left\">";
+
+						$PAGE .= &htmlButtonAction({ name => "clear", style => "button", value => "Clear", function => "buttonClear('modifyForm'); return true;" }) . "<br />";
+						$PAGE .= &htmlButtonAction({ name => "set", style => "button", value => "Set", function => "buttonSet('modifyForm'); return true;" }) . "<br />";
+						$PAGE .= &htmlButtonAction({ name => "toggle", style => "button", value => "Toggle", function => "buttonToggle('modifyForm'); return true;" }) . "<br />";
+
+						$PAGE .= "</td></tr>";
+						$PAGE .= "</table>";
+
+						$PAGE .= "</td></tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"middle\">";
+						$PAGE .= "<td align=\"right\">&nbsp;</td>";
+						$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Set members" }) . "</td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &htmlHiddenField({ name => "grp", value => $q->param('grp') });
+					}
+				}
+
+				$PAGE .= &htmlHiddenField({ name => "action", value => "editg" });
+				$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+				$PAGE .= &htmlHiddenField({ name => "subleaf", value => $q->param('subleaf') });
 
 				$PAGE .= &htmlFormEnd();
 			}

@@ -154,6 +154,8 @@
 #define TABLECOL_FACTIONS_MAP_DEVICES_ID "devices_id"
 #define TABLECOL_FACTIONS_MAP_PERIPHERAL "peripheral"
 #define TABLECOL_FACTIONS_MAP_PERIPHERALS_ID "peripherals_id"
+#define TABLECOL_FACTIONS_MAP_SERVICE "service"
+#define TABLECOL_FACTIONS_MAP_SERVICES_ID "services_id"
 #define TABLECOL_FILES_NAME "name"
 #define TABLECOL_FILES_OWNER "owner"
 #define TABLECOL_FILES_PUBLIC "public"
