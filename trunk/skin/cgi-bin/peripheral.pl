@@ -373,6 +373,31 @@ sub peripheralThing {
 						}
 					}
 				}
+				elsif($arg->{leaf} == 6) {
+					@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						@r = &sendCommand({ command => "attachedFaction", item => "", domain => "", param => $arg->{node}, option => "peripheral" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+							foreach my $s (@s) {
+								@r = &sendCommand({ command => "pullFaction", item => $s, domain => "", param => "id", option => "" });
+
+								if(checkError({ packet => \@r }) == 0) {
+									if($r[3] && $r[3] ne "") {
+										push @w, $r[3];
+									}
+								}
+							}
+
+							&tablePeripheralDetail({ data => join($ITEM_DELIMITER, @w), slice => $arg->{slice}, leaf => $arg->{leaf}, sort => $arg->{sort}, order => $arg->{order} });
+						}
+					}
+				}
 
 				$c[1] = &headCookieSet({ name => "tellu_peripheral_leaf", value => $arg->{leaf} });
 			}

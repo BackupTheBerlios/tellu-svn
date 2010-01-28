@@ -445,6 +445,31 @@ sub machineThing {
 						}
 					}
 				}
+				elsif($arg->{leaf} == 6) {
+					@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						@r = &sendCommand({ command => "attachedFaction", item => "", domain => "", param => $s[0], option => "machine" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+							foreach my $s (@s) {
+								@r = &sendCommand({ command => "pullFaction", item => $s, domain => "", param => "id", option => "" });
+
+								if(checkError({ packet => \@r }) == 0) {
+									if($r[3] && $r[3] ne "") {
+										push @w, $r[3];
+									}
+								}
+							}
+
+							&tableMachineDetail({ data => join($ITEM_DELIMITER, @w), slice => $arg->{slice}, leaf => $arg->{leaf}, sort => $arg->{sort}, order => $arg->{order} });
+						}
+					}
+				}
 
 				$c[1] = &headCookieSet({ name => "tellu_machine_leaf", value => $arg->{leaf} });
 			}
