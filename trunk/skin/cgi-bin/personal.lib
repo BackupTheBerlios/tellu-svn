@@ -303,6 +303,10 @@ sub editPersonalFaction {
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
 		$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
 		$PAGE .= "</tr>";
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td><i>&sup3;&nbsp;temporary faction will be removed automatically on logout.</i></td>";
+		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td></td><td></td>";
@@ -455,11 +459,11 @@ sub editPersonalFaction {
 
 						$PAGE .= "<tr class=\"middle\">";
 						$PAGE .= "<td align=\"right\">&nbsp;</td>";
-						$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+						$PAGE .= "<td><i>&sup2;&nbsp;denotes readonly field which value cannot be changed.</i></td>";
 						$PAGE .= "</tr>";
 						$PAGE .= "<tr class=\"middle\">";
 						$PAGE .= "<td align=\"right\">&nbsp;</td>";
-						$PAGE .= "<td><i>&sup2;&nbsp;denotes readonly field which value cannot be changed.</i></td>";
+						$PAGE .= "<td><i>&sup3;&nbsp;temporary faction will be removed automatically on logout.</i></td>";
 						$PAGE .= "</tr>";
 
 						$PAGE .= "<tr class=\"top\">";
