@@ -480,6 +480,26 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_PASSWORD) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FACTIONS_MAP " (" TABLECOL_FACTIONS_MAP_FACTION_ID ", " TABLECOL_FACTIONS_MAP_PASSWORDS_ID ") VALUES('%s', '%s')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_FILE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FACTIONS_MAP " (" TABLECOL_FACTIONS_MAP_FACTION_ID ", " TABLECOL_FACTIONS_MAP_FILES_ID ") VALUES('%s', '%s')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -527,6 +547,26 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s' AND " TABLECOL_FACTIONS_MAP_SERVICES_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_PASSWORD) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s' AND " TABLECOL_FACTIONS_MAP_PASSWORDS_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_FILE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s' AND " TABLECOL_FACTIONS_MAP_FILES_ID " = '%s'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc4Buffer,
 						0
@@ -580,6 +620,24 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_PASSWORD) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FACTIONS_MAP_FACTION_ID " FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_PASSWORDS_ID " = '%s'%c",
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_FILE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FACTIONS_MAP_FACTION_ID " FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FILES_ID " = '%s'%c",
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -624,6 +682,24 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLECOL_FACTIONS_MAP_SERVICES_ID " FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_PASSWORD) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FACTIONS_MAP_PASSWORDS_ID " FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_FILE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_FACTIONS_MAP_FILES_ID " FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s'%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
@@ -698,6 +774,24 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_PASSWORD) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FACTIONS_MAP " (" TABLECOL_FACTIONS_MAP_FACTION_ID ", " TABLECOL_FACTIONS_MAP_PASSWORDS_ID ") (SELECT '%s', " TABLECOL_PWD_ID " FROM " TABLE_PWD ")%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_FILE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_FACTIONS_MAP " (" TABLECOL_FACTIONS_MAP_FACTION_ID ", " TABLECOL_FACTIONS_MAP_FILES_ID ") (SELECT '%s', " TABLECOL_FILES_ID " FROM " TABLE_FILES ")%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -764,6 +858,24 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s' AND " TABLECOL_FACTIONS_MAP_SERVICES_ID " IN (SELECT " TABLECOL_SERVICE_ID " FROM " TABLE_SERVICE_DATA " WHERE " TABLECOL_SERVICE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_PASSWORD) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s' AND " TABLECOL_FACTIONS_MAP_PASSWORDS_ID " IN (SELECT " TABLECOL_PWD_ID " FROM " TABLE_PWD ")%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_FACTIONS_MAP_FILE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " = '%s' AND " TABLECOL_FACTIONS_MAP_FILES_ID " IN (SELECT " TABLECOL_FILES_ID " FROM " TABLE_FILES ")%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);

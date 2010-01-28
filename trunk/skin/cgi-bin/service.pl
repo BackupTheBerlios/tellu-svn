@@ -67,14 +67,14 @@ elsif($q->param('slice')) {
 	$s = $q->param('slice');
 
 	if(!$s || $s eq "") {
-		$s = "dev";
+		$s = "ser";
 	}
 
 	&serviceThing({ node => $n, domain => "", slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_service_slice", value => $s });
 }
 elsif($q->param('serviceNode')) {
 	if(!$s || $s eq "") {
-		$s = "dev";
+		$s = "ser";
 	}
 
 	&serviceThing({ node => $q->param('serviceNode'), domain => "", slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_service_node", value => $q->param('serviceNode') });
@@ -105,10 +105,10 @@ sub serviceThing {
 			&tableProviderBriefSlice();
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "ser";
 			}
 
-			if($arg->{slice} eq "dev") {
+			if($arg->{slice} eq "ser") {
 				@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "type_id,name,street,zip,city,country", option => "" });
 			}
 			elsif($arg->{slice} eq "net") {
@@ -141,10 +141,10 @@ sub serviceThing {
 			&tableProviderListingSlice();
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "ser";
 			}
 
-			if($arg->{slice} eq "dev") {
+			if($arg->{slice} eq "ser") {
 				@r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "type_id,name,street,zip,city,country", option => "" });
 			}
 			elsif($arg->{slice} eq "net") {
@@ -178,7 +178,7 @@ sub serviceThing {
 			my $u = "";
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "ser";
 			}
 
 			@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });

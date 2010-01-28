@@ -79,7 +79,7 @@ elsif($q->param('slice')) {
 	$s = $q->param('slice');
 
 	if(!$s || $s eq "") {
-		$s = "dev";
+		$s = "per";
 	}
 
 	&peripheralThing({ node => $n, domain => "", slice => $s, leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_peripheral_slice", value => $s, key => $q->param('key') });
@@ -96,7 +96,7 @@ elsif($q->param('peripheralNode')) {
 	}
 
 	if(!$s || $s eq "") {
-		$s = "dev";
+		$s = "per";
 	}
 
 	&peripheralThing({ node => $q->param('peripheralNode'), domain => "", slice => $s, leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_peripheral_node", value => $q->param('peripheralNode'), key => $q->param('key') });
@@ -127,10 +127,10 @@ sub peripheralThing {
 			&tablePeripheralBriefSlice();
 
 			if(!$arg->{slice} || $arg->{slice} eq "" || $arg->{slice} eq "incs") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "per";
 			}
 
-			if($arg->{slice} eq "dev") {
+			if($arg->{slice} eq "per") {
 				@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "model,category,manufacturer,size,memory,connection", option => "" });
 			}
 			elsif($arg->{slice} eq "net") {
@@ -166,10 +166,10 @@ sub peripheralThing {
 			&tablePeripheralListingSlice();
 
 			if(!$arg->{slice} || $arg->{slice} eq "" || $arg->{slice} eq "incs") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "per";
 			}
 
-			if($arg->{slice} eq "dev") {
+			if($arg->{slice} eq "per") {
 				@r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "model,category,manufacturer,size,memory,connection", option => "" });
 			}
 			elsif($arg->{slice} eq "net") {
@@ -206,11 +206,11 @@ sub peripheralThing {
 			my $u = "";
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "per";
 			}
 
 			if($arg->{slice} eq "incs") {
-				my @l = ('Files', 'Passwords', 'Devices', 'Peripherals', 'Services', 'Factions');
+				my @l = ('Attachments', 'Passwords', 'Devices', 'Peripherals', 'Services', 'Factions');
 				my @w = ();
 
 				$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";

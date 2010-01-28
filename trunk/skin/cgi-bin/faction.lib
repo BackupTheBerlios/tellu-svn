@@ -1,0 +1,276 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+require "chest.lib";
+require "network.lib";
+require "prefs.lib";
+require "item.lib";
+
+sub menuFaction {
+	my ($arg) = @_;
+
+	my @r = &sendCommand({ command => "listFaction", item => "", domain => "", param => "name", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @o = ();
+		my @t = ();
+		my %l = ();
+
+		if($r[3] && $r[3] ne "") {
+			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+				my @s = split(/$ITEM_SEPARATOR/, $e);
+
+				push @o, $s[0];
+				$l{$s[0]} = $s[2] . " (" . $s[1] . ")";
+			}
+
+			$t[0] = $q->optgroup( -name => "Factions", -values => \@o, -labels => \%l, -class => "header" );
+
+			$PAGE .= &htmlFormBegin({ name => "factionsForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= &htmlSelectMenu({ name => "factionNode", value => \@t, select => $arg->{select} });
+			$PAGE .= "&nbsp;";
+			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= "<p>&nbsp;</p>";
+		}
+		else {
+			@t[0] = 0;
+			$l{0} = "No items available";
+
+			$PAGE .= &htmlFormBegin({ name => "factionsForm", action => $SELF, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= &htmlSelectMenu({ name => "factionNode", value => \@t, label => \%l, select => $arg->{select}, disabled => 1 });
+			$PAGE .= "&nbsp;";
+			$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>", disabled => 1 });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= "<p>&nbsp;</p>";
+		}
+
+		return(0);
+	}
+
+	return(-1);
+}
+
+sub tableFactionDetail {
+	my ($arg) = @_;
+
+	my @r = ();
+	my @w = ();
+
+	if($arg->{slice} eq "node") {
+		require "machine.lib";
+		require "machine.js";
+
+		@r = &sendCommand({ command => "attachedFaction", item => $arg->{node}, domain => "", param => "", option => "machine" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "pullMachineByID", item => $s, domain => "", param => "node", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						push @w, $r[3];
+					}
+				}
+			}
+
+			$SCRIPT = &machineListingFuncs();
+
+			&tableMachineListing({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @w) });
+		}
+	}
+	elsif($arg->{slice} eq "dev") {
+		require "device.lib";
+		require "device.js";
+
+		@r = &sendCommand({ command => "attachedFaction", item => $arg->{node}, domain => "", param => "", option => "device" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "pullDevice", item => $s, domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						push @w, join($ITEM_SEPARATOR, $s, $s[5], $s[6], $s[7], $s[8], $s[9], $s[10]);
+					}
+				}
+			}
+
+			$SCRIPT = &deviceListingFuncs();
+
+			&tableDeviceListing({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @w) });
+		}
+	}
+	elsif($arg->{slice} eq "per") {
+		require "peripheral.lib";
+		require "peripheral.js";
+
+		@r = &sendCommand({ command => "attachedFaction", item => $arg->{node}, domain => "", param => "", option => "peripheral" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "pullPeripheral", item => $s, domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						push @w, join($ITEM_SEPARATOR, $s, $s[5], $s[6], $s[7], $s[8], $s[9], $s[10]);
+					}
+				}
+			}
+
+			$SCRIPT = &peripheralListingFuncs();
+
+			&tablePeripheralListing({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @w) });
+		}
+	}
+	elsif($arg->{slice} eq "ser") {
+		require "service.lib";
+		require "service.js";
+
+		@r = &sendCommand({ command => "attachedFaction", item => $arg->{node}, domain => "", param => "", option => "service" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "pullProvider", item => $s, domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						push @w, join($ITEM_SEPARATOR, $s, $s[0], $s[6], $s[7], $s[8], $s[9], $s[10]);
+					}
+				}
+			}
+
+			$SCRIPT = &serviceListingFuncs();
+
+			&tableProviderListing({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @w) });
+		}
+	}
+	elsif($arg->{slice} eq "pwd") {
+		require "machine.lib";
+		require "personal.js";
+
+		@r = &sendCommand({ command => "attachedFaction", item => $arg->{node}, domain => "", param => "", option => "password" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "pullPassword", item => $s, domain => "", param => "id", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						push @w, $r[3];
+					}
+				}
+			}
+
+			my $k = "";
+
+			if($arg->{key} && $arg->{key} ne "") {
+				$k = $arg->{key};
+			}
+
+			$SCRIPT = &passwordFuncs({ slice => $arg->{slice} });
+
+			&tableMachineDetail({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @w), key => $k });
+		}
+	}
+	elsif($arg->{slice} eq "fle") {
+		require "machine.lib";
+
+		@r = &sendCommand({ command => "attachedFaction", item => $arg->{node}, domain => "", param => "", option => "file" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "pullFile", item => $s, domain => "", param => "id", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						push @w, $r[3];
+					}
+				}
+			}
+
+			$SCRIPT = "";
+
+			&tableMachineDetail({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => join($ITEM_DELIMITER, @w) });
+		}
+	}
+}
+
+sub tableFactionDetailSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/faction/faction.png\"></td>";
+	$MENU .= "<td class=\"c3\">Factions</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=node\">Machines</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Devices</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=per\">Peripherals</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=ser\">Services</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=pwd\">Passwords</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=fle\">Attachments</a></li>";
+	$MENU .= "</ul>";
+}
+
+sub tableFactionSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/faction/faction.png\"></td>";
+	$MENU .= "<td class=\"c3\">Factions</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "</ul>";
+}
+
+1;

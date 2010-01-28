@@ -13,8 +13,8 @@ sub peripheralListingFuncs {
 
 	my $r = "";
 
-	$r .= "function popupPeripheral(dev, slice, width, height) {" . $CONFIG_LINEFEED;
-	$r .= " window.open('peripheral_popup.pl?dev=' +dev+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "function popupPeripheral(per, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('peripheral_popup.pl?per=' +per+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
@@ -25,8 +25,8 @@ sub peripheralListingDisposedFuncs {
 
 	my $r = "";
 
-	$r .= "function popupPeripheral(dev, slice, width, height) {" . $CONFIG_LINEFEED;
-	$r .= " window.open('peripheral_d_popup.pl?dev=' +dev+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "function popupPeripheral(per, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('peripheral_d_popup.pl?per=' +per+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;

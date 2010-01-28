@@ -16,6 +16,7 @@ sub headPrepare {
 
 	$PAGE = "";
 	$MENU = "";
+	$SCRIPT = "";
 
 	$SESSION_ERR = "";
 

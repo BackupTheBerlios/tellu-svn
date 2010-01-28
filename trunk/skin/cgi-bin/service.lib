@@ -122,7 +122,7 @@ sub menuDProvider {
 sub tableProviderBrief {
 	my ($arg) = @_;
 
-	if($arg->{slice} eq "dev") {
+	if($arg->{slice} eq "ser") {
 		my $t = "Service class,Name,Street,Postal code,Town,Country";
 		my $m = "26,0,30,0,0,0";
 
@@ -294,7 +294,7 @@ sub tableProviderBriefs {
 sub tableProviderDetail {
 	my ($arg) = @_;
 
-	if($arg->{slice} eq "dev") {
+	if($arg->{slice} eq "ser") {
 		my $t = "Service class,Name,Street,Postal code,Town,Country";
 		my $m = "26,0,30,0,0,0";
 
@@ -459,7 +459,7 @@ sub tableProviderDetails {
 sub tableProviderListing {
 	my ($arg) = @_;
 
-	if($arg->{slice} eq "dev") {
+	if($arg->{slice} eq "ser") {
 		my $t = "Provider,Service class,Name,Street,Postal code,Town,Country";
 		my $m = "28,26,0,30,0,0,0";
 
@@ -676,7 +676,7 @@ sub tableProviderBriefSlice {
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=ser\">Provider</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
@@ -695,7 +695,7 @@ sub tableProviderListingSlice {
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=ser\">Provider</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
@@ -714,7 +714,7 @@ sub tableProviderDetailSlice {
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=ser\">Provider</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";
@@ -736,7 +736,7 @@ sub tableDProviderDetailSlice {
 	$MENU .= "</table>";
 
 	$MENU .= "<ul id=\"slices\">";
-	$MENU .= "<li><a href=\"" . $SELF . "?slice=dev\">Provider</a></li>";
+	$MENU .= "<li><a href=\"" . $SELF . "?slice=ser\">Provider</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=net\">Contact</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=security\">Agent</a></li>";
 	$MENU .= "<li><a href=\"" . $SELF . "?slice=repair\">Brands</a></li>";

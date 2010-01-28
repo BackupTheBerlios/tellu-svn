@@ -18,8 +18,8 @@ my @r = ();
 
 my $n = &headCookieGet({ name => "tellu_peripheral_d_popup_node" });
 
-if($q->param('dev') && $q->param('dev') ne "") {
-	$n = $q->param('dev');
+if($q->param('per') && $q->param('per') ne "") {
+	$n = $q->param('per');
 }
 
 my $t = "";
@@ -28,7 +28,7 @@ my $u = "";
 my $s = $q->param('slice');
 
 if(!$s || $s eq "") {
-	$s = "dev";
+	$s = "per";
 }
 
 @r = &sendCommand({ command => "pullPeripheral", item => $n, domain => "", param => "", option => "" });

@@ -242,6 +242,72 @@ sub editPersonalFaction {
 			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
 		}
 	}
+	elsif($q->param('verb') && $q->param('verb') eq "attpwd") {
+		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "password" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "removeFaction", item => $q->param('grp'), domain => "", param => $s, option => "password" });
+				}
+			}
+
+			@s = $q->param('faction');
+
+			foreach my $s (@s) {
+				@r = &sendCommand({ command => "attachFaction", item => $q->param('grp'), domain => "", param => $s, option => "password" });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to set faction members.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "attfle") {
+		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "file" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				$s =~ s/$ITEM_SEPARATOR$//;
+
+				if($s != 0) {
+					@r = &sendCommand({ command => "removeFaction", item => $q->param('grp'), domain => "", param => $s, option => "file" });
+				}
+			}
+
+			@s = $q->param('faction');
+
+			foreach my $s (@s) {
+				@r = &sendCommand({ command => "attachFaction", item => $q->param('grp'), domain => "", param => $s, option => "file" });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to set faction members.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					last;
+				}
+			}
+
+			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+		}
+	}
 
 	if(!$q->param('leaf') || $q->param('leaf') == 0) {
 		$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=editg&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
@@ -682,7 +748,7 @@ sub editPersonalFaction {
 			$PAGE .= "<td class=\"leaf\"><a href=\"" . $SELF . "?action=editg\">&lt;&lt; My factions</a></td>";
 			$PAGE .= "<td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
 
-			my @ll = ('Machines', 'Devices', 'Peripherals', 'Services');
+			my @ll = ('Machines', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments');
 
 			my $s = 0;
 
@@ -896,6 +962,64 @@ sub editPersonalFaction {
 
 								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
 								$PAGE .= &htmlHiddenField({ name => "verb", value => "attser" });
+							}
+						}
+						elsif($q->param('subleaf') && $q->param('subleaf') == 4) {
+							@r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "password" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									$s =~ s/$ITEM_SEPARATOR$//;
+
+									push @u, $s if($s != 0);
+								}
+							}
+
+							@r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									my @p = split(/$ITEM_SEPARATOR/, $s);
+
+									push @t, $p[0];
+									$l{$p[0]} = $p[2] . " for " . $p[3] . " (" . $p[1] . ")";
+								}
+
+								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
+								$PAGE .= &htmlHiddenField({ name => "verb", value => "attpwd" });
+							}
+						}
+						elsif($q->param('subleaf') && $q->param('subleaf') == 5) {
+							@r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "file" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									$s =~ s/$ITEM_SEPARATOR$//;
+
+									push @u, $s if($s != 0);
+								}
+							}
+
+							@r = &sendCommand({ command => "listFile", item => "", domain => "", param => "name", option => "" });
+
+							if(checkError({ packet => \@r }) == 0) {
+								@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+								foreach my $s (@s) {
+									my @p = split(/$ITEM_SEPARATOR/, $s);
+
+									push @t, $p[0];
+									$l{$p[0]} = $p[2] . ", " . $p[3] . " (" . $p[1] . ")";
+								}
+
+								$PAGE .= &htmlSelectList({ name => "faction", value => \@t, label => \%l, select => \@u, multiple => 1 });
+								$PAGE .= &htmlHiddenField({ name => "verb", value => "attfle" });
 							}
 						}
 

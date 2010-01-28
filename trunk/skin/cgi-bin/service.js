@@ -13,8 +13,8 @@ sub serviceListingFuncs {
 
 	my $r = "";
 
-	$r .= "function popupProvider(dev, slice, width, height) {" . $CONFIG_LINEFEED;
-	$r .= " window.open('service_popup.pl?dev=' +dev+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "function popupProvider(ser, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('service_popup.pl?ser=' +ser+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
@@ -25,8 +25,8 @@ sub serviceListingDisposedFuncs {
 
 	my $r = "";
 
-	$r .= "function popupProvider(dev, slice, width, height) {" . $CONFIG_LINEFEED;
-	$r .= " window.open('service_d_popup.pl?dev=' +dev+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "function popupProvider(ser, slice, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('service_d_popup.pl?ser=' +ser+ '&slice=' +slice+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;

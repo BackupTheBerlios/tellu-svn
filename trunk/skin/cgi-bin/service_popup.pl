@@ -18,8 +18,8 @@ my @r = ();
 
 my $n = &headCookieGet({ name => "tellu_service_popup_node" });
 
-if($q->param('dev') && $q->param('dev') ne "") {
-	$n = $q->param('dev');
+if($q->param('ser') && $q->param('ser') ne "") {
+	$n = $q->param('ser');
 }
 
 my $t = "";
@@ -28,7 +28,7 @@ my $u = "";
 my $s = $q->param('slice');
 
 if(!$s || $s eq "") {
-	$s = "dev";
+	$s = "ser";
 }
 
 @r = &sendCommand({ command => "pullProvider", item => $n, domain => "", param => "", option => "" });

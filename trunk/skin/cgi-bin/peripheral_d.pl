@@ -67,14 +67,14 @@ elsif($q->param('slice')) {
 	$s = $q->param('slice');
 
 	if(!$s || $s eq "") {
-		$s = "dev";
+		$s = "per";
 	}
 
 	&peripheralThing({ node => $n, domain => "", slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_peripheral_d_slice", value => $s });
 }
 elsif($q->param('peripheralNode')) {
 	if(!$s || $s eq "") {
-		$s = "dev";
+		$s = "per";
 	}
 
 	&peripheralThing({ node => $q->param('peripheralNode'), domain => "", slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_peripheral_d_node", value => $q->param('peripheralNode') });
@@ -105,10 +105,10 @@ sub peripheralThing {
 			&tablePeripheralBriefSlice();
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "per";
 			}
 
-			if($arg->{slice} eq "dev") {
+			if($arg->{slice} eq "per") {
 				@r = &sendCommand({ command => "listDisposedPeripheral", item => "", domain => "", param => "model,category,manufacturer,size,memory,connection", option => "" });
 			}
 			elsif($arg->{slice} eq "net") {
@@ -144,10 +144,10 @@ sub peripheralThing {
 			&tablePeripheralListingSlice();
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "per";
 			}
 
-			if($arg->{slice} eq "dev") {
+			if($arg->{slice} eq "per") {
 				@r = &sendCommand({ command => "listDisposedPeripheral", item => "", domain => "", param => "model,category,manufacturer,size,memory,connection", option => "" });
 			}
 			elsif($arg->{slice} eq "net") {
@@ -184,7 +184,7 @@ sub peripheralThing {
 			my $u = "";
 
 			if(!$arg->{slice} || $arg->{slice} eq "") {
-				$arg->{slice} = "dev";
+				$arg->{slice} = "per";
 			}
 
 			@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
