@@ -456,6 +456,8 @@ for i in cgi-bin files html templates; do
 	fi
 done
 
+(cd "$INSTDIR"/cgi-bin/ && ln -sf admin.pl admin)
+
 echo "Setting file ownerships in '$INSTDIR'"
 
 chown -R $HTTPU:$HTTPG "$INSTDIR"
