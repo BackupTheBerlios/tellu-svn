@@ -225,6 +225,14 @@ extern char *fetchHelp(int, int, struct threadInfo *);
 extern char *listLog(struct threadInfo *);
 extern char *pullLog(struct threadInfo *);
 extern char *searchLog(struct threadInfo *);
+extern char *listHistory(struct threadInfo *);
+extern char *pullHistory(struct threadInfo *);
+extern char *searchHistory(struct threadInfo *);
+extern char *pullDatabaseStatus(struct threadInfo *);
+extern char *pullDatabaseVariables(struct threadInfo *);
+extern char *pullDatabaseErrors(struct threadInfo *);
+extern char *pullDatabaseWarnings(struct threadInfo *);
+extern char *listSession(struct threadInfo *);
 extern char *fetchLog(int, int, struct threadInfo *);
 
 // worker_machine.c

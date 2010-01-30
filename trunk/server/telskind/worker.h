@@ -154,8 +154,17 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_READ, "pullRGB", NULL, pullRGB, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "searchRGB", NULL, searchRGB, replyFree },
 
-	{ PRIVILEGE_LEVEL_READ, "pullTemp", NULL, pullTemp, replyFree },
-	{ PRIVILEGE_LEVEL_READ, "pushTemp", NULL, pushTemp, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "listLog", NULL, listLog, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullLog", NULL, pullLog, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "searchLog", NULL, searchLog, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "listHistory", NULL, listHistory, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullHistory", NULL, pullHistory, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "searchHistory", NULL, searchHistory, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullDatabaseStatus", NULL, pullDatabaseStatus, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullDatabaseVariables", NULL, pullDatabaseVariables, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullDatabaseErrors", NULL, pullDatabaseErrors, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullDatabaseWarnings", NULL, pullDatabaseWarnings, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "listSession", NULL, listSession, replyFree },
 
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "listUser", NULL, listUser, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "pullUser", NULL, pullUser, replyFree },
@@ -171,14 +180,13 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "pushGroup", NULL, pushGroup, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "deleteGroup", NULL, deleteGroup, replyFree },
 
-	{ PRIVILEGE_LEVEL_SUPERVISOR, "listLog", NULL, listLog, replyFree },
-	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullLog", NULL, pullLog, replyFree },
-	{ PRIVILEGE_LEVEL_SUPERVISOR, "searchLog", NULL, searchLog, replyFree },
-
 	{ PRIVILEGE_LEVEL_PREAUTH, "tryLogin", NULL, tryLogin, replyFree },
 	{ PRIVILEGE_LEVEL_PREAUTH, "tryLogout", NULL, tryLogout, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "changePassword", NULL, changeOwnPassword, replyFree },
 	{ PRIVILEGE_LEVEL_ADMIN, "changeUserPassword", NULL, changeUserPassword, replyFree },
+
+	{ PRIVILEGE_LEVEL_READ, "pullTemp", NULL, pullTemp, replyFree },
+	{ PRIVILEGE_LEVEL_READ, "pushTemp", NULL, pushTemp, replyFree },
 
 	{ PRIVILEGE_LEVEL_NONE, NULL, NULL, NULL, NULL }
 };

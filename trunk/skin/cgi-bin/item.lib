@@ -355,15 +355,17 @@ sub itemClean {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+				if(@s) {
+					foreach my $s (@s) {
+						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$SESSION_CACHE{"esd" . $p} = $m;
+						$SESSION_CACHE{"esd" . $p} = $m;
 
-					if($p eq $arg->{item}) {
-						$r = $m;
+						if($p eq $arg->{item}) {
+							$r = $m;
 
-						last;
+							last;
+						}
 					}
 				}
 			}
@@ -383,15 +385,17 @@ sub itemClean {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+				if(@s) {
+					foreach my $s (@s) {
+						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$SESSION_CACHE{"warranty" . $p} = $m;
+						$SESSION_CACHE{"warranty" . $p} = $m;
 
-					if($p eq $arg->{item}) {
-						$r = $m;
+						if($p eq $arg->{item}) {
+							$r = $m;
 
-						last;
+							last;
+						}
 					}
 				}
 			}
@@ -422,20 +426,25 @@ sub itemClean {
 				if(checkError({ packet => \@r }) == 0) {
 					my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-					foreach my $s (@s) {
-						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+					if(@s) {
+						foreach my $s (@s) {
+							my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-						$SESSION_CACHE{"month" . $p} = $m;
+							$SESSION_CACHE{"month" . $p} = $m;
 
-						if($p eq $n) {
-							$r .= $m . ", ";
+							if($p eq $n) {
+								$r .= $m . ", ";
 
-							last;
+								last;
+							}
 						}
+					}
+					else {
+						$r .= $n . ", ";
 					}
 				}
 				else {
-					$r .= $n . ",";
+					$r .= $n . ", ";
 				}
 			}
 
@@ -469,15 +478,17 @@ sub itemClean {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+				if(@s) {
+					foreach my $s (@s) {
+						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$SESSION_CACHE{"connection" . $p} = $m;
+						$SESSION_CACHE{"connection" . $p} = $m;
 
-					if($p eq $arg->{item}) {
-						$r = $m;
+						if($p eq $arg->{item}) {
+							$r = $m;
 
-						last;
+							last;
+						}
 					}
 				}
 			}
@@ -497,15 +508,17 @@ sub itemClean {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+				if(@s) {
+					foreach my $s (@s) {
+						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$SESSION_CACHE{"memory" . $p} = $m;
+						$SESSION_CACHE{"memory" . $p} = $m;
 
-					if($p eq $arg->{item}) {
-						$r = $m;
+						if($p eq $arg->{item}) {
+							$r = $m;
 
-						last;
+							last;
+						}
 					}
 				}
 			}
@@ -604,6 +617,53 @@ sub itemClean {
 	}
 	elsif($arg->{flag} == 30) {
 		$r = "<a href=\"http://maps.google.com/?q=" . $arg->{item} . "\" target=\"_blank\" style=\"color: #000000;\">" . $arg->{item} . "</a>";
+	}
+	elsif($arg->{flag} == 31) {
+		if($arg->{item} =~ /^0/) {
+			$r = "n/a";
+		}
+		else {
+			my ($o, $t) = split(/\s+/, $arg->{item}, 2);
+
+			$o =~ s/\-//go;
+
+			my ($y, $n, $d) = (int(substr($o, 0, 4)), int(substr($o, 4, 2)), int(substr($o, 6, 2)));
+
+			$r = $d . ". ";
+
+			if($SESSION_CACHE{"month" . $n} && $SESSION_CACHE{"month" . $n} ne "") {
+				$r .= $SESSION_CACHE{"month" . $n} . ", ";
+			}
+			else {
+				@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					if(@s) {
+						foreach my $s (@s) {
+							my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+
+							$SESSION_CACHE{"month" . $p} = $m;
+
+							if($p eq $n) {
+								$r .= $m . ", ";
+
+								last;
+							}
+						}
+					}
+					else {
+						$r .= $n . ", ";
+					}
+				}
+				else {
+					$r .= $n . ", ";
+				}
+			}
+
+			$r .= $y . ", " . $t;
+		}
 	}
 
 	return $r;

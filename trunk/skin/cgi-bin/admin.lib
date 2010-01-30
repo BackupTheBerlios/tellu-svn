@@ -1,0 +1,335 @@
+#!/usr/bin/perl
+
+my ($pack, $f, $line) = caller;
+
+if($pack eq "" && $f eq "" && $line eq "") {
+	print STDOUT "Content-Type: text/html" . "\r\n\r\n";
+
+	exit(0);
+}
+
+require "chest.lib";
+require "network.lib";
+require "item.lib";
+
+sub editAdminUser {
+	my ($arg) = @_;
+
+$PAGE .= "editAdminUser";
+
+}
+
+sub editAdminPort {
+	my ($arg) = @_;
+
+$PAGE .= "editAdminPort";
+
+}
+
+sub editAdminService {
+	my ($arg) = @_;
+
+$PAGE .= "editAdminService";
+
+}
+
+sub editAdminSession {
+	my ($arg) = @_;
+
+	my $l = 0;
+	my $f = 0;
+
+	if($arg->{leaf}) {
+		$l = $arg->{leaf};
+	}
+
+	if($arg->{subleaf}) {
+		$f = $arg->{subleaf};
+	}
+
+	my @r = &sendCommand({ command => "listSession", item => "", domain => "", param => "", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		&tableAdminDetail({ data => $r[3], slice => "Sessions", leaf => $l, subleaf => $f, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order => $arg->{order} });
+	}
+}
+
+sub editAdminDbstat {
+	my ($arg) = @_;
+
+	my $l = 0;
+	my $f = 0;
+
+	if($arg->{leaf}) {
+		$l = $arg->{leaf};
+	}
+
+	if($arg->{subleaf}) {
+		$f = $arg->{subleaf};
+	}
+
+	my @r = &sendCommand({ command => "pullDatabase" . $arg->{select}, item => "", domain => "", param => "", option => "" });
+	my @w = ();
+
+	if(checkError({ packet => \@r }) == 0) {
+		my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+		foreach my $s (@s) {
+			push @w, 0 . $ITEM_SEPARATOR . $s;
+		}
+
+		&tableAdminDetail({ data => join($ITEM_DELIMITER, @w), slice => $arg->{select}, leaf => $l, subleaf => $f, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order => $arg->{order} });
+	}
+}
+
+sub editAdminSkinstat {
+	my ($arg) = @_;
+
+	my $l = 0;
+	my $f = 0;
+
+	if($arg->{leaf}) {
+		$l = $arg->{leaf};
+	}
+
+	if($arg->{subleaf}) {
+		$f = $arg->{subleaf};
+	}
+
+	if($arg->{select} eq "Uploads") {
+		my $s = 0;
+
+		if(opendir(DIR, "$DIR_UPLOAD")) {
+			my @d = grep { ! /^\./ && -d "$DIR_UPLOAD/$_" } readdir(DIR);
+
+			foreach my $d (@d) {
+				if(opendir(SUB, "$DIR_UPLOAD/$d")) {
+					my @f = grep { ! /^\./ && -f "$DIR_UPLOAD/$d/$_" } readdir(SUB);
+
+					foreach my $f (@f) {
+						my @l = stat($DIR_UPLOAD . "/" . $d . "/" . $f);
+
+						if($l[7] && $l[7] != 0) {
+							$s += int($l[7]);
+						}
+					}
+
+					closedir(SUB);
+				}
+			}
+
+			closedir(DIR);
+		}
+
+		&tableAdminDetail({ data => join($ITEM_SEPARATOR, 0, int($s / $CONFIG_KILOBYTE)), slice => $arg->{select}, leaf => $l, subleaf => $f, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order => $arg->{order} });
+	}
+	else {
+		my @r = &sendCommand({ command => "list" . $arg->{select}, item => "", domain => "", param => "", option => "" });
+		my @l = ();
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+			foreach my $s (@s) {
+				my @i = split(/$ITEM_SEPARATOR/, $s);
+
+				push @l, $i[0] . " " . $i[1];
+			}
+		}
+
+		if(@l) {
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $t (@l) {
+				if($s == $f) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=admin&verb=update&select=" . $arg->{select} . "&leaf=" . $l . "&subleaf=" . $s . "\">" . $t . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=admin&verb=update&select=" . $arg->{select} . "&leaf=" . $l . "&subleaf=" . $s . "\">" . $t . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			my ($p, $m) = split(/\s+/, $l[$f], 2);
+
+			@r = &sendCommand({ command => "pull" . $arg->{select}, item => "", domain => "", param => $p, option => $m });
+
+			&tableAdminDetail({ data => $r[3], slice => $arg->{select}, leaf => $l, subleaf => $f, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order => $arg->{order} });
+		}
+	}
+}
+
+sub tableAdminDetail {
+	my ($arg) = @_;
+
+	if($arg->{slice} eq "Status" || $arg->{slice} eq "Variables") {
+		my $t = "Variable,Value";
+		my $m = "0,0";
+
+		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "Uploads") {
+		my $t = "Storage used by uploaded attachments";
+		my $m = "3";
+
+		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "Log") {
+		my $t = "Date,Service,Version,System,Release,Server,Domain,Class,Message";
+		my $m = "31,0,0,0,0,0,0";
+
+		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "History") {
+		my $t = "Date,Service,Version,System,Release,Server,Domain,Connections";
+		my $m = "31,0,0,0,0,0";
+
+		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "Sessions") {
+		my $t = "Established,Accessed,Events,User";
+		my $m = "31,31,0,0";
+
+		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+}
+
+sub tableAdminDetails {
+	my ($arg) = @_;
+
+	my @t = split(/,/, $arg->{title});
+	my @m = split(/,/, $arg->{modifier});
+
+	#
+	# Create table header
+	#
+
+	$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
+	$PAGE .= "<tr class=\"top\">";
+
+	my $f = 0;
+	my $i = 1;
+
+	if($arg->{subleaf}) {
+		$f = $arg->{subleaf};
+	}
+
+	foreach my $t (@t) {
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&leaf=" . $arg->{leaf} . "&subleaf=" . $f . "&action=" . $arg->{action} . "&verb=" . $arg->{verb} . "&select=" . $arg->{select} . "&sort=" . $i++ . "&" . "order=d" . "\">" . $t . "</a></td>";
+		}
+		else {
+			$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&leaf=" . $arg->{leaf} . "&subleaf=" . $f . "&action=" . $arg->{action} . "&verb=" . $arg->{verb} . "&select=" . $arg->{select} . "&sort=" . $i++ . "&" . "order=a" . "\">" . $t . "</a></td>";
+		}
+	}
+
+	$PAGE .= "</tr>";
+
+	#
+	# Display and sort items in requested order
+	#
+
+	my @i = split(/$ITEM_DELIMITER/, $arg->{data});
+
+	if($arg->{sort}) {
+		my @k = ();
+
+		foreach my $i (@i) {
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+
+			$j[0] = $j[$arg->{sort}];
+
+			push @k, join($ITEM_SEPARATOR, @j);
+		}
+
+		if(!$arg->{order} || $arg->{order} eq "a") {
+			@i = sort { uc($b) cmp uc($a) } @k;
+		}
+		else {
+			@i = sort { uc($a) cmp uc($b) } @k;
+		}
+	}
+
+	if(@i) {
+		foreach my $i (@i) {
+			my $ev = 0;
+			my @j = split(/$ITEM_SEPARATOR/, $i);
+
+			shift(@j);
+
+			$PAGE .= "<tr class=\"top\">";
+
+			for(my $k = 0; $k < @t; $k++) {
+				if($ev == 0) {
+					$PAGE .= "<td class=\"c1\">";
+				}
+				else {
+					$PAGE .= "<td class=\"c2\">";
+				}
+
+				$ev ^= 1;
+
+				if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
+					$PAGE .= "n/a";
+				}
+				else {
+					my $r = &itemClean({ item => $j[$k], flag => $m[$k] });
+
+					if(!$r || $r eq "") {
+						$PAGE .= "n/a";
+					}
+					else {
+						$PAGE .= $r;
+					}
+				}
+
+				$PAGE .= "</td>";
+			}
+
+			$PAGE .= "</tr>";
+		}
+	}
+	else {
+		my $ev = 0;
+
+		$PAGE .= "<tr class=\"top\">";
+
+		foreach my $t (@t) {
+			if($ev == 0) {
+				$PAGE .= "<td class=\"c1\">n/a</td>";
+			}
+			else {
+				$PAGE .= "<td class=\"c2\">n/a</td>";
+			}
+
+			$ev ^= 1;
+		}
+
+		$PAGE .= "</tr>";
+	}
+
+	$PAGE .= "</table>";
+}
+
+sub tableAdminSlice {
+	my ($arg) = @_;
+
+	$MENU .= "<table class=\"plain\" cellpadding=\"0\" cellspacing=\"0\">";
+	$MENU .= "<tr class=\"middle\">";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/admin/admin.png\"></td>";
+	$MENU .= "<td class=\"c3\">Admin</td>";
+	$MENU .= "</tr>";
+	$MENU .= "</table>";
+
+	$MENU .= "<ul id=\"slices\">";
+	$MENU .= "</ul>";
+}
+
+1;

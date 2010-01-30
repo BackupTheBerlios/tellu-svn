@@ -14,7 +14,7 @@ if($q->param('file') && $q->param('file') ne "" && $q->param('name') && $q->para
 
 		print STDOUT "Cache-control: no-cache" . $CONFIG_LINEFEED;
 		print STDOUT "Content-disposition: attachment; filename=\"" . $q->param('name') . "\"" . $CONFIG_LINEFEED;
-		print STDOUT "Content-length: " . $l[7] . $CONFIG_LINEFEED;
+		print STDOUT "Content-length: " . int($l[7]) . $CONFIG_LINEFEED;
 		print STDOUT "Content-type: application/x-download" . $CONFIG_LINEFEED . $CONFIG_LINEFEED;
 
 		binmode(FILE);

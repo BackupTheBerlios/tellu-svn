@@ -1068,7 +1068,7 @@ sub editPersonalFaction {
 sub editPersonalFile {
 	my ($arg) = @_;
 
-	$CGI::POST_MAX = (1024 * 1000) * $CONFIG_MAXPOST;
+	$CGI::POST_MAX = ($CONFIG_KILOBYTE * 1000) * $CONFIG_MAXPOST;
 
 	my @l = ('Add new file', 'Modify existing file', 'Delete existing file');
 

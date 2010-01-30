@@ -61,6 +61,12 @@ sub cleanHtml {
 sub checkError {
 	my ($arg) = @_;
 
+	if(!$arg->{packet} || $arg->{packet} eq "") {
+		$PAGE .= "<p>System is in unusable state. Please contact your system administrator or help desk for assistance.</p>";
+
+		return(-1);
+	}
+
 	if(int($arg->{packet}[0]) == $ERROR_NOERROR) {
 		return(0);
 	}

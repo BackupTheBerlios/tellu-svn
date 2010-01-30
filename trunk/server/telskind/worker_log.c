@@ -14,7 +14,10 @@ char *listLog(struct threadInfo * ti) {
 char *pullLog(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -38,6 +41,68 @@ char *searchLog(struct threadInfo * ti) {
 
 	// Search from log entries
 	return(fetchLog(3, QUERY_TYPE_PULL, ti));
+}
+
+char *listHistory(struct threadInfo * ti) {
+	// List all history entries
+	return(fetchLog(4, QUERY_TYPE_PULL, ti));
+}
+
+char *pullHistory(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Get requested history entry
+	return(fetchLog(5, QUERY_TYPE_PULL, ti));
+}
+
+char *searchHistory(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Search from history entries
+	return(fetchLog(6, QUERY_TYPE_PULL, ti));
+}
+
+char *pullDatabaseStatus(struct threadInfo * ti) {
+	// Get database status
+	return(fetchLog(7, QUERY_TYPE_PULL, ti));
+}
+
+char *pullDatabaseVariables(struct threadInfo * ti) {
+	// Get database variables
+	return(fetchLog(8, QUERY_TYPE_PULL, ti));
+}
+
+char *pullDatabaseErrors(struct threadInfo * ti) {
+	// Get database errors
+	return(fetchLog(9, QUERY_TYPE_PULL, ti));
+}
+
+char *pullDatabaseWarnings(struct threadInfo * ti) {
+	// Get database warnings
+	return(fetchLog(10, QUERY_TYPE_PULL, ti));
+}
+
+char *listSession(struct threadInfo * ti) {
+	// List all sessions
+	return(fetchLog(11, QUERY_TYPE_PULL, ti));
 }
 
 char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
@@ -169,7 +234,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_PROC " = '%s' AND " TABLECOL_LOG_PROCVER " = '%s' ORDER BY " TABLEORD_LOG_LOG "%c",
+					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_PROC " = '%s' AND " TABLECOL_LOG_PROCVER " = '%s' ORDER BY " TABLEORD_LOG_LOG " DESC LIMIT 10000%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc5Buffer,
 					0
@@ -184,6 +249,90 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE %s LIKE '%%%s%%' ORDER BY " TABLEORD_LOG_LOG "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 4:
+				// List all history entries
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT DISTINCT " TABLEKEY_HIST_LIST " FROM " TABLE_HIST " ORDER BY " TABLEORD_HIST_LIST "%c",
+					0
+				);
+
+				break;
+			case 5:
+				// Get requested history entry
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_PROC " = '%s' AND " TABLECOL_HIST_PROCVER " = '%s' ORDER BY " TABLEORD_HIST_HIST " DESC LIMIT 10000%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc5Buffer,
+					0
+				);
+
+				break;
+			case 6:
+				// Search from history entries
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE %s LIKE '%%%s%%' ORDER BY " TABLEORD_HIST_HIST "%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 7:
+				// Get database status
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SHOW STATUS%c",
+					0
+				);
+
+				break;
+			case 8:
+				// Get database variables
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SHOW VARIABLES%c",
+					0
+				);
+
+				break;
+			case 9:
+				// Get database errors
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SHOW ERRORS%c",
+					0
+				);
+
+				break;
+			case 10:
+				// Get database warnings
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SHOW WARNINGS%c",
+					0
+				);
+
+				break;
+			case 11:
+				// List all sessions
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_SESSION_NAME " FROM " TABLE_SESSION " ORDER BY " TABLEORD_SESSION_NAME "%c",
 					0
 				);
 
