@@ -63,7 +63,7 @@ elsif($q->param('leaf') == 2) {
 	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 }
 elsif($q->param('leaf') == 3) {
-	$t = "Manage sessions";
+	$t = "View sessions";
 
 	my $l = 0;
 
