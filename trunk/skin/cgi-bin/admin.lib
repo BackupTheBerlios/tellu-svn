@@ -183,13 +183,13 @@ sub tableAdminDetail {
 	}
 	elsif($arg->{slice} eq "Log") {
 		my $t = "Date,Service,Version,System,Release,Node,Domain,Class,Message";
-		my $m = "31,0,0,0,0,0,0";
+		my $m = "31,0,0,0,0,0,0,32,0";
 
 		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "History") {
 		my $t = "Date,Service,Version,System,Release,Node,Domain,Connections";
-		my $m = "31,0,0,0,0,0";
+		my $m = "31,0,0,0,0,0,0,0";
 
 		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}

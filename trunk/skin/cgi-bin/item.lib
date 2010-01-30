@@ -665,6 +665,14 @@ sub itemClean {
 			$r .= $y . ", " . $t;
 		}
 	}
+	elsif($arg->{flag} == 32) {
+		if($arg->{item} == 1) {
+			$r = "Info";
+		}
+		else {
+			$r = "Unknown";
+		}
+	}
 
 	return $r;
 }
