@@ -184,6 +184,8 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_PREAUTH, "tryLogout", NULL, tryLogout, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "changePassword", NULL, changeOwnPassword, replyFree },
 	{ PRIVILEGE_LEVEL_ADMIN, "changeUserPassword", NULL, changeUserPassword, replyFree },
+	{ PRIVILEGE_LEVEL_ADMIN, "isAuthLDAP", NULL, isAuthLDAP, replyFree },
+	{ PRIVILEGE_LEVEL_READ, "isUserAdmin", NULL, isUserAdmin, replyFree },
 
 	{ PRIVILEGE_LEVEL_READ, "pullTemp", NULL, pullTemp, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "pushTemp", NULL, pushTemp, replyFree },

@@ -151,6 +151,8 @@ extern char *tryLogin(struct threadInfo *);
 extern char *tryLogout(struct threadInfo *);
 extern char *changeOwnPassword(struct threadInfo *);
 extern char *changeUserPassword(struct threadInfo *);
+extern char *isAuthLDAP(struct threadInfo *);
+extern char *isUserAdmin(struct threadInfo *);
 extern char *fetchAccess(int, int, struct threadInfo *);
 
 // worker_device.c

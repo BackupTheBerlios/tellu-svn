@@ -234,7 +234,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_PROC " = '%s' AND " TABLECOL_LOG_PROCVER " = '%s' ORDER BY " TABLEORD_LOG_LOG " DESC LIMIT 10000%c",
+					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_PROC " = '%s' AND " TABLECOL_LOG_PROCVER " = '%s' ORDER BY " TABLEORD_LOG_LOG " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc5Buffer,
 					0
@@ -268,7 +268,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_PROC " = '%s' AND " TABLECOL_HIST_PROCVER " = '%s' ORDER BY " TABLEORD_HIST_HIST " DESC LIMIT 10000%c",
+					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_PROC " = '%s' AND " TABLECOL_HIST_PROCVER " = '%s' ORDER BY " TABLEORD_HIST_HIST " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc5Buffer,
 					0

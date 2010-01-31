@@ -111,6 +111,25 @@ char *changeUserPassword(struct threadInfo * ti) {
 	return(fetchAccess(2, QUERY_TYPE_PUSH, ti));
 }
 
+char *isAuthLDAP(struct threadInfo * ti) {
+	// Check if authenticating against ldap
+	if((ti->storageInfo.mysqlBool = configFetch("auth_ldap", &ti->storageInfo.i)) != NULL) {
+		if(*ti->storageInfo.mysqlBool == CONFIG_TYPE_BOOLEAN_YES) {
+			replyPrepare(ERROR_NOERROR, 0, 0, "yes", ti);
+
+			return(ti->dataBuffer);
+		}
+	}
+
+	replyPrepare(ERROR_NOERROR, 0, 0, "no", ti);
+
+	return(ti->dataBuffer);
+}
+
+char *isUserAdmin(struct threadInfo * ti) {
+	return(fetchAccess(3, QUERY_TYPE_PULL, ti));
+}
+
 char *fetchAccess(int getThis, int getType, struct threadInfo * ti) {
 	int (*dbConnect)(struct threadStorageInfo *);
 	void (*dbDisconnect)(struct threadStorageInfo *);
@@ -245,6 +264,17 @@ char *fetchAccess(int getThis, int getType, struct threadInfo * ti) {
 					"UPDATE " TABLE_USERS " SET " TABLECOL_USER_PWD " = " TABLE_PWD_HASH "('%s') WHERE " TABLECOL_USER_UID " = '%s'%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 3:
+				// Check if requestor is admin or not
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+"SELECT DISTINCT " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_PERM " = '" PRIVILEGE_LEVEL_ADMIN_S "'%c",
+					ti->commandInfo.esc1Buffer,
 					0
 				);
 
