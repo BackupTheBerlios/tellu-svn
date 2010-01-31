@@ -14,6 +14,25 @@ require "admin.js";
 
 &headPrepare();
 
+my $t = "";
+my $s = 0;
+my $x = 0;
+
+my @r = &sendCommand({ command => "isUserAdmin", item => "", domain => "", param => "", option => "" });
+my @l = ();
+
+if(checkError({ packet => \@r }) == 0) {
+	if($r[3] && $r[3] == 64) {
+		@l = ('My account', 'Users', 'Ports', 'Classes', 'Sessions', 'Database status', 'Server status');
+
+		$x = 1;
+	}
+}
+
+if(!@l) {
+	@l = ('My account');
+}
+
 &tableAdminSlice();
 
 $PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=admin&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
@@ -21,11 +40,6 @@ $PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=admin
 $PAGE .= "<p>&nbsp;</p>";
 $PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
 $PAGE .= "<tr class=\"middle\">";
-
-my $t = "";
-my $s = 0;
-
-my @l = ('Users', 'Ports', 'Classes', 'Sessions', 'Database status', 'Server status');
 
 foreach my $l (@l) {
 	if($s == $q->param('leaf')) {
@@ -41,139 +55,203 @@ foreach my $l (@l) {
 $PAGE .= "</tr>";
 $PAGE .= "</table>";
 
-if(!$q->param('leaf') || $q->param('leaf') == 0) {
-	$t = "Manage users";
+if($x == 0) {
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$t = "My account";
 
-	&editAdminUser({ leaf => $q->param('leaf') });
+		&editAdminAccount({ leaf => $l, subleaf => $f, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order') });
 
-	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
-}
-elsif($q->param('leaf') == 1) {
-	$t = "Manage port descriptions";
+		$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+		$PAGE .= &htmlHiddenField({ name => "leaf", value => $l });
 
-	&editAdminPort({ leaf => $q->param('leaf') });
+		$PAGE .= &htmlFormEnd();
 
-	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
-}
-elsif($q->param('leaf') == 2) {
-	$t = "Manage service classes";
-
-	&editAdminService({ leaf => $q->param('leaf') });
-
-	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
-}
-elsif($q->param('leaf') == 3) {
-	$t = "View sessions";
-
-	my $l = 0;
-
-	if($q->param('leaf')) {
-		$l = $q->param('leaf');
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 	}
-
-	&editAdminSession({ leaf => $l, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order'), select => $q->param('select') });
-
-	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
-}
-elsif($q->param('leaf') == 4) {
-	$t = "View database status";
-
-	my @t = ();
-
-	$t[0] = $q->optgroup( -name => "View database status", -values => [ "Status", "Variables" ], -class => "header" );
-	$t[1] = $q->optgroup( -name => "View database messages", -values => [ "Errors", "Warnings" ], -class => "header" );
-
-	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
-
-	$PAGE .= "<tr class=\"top\">";
-	$PAGE .= "<td></td><td></td>";
-	$PAGE .= "</tr>";
-
-	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\" width=\"20%\">Action:</td>";
-	$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "select", value => \@t, select => $q->param('select') });
-	$PAGE .= "&nbsp;";
-	$PAGE .= &htmlButtonSubmit({ name => "submit", value => "View >>" }) . "</td>";
-	$PAGE .= "</tr>";
-
-	$PAGE .= "<tr class=\"top\">";
-	$PAGE .= "<td></td><td></td>";
-	$PAGE .= "</tr>";
-	$PAGE .= "</table>";
-	$PAGE .= "<p>&nbsp;</p>";
-
-	my $l = 0;
-
-	if($q->param('leaf')) {
-		$l = $q->param('leaf');
+	else {
+		&htmlPage({ title => $WINDOW_TITLE, script => "", header => "&nbsp;", content => $PAGE, slices => $MENU });
 	}
-
-	if($q->param('verb') eq "update") {
-		&editAdminDbstat({ leaf => $l, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order'), select => $q->param('select') });
-	}
-
-	$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
-	$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
-	$PAGE .= &htmlHiddenField({ name => "leaf", value => $l });
-	$PAGE .= &htmlHiddenField({ name => "subleaf", value => $f });
-
-	$PAGE .= &htmlFormEnd();
-
-	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
-}
-elsif($q->param('leaf') == 5) {
-	$t = "View server status";
-
-	my @t = ();
-
-	$t[0] = $q->optgroup( -name => "View usage of storage", -values => [ "Uploads" ], -class => "header" );
-	$t[1] = $q->optgroup( -name => "View server status", -values => [ "Log", "History" ], -class => "header" );
-
-	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
-
-	$PAGE .= "<tr class=\"top\">";
-	$PAGE .= "<td></td><td></td>";
-	$PAGE .= "</tr>";
-
-	$PAGE .= "<tr class=\"middle\">";
-	$PAGE .= "<td align=\"right\" width=\"20%\">Action:</td>";
-	$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "select", value => \@t, select => $q->param('select') });
-	$PAGE .= "&nbsp;";
-	$PAGE .= &htmlButtonSubmit({ name => "submit", value => "View >>" }) . "</td>";
-	$PAGE .= "</tr>";
-
-	$PAGE .= "<tr class=\"top\">";
-	$PAGE .= "<td></td><td></td>";
-	$PAGE .= "</tr>";
-	$PAGE .= "</table>";
-	$PAGE .= "<p>&nbsp;</p>";
-
-	my $l = 0;
-	my $f = 0;
-
-	if($q->param('leaf')) {
-		$l = $q->param('leaf');
-	}
-
-	if($q->param('subleaf')) {
-		$f = $q->param('subleaf');
-	}
-
-	if($q->param('verb') eq "update") {
-		&editAdminSkinstat({ leaf => $l, subleaf => $f, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order'), select => $q->param('select') });
-	}
-
-	$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
-	$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
-	$PAGE .= &htmlHiddenField({ name => "leaf", value => $l });
-	$PAGE .= &htmlHiddenField({ name => "subleaf", value => $f });
-
-	$PAGE .= &htmlFormEnd();
-
-	&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 }
 else {
-	&htmlPage({ title => $WINDOW_TITLE, script => "", header => "&nbsp;", content => $PAGE, slices => $MENU });
+	if(!$q->param('leaf') || $q->param('leaf') == 0) {
+		$t = "My account";
+
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "My account", -values => [ "Change password", "Set front page", "Set popup windows" ], -class => "header" );
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Action:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "select", value => \@t, select => $q->param('select') });
+		$PAGE .= "&nbsp;";
+		$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+		$PAGE .= "<p>&nbsp;</p>";
+
+		my $l = 0;
+
+		if($q->param('leaf')) {
+			$l = $q->param('leaf');
+		}
+
+		if($q->param('verb') eq "update") {
+			&editAdminAccount({ leaf => $l, action => $q->param('action'), verb => $q->param('verb'), select => $q->param('select') });
+		}
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+		$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+
+		$PAGE .= &htmlFormEnd();
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('leaf') == 1) {
+		$t = "Manage users";
+
+		&editAdminUser({ leaf => $q->param('leaf') });
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('leaf') == 2) {
+		$t = "Manage port descriptions";
+
+		&editAdminPort({ leaf => $q->param('leaf') });
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('leaf') == 3) {
+		$t = "Manage service classes";
+
+		&editAdminService({ leaf => $q->param('leaf') });
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('leaf') == 4) {
+		$t = "View sessions";
+
+		my $l = 0;
+
+		if($q->param('leaf')) {
+			$l = $q->param('leaf');
+		}
+
+		&editAdminSession({ leaf => $l, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order'), select => $q->param('select') });
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('leaf') == 5) {
+		$t = "View database status";
+
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "View database status", -values => [ "Status", "Variables" ], -class => "header" );
+		$t[1] = $q->optgroup( -name => "View database messages", -values => [ "Errors", "Warnings" ], -class => "header" );
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Action:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "select", value => \@t, select => $q->param('select') });
+		$PAGE .= "&nbsp;";
+		$PAGE .= &htmlButtonSubmit({ name => "submit", value => "View >>" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+		$PAGE .= "<p>&nbsp;</p>";
+
+		my $l = 0;
+
+		if($q->param('leaf')) {
+			$l = $q->param('leaf');
+		}
+
+		if($q->param('verb') eq "update") {
+			&editAdminDbstat({ leaf => $l, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order'), select => $q->param('select') });
+		}
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+		$PAGE .= &htmlHiddenField({ name => "leaf", value => $l });
+		$PAGE .= &htmlHiddenField({ name => "subleaf", value => $f });
+
+		$PAGE .= &htmlFormEnd();
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	elsif($q->param('leaf') == 6) {
+		$t = "View server status";
+
+		my @t = ();
+
+		$t[0] = $q->optgroup( -name => "View usage of storage", -values => [ "Uploads" ], -class => "header" );
+		$t[1] = $q->optgroup( -name => "View server status", -values => [ "Log", "History" ], -class => "header" );
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Action:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "select", value => \@t, select => $q->param('select') });
+		$PAGE .= "&nbsp;";
+		$PAGE .= &htmlButtonSubmit({ name => "submit", value => "View >>" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+		$PAGE .= "<p>&nbsp;</p>";
+
+		my $l = 0;
+		my $f = 0;
+
+		if($q->param('leaf')) {
+			$l = $q->param('leaf');
+		}
+
+		if($q->param('subleaf')) {
+			$f = $q->param('subleaf');
+		}
+
+		if($q->param('verb') eq "update") {
+			&editAdminSkinstat({ leaf => $l, subleaf => $f, action => $q->param('action'), verb => $q->param('verb'), sort => $q->param('sort'), order => $q->param('order'), select => $q->param('select') });
+		}
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+		$PAGE .= &htmlHiddenField({ name => "leaf", value => $l });
+		$PAGE .= &htmlHiddenField({ name => "subleaf", value => $f });
+
+		$PAGE .= &htmlFormEnd();
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+	}
+	else {
+		&htmlPage({ title => $WINDOW_TITLE, script => "", header => "&nbsp;", content => $PAGE, slices => $MENU });
+	}
 }
 
 exit(0);

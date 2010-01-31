@@ -57,24 +57,16 @@ char *newUser(struct threadInfo * ti) {
 }
 
 char *pushUser(struct threadInfo * ti) {
-	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
 	}
 
 	// Modify existing user
-	fetchUser(5, QUERY_TYPE_PUSH, ti);
-
-	return(fetchUser(6, QUERY_TYPE_PUSH, ti));
+	return(fetchUser(5, QUERY_TYPE_PUSH, ti));
 }
 
 char *deleteUser(struct threadInfo * ti) {
@@ -87,9 +79,7 @@ char *deleteUser(struct threadInfo * ti) {
 	}
 
 	// Delete existing user
-	fetchUser(8, QUERY_TYPE_PUSH, ti);
-
-	return(fetchUser(7, QUERY_TYPE_PUSH, ti));
+	return(fetchUser(6, QUERY_TYPE_PUSH, ti));
 }
 
 char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
@@ -293,15 +283,19 @@ char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
 
 				break;
 			case 5:
+				// Modify existing user
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_USERS " SET %s = '%s' WHERE " TABLECOL_USER_UID " = '%s'%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc5Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
 
 				break;
 			case 6:
-
-				break;
-			case 7:
-
-				break;
-			case 8:
 
 				break;
 			default:
