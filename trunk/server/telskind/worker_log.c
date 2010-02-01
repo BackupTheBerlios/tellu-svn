@@ -100,9 +100,14 @@ char *pullDatabaseWarnings(struct threadInfo * ti) {
 	return(fetchLog(10, QUERY_TYPE_PULL, ti));
 }
 
+char *pullDatabaseTablestatus(struct threadInfo * ti) {
+	// Get database tablestatus
+	return(fetchLog(11, QUERY_TYPE_PULL, ti));
+}
+
 char *listSession(struct threadInfo * ti) {
 	// List all sessions
-	return(fetchLog(11, QUERY_TYPE_PULL, ti));
+	return(fetchLog(12, QUERY_TYPE_PULL, ti));
 }
 
 char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
@@ -328,6 +333,16 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 
 				break;
 			case 11:
+				// Get database tablestatus
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SHOW TABLE STATUS%c",
+					0
+				);
+
+				break;
+			case 12:
 				// List all sessions
 				snprintf(
 					ti->commandInfo.statBuffer,

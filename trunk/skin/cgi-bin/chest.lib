@@ -75,19 +75,26 @@ sub checkError {
 
 		&formAccessLogin({ message => $arg->{packet}[3] });
 
-		return(-1);
+		my @c = ();
+
+		$c[0] = &headCookieSet({ name => "tellu_cid", value => "" });
+		$c[1] = &headCookieSet({ name => "tellu_uid", value => "" });
+
+		&htmlPage({ template => "login", title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => "", content => $PAGE, slices => $MENU, cookie => \@c });
+
+		exit(0);
 	}
 	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_PERMISSIONDENIED) {
 		$SESSION_ERR = $arg->{packet}[3];
 
-		$PAGE .= "<p>Please contact your system administrator or help desk if you need to have an access to this resource.</p>";
+		$PAGE .= "<p>Permission denied: please contact your system administrator or help desk if you need to have an access to this resource.</p>";
 
 		return(-1);
 	}
 	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && (int($arg->{packet}[1]) == $ERROR_CLASS_DATABASE || int($arg->{packet}[1]) == $ERROR_CLASS_SERVER)) {
 		$SESSION_ERR = $arg->{packet}[3];
 
-		$PAGE .= "<p>System is in unusable state. Please contact your system administrator or help desk for assistance.</p>";
+		$PAGE .= "<p>Server error: system is in unusable state. Please contact your system administrator or help desk for assistance.</p>";
 
 		return(-1);
 	}

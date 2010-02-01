@@ -328,8 +328,182 @@ $PAGE .= "editAdminPort";
 sub editAdminService {
 	my ($arg) = @_;
 
-$PAGE .= "editAdminService";
+	my $m = "";
 
+	if($q->param('select') && $q->param('select') eq "Create new service class") {
+		if($q->param('submit') && $q->param('submit') eq "Create") {
+			if(!$q->param('new_name') || $q->param('new_name') eq "") {
+				$m = "Service class name is required. Please try again.";
+			}
+			else {
+				my @r = &sendCommand({ command => "newService", item => cleanHtml({ string => $q->param('new_name') }), domain => "", param => "", option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					$m = "New service class is created.";
+				}
+				else {
+					$m = "Error occurred while trying to create new service class";
+
+					if($r[3] && $r[3] ne "") {
+						$m .= ": " . $r[3];
+					}
+					else {
+						$m .= ".";
+					}
+				}
+			}
+		}
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		if($m && $m ne "") {
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td>" . $m . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+		}
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Service class name&nbsp;&sup1;:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "new_name", value => "", style => "textreq" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Create" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+	}
+	else {
+		if($q->param('submit') && $q->param('submit') eq "Update") {
+			if($q->param('disposed') && $q->param('disposed') == 1) {
+				my @r = &sendCommand({ command => "deleteService", item => $q->param('select'), domain => "", param => "", option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					$m = "Service class is disposed.";
+				}
+				else {
+					$m = "Error occurred while trying to dispose service class";
+
+					if($r[3] && $r[3] ne "") {
+						$m .= ": " . $r[3];
+					}
+					else {
+						$m .= ".";
+					}
+				}
+			}
+			else {
+				if(!$q->param('ext_name') || $q->param('ext_name') eq "") {
+					$m = "Service class name is required. Please try again.";
+				}
+				else {
+					my @r = &sendCommand({ command => "pushService", item => $q->param('select'), domain => "", param => "name", option => $q->param('ext_name') });
+
+					if(checkError({ packet => \@r }) == 0) {
+						$m = "Service class is updated.";
+					}
+					else {
+						$m = "Error occurred while trying to update service class";
+
+						if($r[3] && $r[3] ne "") {
+							$m .= ": " . $r[3];
+						}
+						else {
+							$m .= ".";
+						}
+					}
+				}
+			}
+		}
+
+		my @r = &sendCommand({ command => "pullService", item => $q->param('select'), domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			$s[0] = cleanNull({ string => $s[0] });
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			if($m && $m ne "") {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td>" . $m . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "<tr class=\"middle\">";
+			$PAGE .= "<td align=\"right\" width=\"20%\">Service class name&nbsp;&sup1;:</td>";
+			$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "ext_name", value => $s[0], style => "textreq" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"middle\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td>" . &htmlSelectTick({ name => "disposed", label => "Dispose this service class?", value => 1, onclick => "toggleUpdateButton('modifyForm'); return true;" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"middle\">";
+			$PAGE .= "<td align=\"right\">&nbsp;</td>";
+			$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Update" }) . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "</table>";
+		}
+	}
 }
 
 sub editAdminSession {
@@ -367,8 +541,18 @@ sub editAdminDbstat {
 		$f = $arg->{subleaf};
 	}
 
-	my @r = &sendCommand({ command => "pullDatabase" . $arg->{select}, item => "", domain => "", param => "", option => "" });
+	my @r = ();
 	my @w = ();
+
+	if($arg->{select} eq "Global status") {
+		@r = &sendCommand({ command => "pullDatabaseStatus", item => "", domain => "", param => "", option => "" });
+	}
+	elsif($arg->{select} eq "Table status") {
+		@r = &sendCommand({ command => "pullDatabaseTablestatus", item => "", domain => "", param => "", option => "" });
+	}
+	elsif($arg->{select} eq "Variables") {
+		@r = &sendCommand({ command => "pullDatabaseVariables", item => "", domain => "", param => "", option => "" });
+	}
 
 	if(checkError({ packet => \@r }) == 0) {
 		my @s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -468,9 +652,15 @@ sub editAdminSkinstat {
 sub tableAdminDetail {
 	my ($arg) = @_;
 
-	if($arg->{slice} eq "Status" || $arg->{slice} eq "Variables") {
+	if($arg->{slice} eq "Global status" || $arg->{slice} eq "Variables") {
 		my $t = "Variable,Value";
 		my $m = "0,0";
+
+		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
+	elsif($arg->{slice} eq "Table status") {
+		my $t = "Table,Engine,Version,Row format,Rows,Average row length,Data length,Max data length,Index length,Data free,Auto increment,Create time,Update time,Check time,Collation,Checksum,Create options,Comment";
+		my $m = "0,0,0,0,0,203,203,203,203,203,0,31,31,31,0,0,0,0";
 
 		&tableAdminDetails({ slice => $arg->{slice}, leaf => $arg->{leaf}, subleaf => $arg->{subleaf}, action => $arg->{action}, verb => $arg->{verb}, select => $arg->{select}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
@@ -623,7 +813,7 @@ sub tableAdminSlice {
 	$MENU .= "<table class=\"plain\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
 	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/admin/admin.png\"></td>";
-	$MENU .= "<td class=\"c3\">Admin</td>";
+	$MENU .= "<td class=\"c3\">Administrate</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
 

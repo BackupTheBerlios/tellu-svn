@@ -234,6 +234,7 @@ extern char *pullDatabaseStatus(struct threadInfo *);
 extern char *pullDatabaseVariables(struct threadInfo *);
 extern char *pullDatabaseErrors(struct threadInfo *);
 extern char *pullDatabaseWarnings(struct threadInfo *);
+extern char *pullDatabaseTablestatus(struct threadInfo *);
 extern char *listSession(struct threadInfo *);
 extern char *fetchLog(int, int, struct threadInfo *);
 

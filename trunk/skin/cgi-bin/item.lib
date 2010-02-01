@@ -31,7 +31,11 @@ sub itemClean {
 
 		$r = $arg->{item};
 	}
-	elsif($arg->{flag} == 3 || $arg->{flag} == 103) {
+	elsif($arg->{flag} == 3 || $arg->{flag} == 103 || $arg->{flag} == 203) {
+		if($arg->{flag} == 203) {
+			$arg->{item} /= $CONFIG_KILOBYTE;
+		}
+
 		if($arg->{flag} == 103) {
 			$pr = $arg->{item};
 		}
@@ -49,7 +53,17 @@ sub itemClean {
 			}
 		}
 
-		if(int($arg->{item}) > 1000000000000000) {
+		if(int($arg->{item}) > 1000000000000000000000) {
+			$arg->{item} /= 1000000000000000000000;
+
+			$r .= sprintf("%.1fYb", $arg->{item});
+		}
+		elsif(int($arg->{item}) > 1000000000000000000) {
+			$arg->{item} /= 1000000000000000000;
+
+			$r .= sprintf("%.1fZb", $arg->{item});
+		}
+		elsif(int($arg->{item}) > 1000000000000000) {
 			$arg->{item} /= 1000000000000000;
 
 			$r .= sprintf("%.1fEb", $arg->{item});
@@ -568,15 +582,21 @@ sub itemClean {
 			if(checkError({ packet => \@r }) == 0) {
 				my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-				foreach my $s (@s) {
-					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
+				if(@s) {
+					foreach my $s (@s) {
+						my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$SESSION_CACHE{"class" . $p} = $m;
+						$SESSION_CACHE{"class" . $p} = $m;
 
-					if($p eq $arg->{item}) {
-						$r = $m;
+						if($p eq $arg->{item}) {
+							$r = $m;
 
-						last;
+							last;
+						}
+					}
+
+					if($r eq "") {
+						$r = "Unknown";
 					}
 				}
 			}
