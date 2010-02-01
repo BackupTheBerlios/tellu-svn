@@ -21,6 +21,7 @@ table a:visited {
 }
 
 table.default {
+	background-color: #9abcde;
 	border: 1px solid #444444;
 	empty-cells: show;
 	width: 100%;
