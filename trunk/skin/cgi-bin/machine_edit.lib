@@ -18,9 +18,6 @@ sub editMachineNew {
 		if($q->param('node') && $q->param('node') ne "") {
 			$nd = $q->param('node');
 		}
-		elsif($q->param('ext_node') && $q->param('ext_node') ne "") {
-			$nd = $q->param('ext_node');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Host name cannot be empty.</p>";
 		}
@@ -67,38 +64,16 @@ sub editMachineNew {
 		}
 	}
 
-	my @nd = ();
 	my @dn = ();
 	my @sy = ();
 	my @re = ();
 	my @di = ();
 	my @pl = ();
-	my %nd = ();
 	my %dn = ();
 	my %sy = ();
 	my %re = ();
 	my %di = ();
 	my %pl = ();
-
-	my @r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "node", option => "" });
-
-	if(checkError({ packet => \@r }) == 0) {
-		my @s = split(/$ITEM_DELIMITER/, $r[3]);
-
-		foreach my $s (@s) {
-			my (@p) = split(/$ITEM_SEPARATOR/, $s);
-
-			$p[0] = cleanNull({ string => $p[0] });
-
-			$nd{$p[0]}++ if($p[0] ne "");
-		}
-	}
-
-	while((my $key, $val) = each %nd) {
-		push @nd, $key;
-	}
-
-	@nd = sort { uc($a) cmp uc($b) } @nd;
 
 	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
 
@@ -234,17 +209,6 @@ sub editMachineNew {
 	$PAGE .= "<td align=\"right\" width=\"20%\">Host name&nbsp;&sup1;:</td>";
 	$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "node", value => "", style => "textreq" }) . "</td>";
 	$PAGE .= "</tr>";
-
-	if(@nd) {
-		my @t = ();
-
-		$t[0] = $q->optgroup( -name => "Pick existing host name", -values => \@nd, -class => "header" );
-
-		$PAGE .= "<tr class=\"middle\">";
-		$PAGE .= "<td align=\"right\">&nbsp;</td>";
-		$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_node", value => \@t, onchange => "toggleNodeField('createForm'); return true;" }) . "</td>";
-		$PAGE .= "</tr>";
-	}
 
 	$PAGE .= "<tr class=\"middle\">";
 	$PAGE .= "<td align=\"right\">Domain name&nbsp;&sup1;:</td>";
