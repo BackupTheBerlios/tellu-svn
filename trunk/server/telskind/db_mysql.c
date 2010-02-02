@@ -143,7 +143,12 @@ char *mysqlPull(struct threadStorageInfo * db, char *thisString) {
 		}
 
 		for(db->k = 0; db->k < db->l; db->k++) {
-			db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%s%c", db->mysqlRow[db->k], ITEM_SEPARATOR);
+			if(db->mysqlRow[db->k] == NULL || db->mysqlRow[db->k][0] == 0) {
+				db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%c", ITEM_SEPARATOR);
+			}
+			else {
+				db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%s%c", db->mysqlRow[db->k], ITEM_SEPARATOR);
+			}
 		}
 
 		db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%c", ITEM_DELIMITER);
@@ -619,6 +624,21 @@ int mysqlPermission(unsigned long long thisLevel, char *thisUid, char *thisItem,
 							db->esc1Buffer,
 							0
 						);
+
+						if(mysqlPull(db, db->queryBuffer) != NULL) {
+							if(db->replyBuffer[0] == 0) {
+								if(thisLevel != PRIVILEGE_LEVEL_NONE && PRIVILEGE_LEVEL_DEFAULT >= thisLevel) {
+									db->e = 0;
+								}
+							}
+							else {
+								if(thisLevel != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) >= thisLevel) {
+									db->e = 0;
+								}
+							}
+
+							mysqlFree(db);
+						}
 					}
 					else {
 						mysqlEscape(db, db->esc2Buffer, thisDomain);
@@ -632,21 +652,43 @@ int mysqlPermission(unsigned long long thisLevel, char *thisUid, char *thisItem,
 							db->esc2Buffer,
 							0
 						);
-					}
 
-					if(mysqlPull(db, db->queryBuffer) != NULL) {
-						if(db->queryBuffer[0] == 0) {
-							if(thisLevel != PRIVILEGE_LEVEL_NONE && PRIVILEGE_LEVEL_DEFAULT >= thisLevel) {
-								db->e = 0;
+						if(mysqlPull(db, db->queryBuffer) != NULL) {
+							if(db->replyBuffer[0] == 0) {
+								mysqlFree(db);
+
+								// Check for explicit permissions
+								snprintf(
+									db->queryBuffer,
+									db->u,
+									"SELECT MAX(" TABLECOL_USER_PERM ") AS " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = ''%c",
+									db->esc1Buffer,
+									0
+								);
+
+								if(mysqlPull(db, db->queryBuffer) != NULL) {
+									if(db->replyBuffer[0] == 0) {
+										if(thisLevel != PRIVILEGE_LEVEL_NONE && PRIVILEGE_LEVEL_DEFAULT >= thisLevel) {
+											db->e = 0;
+										}
+									}
+									else {
+										if(thisLevel != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) >= thisLevel) {
+											db->e = 0;
+										}
+									}
+
+									mysqlFree(db);
+								}
+							}
+							else {
+								if(thisLevel != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) >= thisLevel) {
+									db->e = 0;
+								}
+
+								mysqlFree(db);
 							}
 						}
-						else {
-							if(thisLevel != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) >= thisLevel) {
-								db->e = 0;
-							}
-						}
-
-						mysqlFree(db);
 					}
 
 					memset(db->esc2Buffer, 0, (thisDomainLength * 2) + 1);

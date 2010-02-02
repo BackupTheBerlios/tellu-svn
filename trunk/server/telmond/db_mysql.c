@@ -116,7 +116,12 @@ char *mysqlPull(struct threadStorageInfo * db, char *thisString) {
 
 	while((db->mysqlRow = mysql_fetch_row(db->mysqlResult))) {
 		for(db->k = 0; db->k < db->l; db->k++) {
-			db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%s%c", db->mysqlRow[db->k], ITEM_SEPARATOR);
+			if(db->mysqlRow[db->k] == NULL || db->mysqlRow[db->k][0] == 0) {
+				db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%c", ITEM_SEPARATOR);
+			}
+			else {
+				db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%s%c", db->mysqlRow[db->k], ITEM_SEPARATOR);
+			}
 		}
 
 		db->p += snprintf(db->replyBuffer + db->p, db->t - db->p, "%c", ITEM_DELIMITER);
