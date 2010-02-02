@@ -171,7 +171,7 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_READ, "pullUser", NULL, pullUser, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "searchUser", NULL, searchUser, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "newUser", NULL, newUser, replyFree },
-	{ PRIVILEGE_LEVEL_WRITE, "pushUser", NULL, pushUser, replyFree },
+	{ PRIVILEGE_LEVEL_READ, "pushUser", NULL, pushUser, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "deleteUser", NULL, deleteUser, replyFree },
 
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "listGroup", NULL, listGroup, replyFree },
@@ -183,7 +183,7 @@ struct cmdArray cmdArrays[] = {
 
 	{ PRIVILEGE_LEVEL_PREAUTH, "tryLogin", NULL, tryLogin, replyFree },
 	{ PRIVILEGE_LEVEL_PREAUTH, "tryLogout", NULL, tryLogout, replyFree },
-	{ PRIVILEGE_LEVEL_WRITE, "changePassword", NULL, changeOwnPassword, replyFree },
+	{ PRIVILEGE_LEVEL_READ, "changePassword", NULL, changeOwnPassword, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "changeUserPassword", NULL, changeUserPassword, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "isAuthLDAP", NULL, isAuthLDAP, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "isUserAdmin", NULL, isUserAdmin, replyFree },
