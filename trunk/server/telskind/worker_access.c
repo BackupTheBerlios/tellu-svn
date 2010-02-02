@@ -273,7 +273,7 @@ char *fetchAccess(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-"SELECT DISTINCT " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_PERM " = '" PRIVILEGE_LEVEL_ADMIN_S "'%c",
+"SELECT DISTINCT " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '' AND " TABLECOL_USER_GRP " = '' AND " TABLECOL_USER_PERM " = '" PRIVILEGE_LEVEL_ADMIN_S "'%c",
 					ti->commandInfo.esc1Buffer,
 					0
 				);

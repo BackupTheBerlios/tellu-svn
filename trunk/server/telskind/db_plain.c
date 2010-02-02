@@ -136,6 +136,6 @@ int plainSession(char *thisCookie, char *thisUid, int thisCookieLength, int this
 	return(db->e);
 }
 
-int plainPermission(int thisLevel, char *thisUid, char *thisItem, char *thisDomain, int thisUidLength, int thisItemLength, int thisDomainLength, struct threadStorageInfo * db) {
+int plainPermission(unsigned long long thisLevel, char *thisUid, char *thisItem, char *thisDomain, int thisUidLength, int thisItemLength, int thisDomainLength, struct threadStorageInfo * db) {
 	return(-1);
 }

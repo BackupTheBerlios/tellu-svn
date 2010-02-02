@@ -589,21 +589,21 @@ int mysqlSession(char *thisCookie, char *thisUid, int thisCookieLength, int this
 	return(db->e);
 }
 
-int mysqlPermission(int thisLevel, char *thisUid, char *thisItem, char *thisDomain, int thisUidLength, int thisItemLength, int thisDomainLength, struct threadStorageInfo * db) {
-	db->e = -1;
-
+int mysqlPermission(unsigned long long thisLevel, char *thisUid, char *thisItem, char *thisDomain, int thisUidLength, int thisItemLength, int thisDomainLength, struct threadStorageInfo * db) {
 	if(thisUid == NULL || thisUid[0] == 0 || thisUidLength == 0) {
-		return(db->e);
+		return(-1);
 	}
 
 	// Always grant access if requested level is below threshold
-	if(thisLevel <= PRIVILEGE_LEVEL_DEFAULT) {
+	if(thisLevel != PRIVILEGE_LEVEL_NONE && thisLevel <= PRIVILEGE_LEVEL_DEFAULT) {
 		return(0);
 	}
 
+	db->e = -1;
+
 	// Otherwise check if access is allowed
 	if(mysqlConnect(db) == 0) {
-		db->u = (thisUidLength * 2) + (thisItemLength * 2) + (thisDomainLength * 2) + CONFIG_SPACE_SIZE;
+		db->u = (thisUidLength * 2) + (thisDomainLength * 2) + CONFIG_SPACE_SIZE;
 
 		if((db->queryBuffer = malloc(db->u + 1)) != NULL) {
 			if((db->esc1Buffer = malloc((thisUidLength * 2) + 1)) != NULL) {
@@ -611,32 +611,39 @@ int mysqlPermission(int thisLevel, char *thisUid, char *thisItem, char *thisDoma
 					mysqlEscape(db, db->esc1Buffer, thisUid);
 
 					if(thisDomain == NULL || thisDomain[0] == 0) {
+						// Check for explicit permissions
 						snprintf(
 							db->queryBuffer,
 							db->u,
-							"SELECT DISTINCT " TABLECOL_USER_UID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_ID " IN (SELECT DISTINCT " TABLECOL_USER_USID " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_PERM " >= '%d')%c",
+							"SELECT MAX(" TABLECOL_USER_PERM ") AS " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = ''%c",
 							db->esc1Buffer,
-							thisLevel,
 							0
 						);
 					}
 					else {
 						mysqlEscape(db, db->esc2Buffer, thisDomain);
 
+						// Check if requested domain has explicit permissions
 						snprintf(
 							db->queryBuffer,
 							db->u,
-							"SELECT DISTINCT " TABLECOL_USER_UID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_ID " IN (SELECT DISTINCT " TABLECOL_USER_USID " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '%s' AND " TABLECOL_USER_PERM " >= '%d')%c",
+							"SELECT MAX(" TABLECOL_USER_PERM ") AS " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '%s'%c",
 							db->esc1Buffer,
 							db->esc2Buffer,
-							thisLevel,
 							0
 						);
 					}
 
 					if(mysqlPull(db, db->queryBuffer) != NULL) {
-						if(strcmp(db->replyBuffer, thisUid) == 0) {
-							db->e = 0;
+						if(db->queryBuffer[0] == 0) {
+							if(thisLevel != PRIVILEGE_LEVEL_NONE && PRIVILEGE_LEVEL_DEFAULT >= thisLevel) {
+								db->e = 0;
+							}
+						}
+						else {
+							if(thisLevel != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) != PRIVILEGE_LEVEL_NONE && (unsigned long long) atoll(db->replyBuffer) >= thisLevel) {
+								db->e = 0;
+							}
 						}
 
 						mysqlFree(db);

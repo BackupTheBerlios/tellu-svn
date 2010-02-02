@@ -213,6 +213,7 @@
 #define TABLECOL_USER_DESCR "descr"
 #define TABLECOL_USER_DOMAIN "domain"
 #define TABLECOL_USER_GECOS "gecos"
+#define TABLECOL_USER_GRP "grp"
 #define TABLECOL_USER_HOMEPAGE "homepage"
 #define TABLECOL_USER_ID "id"
 #define TABLECOL_USER_LOCKED "locked"

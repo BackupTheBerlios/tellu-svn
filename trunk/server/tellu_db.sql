@@ -25042,7 +25042,4 @@ INSERT INTO skin_groups_map (user_id, group_id) SELECT skin_users.id, skin_group
 #
 INSERT INTO skin_perm_nodes (user_id) SELECT skin_users.id FROM skin_users WHERE skin_users.name='admin';
 INSERT INTO skin_perm_nodes (user_id) SELECT skin_users.id FROM skin_users WHERE skin_users.name='guest';
-UPDATE skin_perm_nodes SET node='', domain='Domain summary', grp='', perm='64' WHERE user_id IN (SELECT id FROM skin_users WHERE name='admin');
-UPDATE skin_perm_nodes SET node='', domain='Global summary', grp='', perm='64' WHERE user_id IN (SELECT id FROM skin_users WHERE name='admin');
-UPDATE skin_perm_nodes SET node='', domain='Domain summary', grp='', perm='2' WHERE user_id IN (SELECT id FROM skin_users WHERE name='guest');
-UPDATE skin_perm_nodes SET node='', domain='Global summary', grp='', perm='2' WHERE user_id IN (SELECT id FROM skin_users WHERE name='guest');
+UPDATE skin_perm_nodes SET node='', domain='', grp='', perm='64' WHERE user_id IN (SELECT id FROM skin_users WHERE name='admin');

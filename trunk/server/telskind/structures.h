@@ -117,7 +117,7 @@ struct threadDbInfo {
 	int (*login)(char *, char *, int, int, struct threadStorageInfo *);
 	int (*logout)(char *, int, struct threadStorageInfo *);
 	int (*session)(char *, char *, int, int, struct threadStorageInfo *);
-	int (*permission)(int, char *, char *, char *, int, int, int, struct threadStorageInfo *);
+	int (*permission)(unsigned long long, char *, char *, char *, int, int, int, struct threadStorageInfo *);
 };
 
 struct threadInfo {
@@ -165,7 +165,7 @@ struct threadInfo {
 };
 
 struct cmdArray {
-	int level;								// Task required privilege level
+	unsigned long long level;						// Task required privilege level
 	char *task;								// Task name
 	void (*constructor)(struct threadInfo *);				// Task constructor pointer
 	char *(*allocator)(struct threadInfo *);				// Task allocator pointer

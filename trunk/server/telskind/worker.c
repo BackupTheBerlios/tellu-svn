@@ -16,7 +16,7 @@ void workerThread(void *threadArg) {
 	void (*cmdDestroyer)(struct threadInfo *);
 
 	int (*dbSession)(char *, char *, int, int, struct threadStorageInfo *);
-	int (*dbPermission)(int, char *, char *, char *, int, int, int, struct threadStorageInfo *);
+	int (*dbPermission)(unsigned long long, char *, char *, char *, int, int, int, struct threadStorageInfo *);
 
 	ti = (struct threadInfo *) threadArg;
 

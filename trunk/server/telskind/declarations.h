@@ -44,7 +44,7 @@ extern int mysqlInsert(char *, int, struct threadStorageInfo *);
 extern int mysqlLogin(char *, char *, int, int, struct threadStorageInfo *);
 extern int mysqlLogout(char *, int, struct threadStorageInfo *);
 extern int mysqlSession(char *, char *, int, int, struct threadStorageInfo *);
-extern int mysqlPermission(int, char *, char *, char *, int, int, int, struct threadStorageInfo *);
+extern int mysqlPermission(unsigned long long, char *, char *, char *, int, int, int, struct threadStorageInfo *);
 
 // db_plain.c
 extern int plainConnect(struct threadStorageInfo *);
@@ -61,7 +61,7 @@ extern int plainInsert(char *, int, struct threadStorageInfo *);
 extern int plainLogin(char *, char *, int, int, struct threadStorageInfo *);
 extern int plainLogout(char *, int, struct threadStorageInfo *);
 extern int plainSession(char *, char *, int, int, struct threadStorageInfo *);
-extern int plainPermission(int, char *, char *, char *, int, int, int, struct threadStorageInfo *);
+extern int plainPermission(unsigned long long, char *, char *, char *, int, int, int, struct threadStorageInfo *);
 
 // messages.c
 extern void infoMessage(int, char *);
