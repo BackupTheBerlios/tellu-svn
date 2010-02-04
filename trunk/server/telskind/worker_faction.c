@@ -109,11 +109,15 @@ char *deleteFaction(struct threadInfo * ti) {
 	}
 
 	// Delete faction
+	fetchFaction(17, QUERY_TYPE_PUSH, ti);
+
 	return(fetchFaction(6, QUERY_TYPE_PUSH, ti));
 }
 
 char *deleteTempFaction(struct threadInfo * ti) {
 	// Delete temporary factions
+	fetchFaction(18, QUERY_TYPE_PUSH, ti);
+
 	return(fetchFaction(16, QUERY_TYPE_PUSH, ti));
 }
 
@@ -913,6 +917,29 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
 					"DELETE FROM " TABLE_FACTIONS " WHERE " TABLECOL_FACTIONS_OWNER " = '%s' AND " TABLECOL_FACTIONS_TYPE " = '1'%c",
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 17:
+				// Delete faction mappings
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " IN (SELECT DISTINCT " TABLECOL_FACTIONS_ID " FROM " TABLE_FACTIONS " WHERE " TABLECOL_FACTIONS_NAME " = '%s' AND " TABLECOL_FACTIONS_OWNER " = '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 18:
+				// Delete temporary faction mappings
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_FACTION_ID " IN (SELECT DISTINCT " TABLECOL_FACTIONS_ID " FROM " TABLE_FACTIONS " WHERE " TABLECOL_FACTIONS_TYPE " = '1' AND " TABLECOL_FACTIONS_OWNER " = '%s')%c",
 					ti->commandInfo.esc1Buffer,
 					0
 				);

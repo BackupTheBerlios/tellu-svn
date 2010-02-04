@@ -148,6 +148,7 @@
 #define TABLECOL_LOG_PROC "proc"
 #define TABLECOL_LOG_PROCVER "procver"
 #define TABLECOL_LOG_TIME "time"
+#define TABLECOL_FACTIONS_ID "id"
 #define TABLECOL_FACTIONS_NAME "name"
 #define TABLECOL_FACTIONS_OWNER "owner"
 #define TABLECOL_FACTIONS_PUBLIC "public"
