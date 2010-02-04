@@ -424,7 +424,7 @@ sub editPersonalFaction {
 
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
-		$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary?", value => 1, onclick => "toggleFactionButton('modifyForm'); return true;" }) . "</td>";
+		$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary? (3)", value => 1, onclick => "toggleFactionButton('modifyForm'); return true;" }) . "</td>";
 		$PAGE .= "</tr>";
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
@@ -584,10 +584,10 @@ sub editPersonalFaction {
 						$PAGE .= "<td align=\"right\">&nbsp;</td>";
 
 						if($s[3] && $s[3] == 1) {
-							$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary?", value => 1, select => 1 }) . "</td>";
+							$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary? (3)", value => 1, select => 1 }) . "</td>";
 						}
 						else {
-							$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary?", value => 1 }) . "</td>";
+							$PAGE .= "<td>" . &htmlSelectTick({ name => "type", label => "Faction is temporary? (3)", value => 1 }) . "</td>";
 						}
 
 						$PAGE .= "</tr>";

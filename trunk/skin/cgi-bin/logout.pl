@@ -14,7 +14,10 @@ require "access.lib";
 &headPrepare();
 
 my @c = ();
-my @r = &sendCommand({ command => "tryLogout", item => "", domain => "", param => "", option => "" });
+my @r = ();
+
+@r = &sendCommand({ command => "deleteTempFaction", item => "", domain => "", param => "", option => "" });
+@r = &sendCommand({ command => "tryLogout", item => "", domain => "", param => "", option => "" });
 
 $c[0] = &headCookieSet({ name => "tellu_cid", value => "" });
 $c[1] = &headCookieSet({ name => "tellu_uid", value => "" });

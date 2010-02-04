@@ -112,6 +112,11 @@ char *deleteFaction(struct threadInfo * ti) {
 	return(fetchFaction(6, QUERY_TYPE_PUSH, ti));
 }
 
+char *deleteTempFaction(struct threadInfo * ti) {
+	// Delete temporary factions
+	return(fetchFaction(16, QUERY_TYPE_PUSH, ti));
+}
+
 char *attachFaction(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
@@ -898,6 +903,17 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 					"SELECT DISTINCT " TABLEKEY_FACTIONS_LIST " FROM " TABLE_FACTIONS " WHERE " TABLECOL_FACTIONS_OWNER " = '%s' ORDER BY %s%c",
 					ti->commandInfo.esc1Buffer,
 					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 16:
+				// Delete temporary factions
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_FACTIONS " WHERE " TABLECOL_FACTIONS_OWNER " = '%s' AND " TABLECOL_FACTIONS_TYPE " = '1'%c",
+					ti->commandInfo.esc1Buffer,
 					0
 				);
 

@@ -23,6 +23,7 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_WRITE, "pushFaction", NULL, pushFaction, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "searchFaction", NULL, searchFaction, replyFree },
 	{ PRIVILEGE_LEVEL_DELETE, "deleteFaction", NULL, deleteFaction, replyFree },
+	{ PRIVILEGE_LEVEL_WRITE, "deleteTempFaction", NULL, deleteTempFaction, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "attachFaction", NULL, attachFaction, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "attachDomainFaction", NULL, attachDomainFaction, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "attachGlobalFaction", NULL, attachGlobalFaction, replyFree },

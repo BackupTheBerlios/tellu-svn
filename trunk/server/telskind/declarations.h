@@ -198,6 +198,7 @@ extern char *newFaction(struct threadInfo *);
 extern char *pushFaction(struct threadInfo *);
 extern char *searchFaction(struct threadInfo *);
 extern char *deleteFaction(struct threadInfo *);
+extern char *deleteTempFaction(struct threadInfo *);
 extern char *attachFaction(struct threadInfo *);
 extern char *attachDomainFaction(struct threadInfo *);
 extern char *attachGlobalFaction(struct threadInfo *);
