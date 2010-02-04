@@ -531,11 +531,11 @@ sub editAdminUser {
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"middle\">";
-		$PAGE .= "<td align=\"right\">Password&nbsp;&sup1;:</td>";
+		$PAGE .= "<td align=\"right\">Password&nbsp;&sup1;&nbsp;&sup3;:</td>";
 		$PAGE .= "<td>" . &htmlInputPassword({ name => "pwd1", value => "", style => "pwdreq" }) . "</td>";
 		$PAGE .= "</tr>";
 		$PAGE .= "<tr class=\"middle\">";
-		$PAGE .= "<td align=\"right\">Verify password&nbsp;&sup1;:</td>";
+		$PAGE .= "<td align=\"right\">Verify password&nbsp;&sup1;&nbsp;&sup3;:</td>";
 		$PAGE .= "<td>" . &htmlInputPassword({ name => "pwd2", value => "", style => "pwdreq" }) . "</td>";
 		$PAGE .= "</tr>";
 
@@ -593,6 +593,10 @@ sub editAdminUser {
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
 		$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
 		$PAGE .= "</tr>";
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td><i>&sup3;&nbsp;if some other than internal authentication module is enabled, these fields has no effect.</i></td>";
+		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td></td><td></td>";
@@ -600,7 +604,7 @@ sub editAdminUser {
 
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
-		$PAGE .= "<td>" . &htmlSelectTick({ name => "locked", label => "Account is locked?", value => 1 }) . "</td>";
+		$PAGE .= "<td>" . &htmlSelectTick({ name => "locked", label => "Account is locked? (3)", value => 1 }) . "</td>";
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
@@ -911,11 +915,11 @@ sub editAdminUser {
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"middle\">";
-		$PAGE .= "<td align=\"right\">New password:</td>";
+		$PAGE .= "<td align=\"right\">New password&nbsp;&sup3;:</td>";
 		$PAGE .= "<td>" . &htmlInputPassword({ name => "pwd1", value => "" }) . "</td>";
 		$PAGE .= "</tr>";
 		$PAGE .= "<tr class=\"middle\">";
-		$PAGE .= "<td align=\"right\">Verify new password:</td>";
+		$PAGE .= "<td align=\"right\">Verify new password&nbsp;&sup3;:</td>";
 		$PAGE .= "<td>" . &htmlInputPassword({ name => "pwd2", value => "" }) . "</td>";
 		$PAGE .= "</tr>";
 
@@ -1003,6 +1007,10 @@ sub editAdminUser {
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
 		$PAGE .= "<td><i>&sup2;&nbsp;denotes readonly field which value cannot be changed.</i></td>";
 		$PAGE .= "</tr>";
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td><i>&sup3;&nbsp;if some other than internal authentication module is enabled, these fields has no effect.</i></td>";
+		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td></td><td></td>";
@@ -1015,7 +1023,7 @@ sub editAdminUser {
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td align=\"right\">&nbsp;</td>";
-			$PAGE .= "<td>" . &htmlSelectTick({ name => "locked", label => "Account is locked?", value => 1, select => $s[1] }) . "</td>";
+			$PAGE .= "<td>" . &htmlSelectTick({ name => "locked", label => "Account is locked? (3)", value => 1, select => $s[1] }) . "</td>";
 			$PAGE .= "</tr>";
 		}
 

@@ -404,7 +404,7 @@ int mysqlLogin(char *thisUid, char *thisPwd, int thisUidLength, int thisPwdLengt
 						snprintf(
 							db->queryBuffer,
 							db->u,
-							"SELECT DISTINCT " TABLECOL_USER_UID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s' AND " TABLECOL_USER_PWD " = ''%c",
+							"SELECT DISTINCT " TABLECOL_USER_UID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s' AND " TABLECOL_USER_PWD " = '' AND " TABLECOL_USER_LOCKED " = '0'%c",
 							db->esc1Buffer,
 							0
 						);
@@ -415,7 +415,7 @@ int mysqlLogin(char *thisUid, char *thisPwd, int thisUidLength, int thisPwdLengt
 						snprintf(
 							db->queryBuffer,
 							db->u,
-							"SELECT DISTINCT " TABLECOL_USER_UID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s' AND " TABLECOL_USER_PWD " = " TABLE_PWD_HASH "('%s')%c",
+							"SELECT DISTINCT " TABLECOL_USER_UID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s' AND " TABLECOL_USER_PWD " = " TABLE_PWD_HASH "('%s') AND " TABLECOL_USER_LOCKED " = '0'%c",
 							db->esc1Buffer,
 							db->esc2Buffer,
 							0
