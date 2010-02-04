@@ -70,7 +70,7 @@
 #define LDAP_MYATTR "uid"
 #define LDAP_MYBASE "dc=example,dc=com"
 #define LDAP_MYFILTER "(objectClass=*)"
-#define LDAP_MYTIMEOUT 30
+#define LDAP_MYTIMEOUT 120
 #define LDAP_MYVERSION LDAP_VERSION3
 
 #define PRIVILEGE_LEVEL_DEFAULT 2
@@ -330,11 +330,13 @@
 #define TABLEKEY_SERVICE_NEW "creator,name"
 #define TABLEKEY_SESSION_NAME "created,created,access,count,name"
 #define TABLEKEY_TEMP_TEMP "creator,temp"
+#define TABLEKEY_USER_LIST "id,name,gecos"
 #define TABLEKEY_USER_DESCR "id,descr"
 #define TABLEKEY_USER_GECOS "id,gecos"
 #define TABLEKEY_USER_HOMEPAGE "id,homepage"
 #define TABLEKEY_USER_LOCKED "id,locked"
 #define TABLEKEY_USER_NOTE "id,note"
+#define TABLEKEY_USER_PERM "user_id,node,domain,grp,perm"
 #define TABLEKEY_USER_PREFS "id,prefs"
 #define TABLEKEY_USER_UID "id,name"
 

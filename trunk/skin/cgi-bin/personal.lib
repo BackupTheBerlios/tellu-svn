@@ -17,6 +17,7 @@ sub editPersonalFaction {
 	my @l = ('Add new faction', 'Modify existing faction', 'Delete existing faction', 'Faction members');
 
 	if($q->param('verb') && $q->param('verb') eq "update") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "listFaction", item => "", domain => "", param => "name", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -62,12 +63,16 @@ sub editPersonalFaction {
 						@r = &sendCommand({ command => "pushFaction", item => $q->param('name'), domain => "", param => "note", option => cleanHtml({ string => $q->param('note') }) });
 					}
 
-					$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' added.</p>";
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+					}
 				}
 			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "modify") {
+		my $er = 0;
+
 		if(!$q->param('name') || $q->param('name') eq "") {
 			$PAGE .= "<p class=\"warning\">Faction name cannot be empty.</p>";
 		}
@@ -84,14 +89,20 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' is updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "delete") {
+		my $er = 0;
+
 		if(!$q->param('name') || $q->param('name') eq "") {
 			$PAGE .= "<p class=\"warning\">Faction name cannot be empty.</p>";
 		}
@@ -104,13 +115,17 @@ sub editPersonalFaction {
 				if($SESSION_ERR && $SESSION_ERR ne "") {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
+
+				$er++;
 			}
-			else {
-				$PAGE .= "<p class=\"info\">Faction '" . $q->param('name') . "' is deleted.</p>";
+
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "attmac") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "machine" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -136,14 +151,19 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "attdev") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "device" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -169,14 +189,19 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "attper") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "peripheral" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -202,14 +227,19 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "attser") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "service" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -235,14 +265,19 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "attpwd") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "password" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -268,14 +303,19 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "attfle") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "attachedFaction", item => $q->param('grp'), domain => "", param => "", option => "file" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -301,11 +341,15 @@ sub editPersonalFaction {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Faction members are updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editg&leaf=" . $q->param('leaf') . "&subleaf=" . $q->param('subleaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 
@@ -1073,6 +1117,8 @@ sub editPersonalFile {
 	my @l = ('Add new file', 'Modify existing file', 'Delete existing file');
 
 	if($q->param('verb') && $q->param('verb') eq "update") {
+		my $er = 0;
+
 		if(!$q->param('file') || $q->param('file') eq "") {
 			$PAGE .= "<p class=\"warning\">File to add cannot be empty.</p>";
 		}
@@ -1136,7 +1182,9 @@ sub editPersonalFile {
 								@r = &sendCommand({ command => "pushFile", item => $q->param('name'), domain => "", param => "size", option => $s });
 								@r = &sendCommand({ command => "pushFile", item => $q->param('name'), domain => "", param => "rand", option => $r });
 
-								$PAGE .= "<p class=\"info\">File '" . $q->param('name') . "' added.</p>";
+								if($er == 0) {
+									&htmlPage({ redirect => $SELF . "?action=editf&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+								}
 							}
 							else {
 								$PAGE .= "<p class=\"warning\">Internal error occurred while trying to upload file. Please contact your system administrator for assistance.</p>";
@@ -1154,6 +1202,8 @@ sub editPersonalFile {
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "modify") {
+		my $er = 0;
+
 		if(!$q->param('name') || $q->param('name') eq "") {
 			$PAGE .= "<p class=\"warning\">File name cannot be empty.</p>";
 		}
@@ -1171,13 +1221,19 @@ sub editPersonalFile {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
 
+				$er++;
+
 				last;
 			}
 		}
 
-		$PAGE .= "<p class=\"info\">File '" . $q->param('name') . "' is updated.</p>";
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF . "?action=editf&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "delete") {
+		my $er = 0;
+
 		if(!$q->param('name') || $q->param('name') eq "") {
 			$PAGE .= "<p class=\"warning\">File name cannot be empty.</p>";
 		}
@@ -1195,7 +1251,9 @@ sub editPersonalFile {
 
 				@r = &sendCommand({ command => "deleteFile", item => $q->param('name'), domain => "", param => "", option => "" });
 
-				$PAGE .= "<p class=\"info\">File '" . $q->param('name') . "' is deleted.</p>";
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=editf&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
 			}
 			else {
 				$PAGE .= "<p class=\"warning\">File '" . $q->param('name') . "' deletion failed.</p>";
@@ -1622,6 +1680,7 @@ sub editPersonalPwds {
 	my @l = ('Add new password', 'Modify existing password', 'Delete existing password');
 
 	if($q->param('verb') && $q->param('verb') eq "update") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -1682,12 +1741,16 @@ sub editPersonalPwds {
 						@r = &sendCommand({ command => "pushPassword", item => $q->param('name'), domain => "", param => "note", option => cleanHtml({ string => $q->param('note') }) });
 					}
 
-					$PAGE .= "<p class=\"info\">Password '" . $q->param('name') . "' added.</p>";
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=editp&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+					}
 				}
 			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "modify") {
+		my $er = 0;
+
 		if(!$q->param('name') || $q->param('name') eq "") {
 			$PAGE .= "<p class=\"warning\">Password name cannot be empty.</p>";
 		}
@@ -1710,6 +1773,8 @@ sub editPersonalPwds {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
@@ -1729,16 +1794,17 @@ sub editPersonalPwds {
 				}
 				else {
 					@r = &sendCommand({ command => "encryptPassword", item => $q->param('name'), domain => "", param => $q->param('password'), option => $q->param('key') });
-
-					$PAGE .= "<p class=\"info\">Password '" . $q->param('name') . "' is updated.</p>";
 				}
 			}
-			else {
-				$PAGE .= "<p class=\"info\">Password '" . $q->param('name') . "' is updated.</p>";
+
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editp&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "delete") {
+		my $er = 0;
+
 		if(!$q->param('name') || $q->param('name') eq "") {
 			$PAGE .= "<p class=\"warning\">Password name cannot be empty.</p>";
 		}
@@ -1751,9 +1817,12 @@ sub editPersonalPwds {
 				if($SESSION_ERR && $SESSION_ERR ne "") {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
+
+				$er++;
 			}
-			else {
-				$PAGE .= "<p class=\"info\">Password '" . $q->param('name') . "' is deleted.</p>";
+
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=editp&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
 		}
 	}

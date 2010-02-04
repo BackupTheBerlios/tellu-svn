@@ -13,6 +13,7 @@ require "admin.js";
 
 
 &headPrepare();
+&tableAdminSlice();
 
 my $t = "";
 my $s = 0;
@@ -23,17 +24,18 @@ my @l = ();
 
 if(checkError({ packet => \@r }) == 0) {
 	if($r[3] && $r[3] == 64) {
-		@l = ('My account', 'Users', 'Ports', 'Classes', 'Sessions', 'Database status', 'Server status');
+		@l = ('My account', 'Users', 'Classes', 'Sessions', 'Database status', 'Server status');
 
 		$x = 1;
 	}
+}
+else {
+	&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
 }
 
 if(!@l) {
 	@l = ('My account');
 }
-
-&tableAdminSlice();
 
 $PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=admin&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -152,18 +154,72 @@ else {
 	elsif($q->param('leaf') == 1) {
 		$t = "Manage users";
 
-		&editAdminUser({ leaf => $q->param('leaf') });
+		my @o = ();
+		my @t = ();
+		my %l = ();
 
-		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+		my @r = &sendCommand({ command => "listUser", item => "", domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			if($r[3] && $r[3] ne "") {
+				foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+					my ($f, $g, $h) = split(/$ITEM_SEPARATOR/, $e);
+
+					$h = cleanNull({ string => $h });
+
+					push @o, $g;
+
+					if($h && $h ne "") {
+						$l{$g} = $g . " (" . $h . ")";
+					}
+					else {
+						$l{$g} = $g;
+					}
+				}
+			}
+		}
+
+		$t[0] = $q->optgroup( -name => "Manage users", -values => "Create new user", -class => "header" );
+		$t[1] = $q->optgroup( -name => "Modify existing users", -values => \@o, -labels => \%l, -class => "header" );
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\" width=\"20%\">Action:</td>";
+		$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "select", value => \@t, select => $q->param('select') });
+		$PAGE .= "&nbsp;";
+		$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Switch >>" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+		$PAGE .= "</table>";
+		$PAGE .= "<p>&nbsp;</p>";
+
+		my $l = 0;
+
+		if($q->param('leaf')) {
+			$l = $q->param('leaf');
+		}
+
+		if($q->param('verb') eq "update") {
+			&editAdminUser({ leaf => $l, action => $q->param('action'), verb => $q->param('verb'), select => $q->param('select') });
+		}
+
+		$PAGE .= &htmlHiddenField({ name => "action", value => "admin" });
+		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
+		$PAGE .= &htmlHiddenField({ name => "leaf", value => $l });
+
+		$PAGE .= &htmlFormEnd();
+
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &adminModifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}
 	elsif($q->param('leaf') == 2) {
-		$t = "Manage port descriptions";
-
-		&editAdminPort({ leaf => $q->param('leaf') });
-
-		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
-	}
-	elsif($q->param('leaf') == 3) {
 		$t = "Manage service classes";
 
 		my @o = ();
@@ -223,7 +279,7 @@ else {
 
 		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &adminModifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}
-	elsif($q->param('leaf') == 4) {
+	elsif($q->param('leaf') == 3) {
 		$t = "View active sessions";
 
 		my $l = 0;
@@ -236,7 +292,7 @@ else {
 
 		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 	}
-	elsif($q->param('leaf') == 5) {
+	elsif($q->param('leaf') == 4) {
 		$t = "View database status";
 
 		my @t = ();
@@ -282,7 +338,7 @@ else {
 
 		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 	}
-	elsif($q->param('leaf') == 6) {
+	elsif($q->param('leaf') == 5) {
 		$t = "View server status";
 
 		my @t = ();

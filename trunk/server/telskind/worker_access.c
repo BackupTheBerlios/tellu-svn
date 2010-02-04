@@ -93,6 +93,7 @@ char *changeOwnPassword(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
+	// Change own password
 	return(fetchAccess(1, QUERY_TYPE_PUSH, ti));
 }
 
@@ -108,6 +109,7 @@ char *changeUserPassword(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
+	// Change user's password
 	return(fetchAccess(2, QUERY_TYPE_PUSH, ti));
 }
 
@@ -127,7 +129,123 @@ char *isAuthLDAP(struct threadInfo * ti) {
 }
 
 char *isUserAdmin(struct threadInfo * ti) {
+	// Check if requestor is admin or not
 	return(fetchAccess(3, QUERY_TYPE_PULL, ti));
+}
+
+char *pullPrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Get user's default privilege level
+	return(fetchAccess(4, QUERY_TYPE_PULL, ti));
+}
+
+char *newPrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Create new user privilege level
+	return(fetchAccess(5, QUERY_TYPE_PUSH, ti));
+}
+
+char *newDefaultPrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Create new user default privilege level
+	return(fetchAccess(6, QUERY_TYPE_PUSH, ti));
+}
+
+char *pushPrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Modify existing user privilege level
+	return(fetchAccess(7, QUERY_TYPE_PUSH, ti));
+}
+
+char *pushDefaultPrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Modify existing user default privilege level
+	return(fetchAccess(8, QUERY_TYPE_PUSH, ti));
+}
+
+char *checkDefaultPrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Check user default privilege level
+	return(fetchAccess(9, QUERY_TYPE_PULL, ti));
+}
+
+char *deletePrivilegeLevel(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Delete existing user privilege level
+	return(fetchAccess(10, QUERY_TYPE_PUSH, ti));
 }
 
 char *fetchAccess(int getThis, int getType, struct threadInfo * ti) {
@@ -273,8 +391,93 @@ char *fetchAccess(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-"SELECT DISTINCT " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '' AND " TABLECOL_USER_GRP " = '' AND " TABLECOL_USER_PERM " = '" PRIVILEGE_LEVEL_ADMIN_S "'%c",
+					"SELECT DISTINCT " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '' AND " TABLECOL_USER_GRP " = '' AND " TABLECOL_USER_PERM " = '" PRIVILEGE_LEVEL_ADMIN_S "'%c",
 					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 4:
+				// Get user's default privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT MAX(" TABLECOL_USER_PERM ") AS " TABLECOL_USER_PERM " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '' AND " TABLECOL_USER_GRP " = ''%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 5:
+				// Create new user privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_PERM_NODES " (" TABLEKEY_USER_PERM ") VALUES((SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s'), '', '%s', '', '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc5Buffer,
+					0
+				);
+
+				break;
+			case 6:
+				// Create new user default privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_PERM_NODES " (" TABLEKEY_USER_PERM ") VALUES((SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s'), '', '', '', '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc5Buffer,
+					0
+				);
+
+				break;
+			case 7:
+				// Modify existing user privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_PERM_NODES " SET " TABLECOL_USER_PERM " = '%s' WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '%s'%c",
+					ti->commandInfo.esc5Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 8:
+				// Modify existing user default privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_PERM_NODES " SET " TABLECOL_USER_PERM " = '%s' WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = ''%c",
+					ti->commandInfo.esc5Buffer,
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 9:
+				// Check user default privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT DISTINCT " TABLECOL_USER_USID " FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_PERM " = '%s' AND " TABLECOL_USER_DOMAIN " = ''%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc5Buffer,
+					0
+				);
+
+				break;
+			case 10:
+				// Delete existing user privilege level
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s') AND " TABLECOL_USER_DOMAIN " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 

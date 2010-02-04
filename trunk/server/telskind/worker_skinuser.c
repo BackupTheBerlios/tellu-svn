@@ -14,7 +14,10 @@ char *listUser(struct threadInfo * ti) {
 char *pullUser(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -40,23 +43,17 @@ char *searchUser(struct threadInfo * ti) {
 char *newUser(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_OPTION].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
 	}
 
 	// Create new user
-	return(fetchUser(4, QUERY_TYPE_ROUND, ti));
+	return(fetchUser(4, QUERY_TYPE_PUSH, ti));
 }
 
-char *pushUser(struct threadInfo * ti) {
+char *pushOwnUser(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
@@ -65,8 +62,24 @@ char *pushUser(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Modify existing user
+	// Modify own user
 	return(fetchUser(5, QUERY_TYPE_PUSH, ti));
+}
+
+char *pushUserUser(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Modify existing user
+	return(fetchUser(6, QUERY_TYPE_PUSH, ti));
 }
 
 char *deleteUser(struct threadInfo * ti) {
@@ -79,7 +92,10 @@ char *deleteUser(struct threadInfo * ti) {
 	}
 
 	// Delete existing user
-	return(fetchUser(6, QUERY_TYPE_PUSH, ti));
+	fetchUser(9, QUERY_TYPE_PUSH, ti);
+	fetchUser(8, QUERY_TYPE_PUSH, ti);
+
+	return(fetchUser(7, QUERY_TYPE_PUSH, ti));
 }
 
 char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
@@ -199,6 +215,14 @@ char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
 		// Construct SQL statement for requested item
 		switch(getThis) {
 			case 1:
+				// List all users
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT DISTINCT " TABLEKEY_USER_LIST " FROM " TABLE_USERS " ORDER BY %s%c",
+					ti->commandInfo.esc4Buffer,
+					0
+				);
 
 				break;
 			case 2:
@@ -280,10 +304,18 @@ char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
 
 				break;
 			case 4:
+				// Create new user
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_USERS " (" TABLECOL_USER_UID ") VALUES('%s')%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
 
 				break;
 			case 5:
-				// Modify existing user
+				// Modify own user
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
@@ -296,6 +328,49 @@ char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
 
 				break;
 			case 6:
+				// Modify existing user
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_USERS " SET %s = '%s' WHERE " TABLECOL_USER_UID " = '%s'%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc5Buffer,
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 7:
+				// Delete existing user
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 8:
+				// Delete existing user privileges
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_PERM_NODES " WHERE " TABLECOL_USER_USID " IN (SELECT DISTINCT " TABLECOL_USER_ID " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " = '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 9:
+				// Delete existing user sessions
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_SESSION " WHERE " TABLECOL_SESSION_UID " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
 
 				break;
 			default:

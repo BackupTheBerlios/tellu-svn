@@ -12,6 +12,7 @@ sub editDisposedDeviceNode {
 	my ($arg) = @_;
 
 	if($q->param('restore') == 1) {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => "disposed", option => "0" });
 
 		if(checkError({ packet => \@r }) != 0) {
@@ -20,12 +21,16 @@ sub editDisposedDeviceNode {
 			if($SESSION_ERR && $SESSION_ERR ne "") {
 				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 			}
+
+			$er++;
 		}
-		else {
-			$PAGE .= "Device is restored.</p>";
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 		}
 	}
 	elsif($q->param('disposed') == 2) {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pushDevice", item => $arg->{node}, domain => "", param => "disposed", option => "2" });
 
 		if(checkError({ packet => \@r }) != 0) {
@@ -34,9 +39,12 @@ sub editDisposedDeviceNode {
 			if($SESSION_ERR && $SESSION_ERR ne "") {
 				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 			}
+
+			$er++;
 		}
-		else {
-			$PAGE .= "Device is disposed permanently.</p>";
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 		}
 	}
 	else {

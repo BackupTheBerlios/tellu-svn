@@ -398,29 +398,6 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_files_map (
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS tellu3.skin_groups (
-	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# group id
-	name		VARCHAR(64),						# group name
-	descr		TEXT NOT NULL,						# group description
-	note		LONGTEXT NOT NULL,					# notes of this group
-
-	PRIMARY KEY	(id),
-	INDEX		(id),
-	INDEX		(name)
-);
-
-INSERT INTO skin_groups (name, descr) VALUES('admins', 'Administrators');
-INSERT INTO skin_groups (name, descr) VALUES('guests', 'Guests');
-INSERT INTO skin_groups (name, descr) VALUES('users', 'Users');
-
-CREATE TABLE IF NOT EXISTS tellu3.skin_groups_map (
-	user_id		BIGINT UNSIGNED NOT NULL,				# id to skin_users table
-	group_id	BIGINT UNSIGNED NOT NULL,				# id to skin_groups table
-
-	INDEX		u_id (user_id), FOREIGN KEY (user_id) REFERENCES skin_users(id) ON DELETE CASCADE,
-	INDEX		g_id (group_id), FOREIGN KEY (group_id) REFERENCES skin_groups(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS tellu3.skin_help (
 	name		VARCHAR(64),						# page name
 	title		VARCHAR(255),						# page title
@@ -13737,6 +13714,12 @@ INSERT INTO skin_misc (class, value, place, title) VALUES('month', '9', '9', 'Se
 INSERT INTO skin_misc (class, value, place, title) VALUES('month', '10', '10', 'October');
 INSERT INTO skin_misc (class, value, place, title) VALUES('month', '11', '11', 'November');
 INSERT INTO skin_misc (class, value, place, title) VALUES('month', '12', '12', 'December');
+INSERT INTO skin_misc (class, value, place, title) VALUES('perm', '2', '1', 'Read');
+INSERT INTO skin_misc (class, value, place, title) VALUES('perm', '4', '2', 'Read/Modify');
+INSERT INTO skin_misc (class, value, place, title) VALUES('perm', '8', '3', 'Read/Modify/Delete');
+INSERT INTO skin_misc (class, value, place, title) VALUES('perm', '16', '4', 'Read/Modify/Delete/Restore');
+INSERT INTO skin_misc (class, value, place, title) VALUES('perm', '32', '5', 'Supervisor');
+INSERT INTO skin_misc (class, value, place, title) VALUES('perm', '64', '6', 'Administrator');
 INSERT INTO skin_misc (class, value, place, title) VALUES('popup_size', '200x320', '1', 'Portrait, 200 x 320 pixels');
 INSERT INTO skin_misc (class, value, place, title) VALUES('popup_size', '320x480', '2', 'Portrait, 320 x 480');
 INSERT INTO skin_misc (class, value, place, title) VALUES('popup_size', '480x640', '3', 'Portrait, 480 x 640');
@@ -13850,22 +13833,6 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_peripherals_map (
 	INDEX		d_id (devices_id), FOREIGN KEY (devices_id) REFERENCES skin_devices(id) ON DELETE CASCADE,
 	INDEX		p_id (peripherals_id), FOREIGN KEY (peripherals_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS tellu3.skin_perm (
-	perm		BIGINT UNSIGNED NOT NULL,				# permission bit
-	name		VARCHAR(64),						# permission name
-	descr		TEXT NOT NULL,						# permission description
-	note		LONGTEXT NOT NULL,					# notes of this permission
-
-	INDEX		(name)
-);
-
-INSERT INTO skin_perm (perm, name) VALUES('2', 'Read');
-INSERT INTO skin_perm (perm, name) VALUES('4', 'Write');
-INSERT INTO skin_perm (perm, name) VALUES('8', 'Delete');
-INSERT INTO skin_perm (perm, name) VALUES('16', 'Restore');
-INSERT INTO skin_perm (perm, name) VALUES('32', 'Supervisor');
-INSERT INTO skin_perm (perm, name) VALUES('64', 'Admin');
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_perm_nodes (
 	user_id		BIGINT UNSIGNED NOT NULL,				# user id
@@ -25028,18 +24995,11 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_users (
 	INDEX		(password)
 );
 
-INSERT INTO skin_users (name, gecos, homepage, password) VALUES('admin', 'System Administrator', 'machine', SHA('admin'));
-INSERT INTO skin_users (name, gecos, homepage, password) VALUES('guest', 'System Guest', 'machine', SHA('guest'));
+INSERT INTO skin_users (name, gecos, password) VALUES('admin', 'System Administrator', SHA('admin'));
+INSERT INTO skin_users (name, gecos, password) VALUES('guest', 'System Guest', SHA('guest'));
 
 #
-# Initialize default group memberships
+# Initialize default permissions
 #
-INSERT INTO skin_groups_map (user_id, group_id) SELECT skin_users.id, skin_groups.id FROM skin_users, skin_groups WHERE skin_users.name='admin' AND skin_groups.name='admins';
-INSERT INTO skin_groups_map (user_id, group_id) SELECT skin_users.id, skin_groups.id FROM skin_users, skin_groups WHERE skin_users.name='guest' AND skin_groups.name='guests';
-
-#
-# Initialize default permission tables
-#
-INSERT INTO skin_perm_nodes (user_id) SELECT skin_users.id FROM skin_users WHERE skin_users.name='admin';
-INSERT INTO skin_perm_nodes (user_id) SELECT skin_users.id FROM skin_users WHERE skin_users.name='guest';
-UPDATE skin_perm_nodes SET node='', domain='', grp='', perm='64' WHERE user_id IN (SELECT id FROM skin_users WHERE name='admin');
+INSERT INTO skin_perm_nodes (user_id,node,domain,grp,perm) VALUES((SELECT skin_users.id FROM skin_users WHERE skin_users.name='admin'), '', '', '', 64);
+INSERT INTO skin_perm_nodes (user_id,node,domain,grp,perm) VALUES((SELECT skin_users.id FROM skin_users WHERE skin_users.name='guest'), '', '', '', 2);

@@ -12,6 +12,7 @@ sub editMachineNew {
 	my ($arg) = @_;
 
 	if($q->param('verb') && $q->param('verb') eq "create") {
+		my $er = 0;
 		my $nd = "";
 		my $dn = "";
 
@@ -55,11 +56,15 @@ sub editMachineNew {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
 
-				$PAGE .= "<p class=\"info\">" . $nd . "." . $dn . " is created.</p>";
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
 			}
 		}
 	}
@@ -359,6 +364,8 @@ sub editMachineNode {
 			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
 			if($s[0] && $s[0] != 0) {
+				my $er = 0;
+
 				if($q->param('verb') eq "attdev") {
 					if($q->param('where') && $q->param('where') eq "global") {
 						@r = &sendCommand({ command => "attachGlobalDevice", item => $q->param('attr'), domain => "", param => "", option => "" });
@@ -369,9 +376,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Device is attached to all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -383,9 +389,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Device is attached to all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -397,10 +402,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Device is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "remdev") {
@@ -413,9 +421,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Device is detached from all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -427,9 +434,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Device is detached from all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -441,10 +447,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Device is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "attper") {
@@ -457,9 +466,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Peripheral is attached to all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -471,9 +479,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Peripheral is attached to all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -485,10 +492,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Peripheral is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "remper") {
@@ -501,9 +511,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Peripheral is detached from all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -515,9 +524,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Peripheral is detached from all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -529,10 +537,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Peripheral is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "attser") {
@@ -545,9 +556,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Service is attached to all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -559,9 +569,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Service is attached to all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -573,10 +582,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Service is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "remser") {
@@ -589,9 +601,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Service is detached from all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -603,9 +614,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Service is detached from all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -617,10 +627,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Service is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "attpwd") {
@@ -633,9 +646,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Password is attached to all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -647,9 +659,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Password is attached to all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -661,10 +672,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Password is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "rempwd") {
@@ -677,9 +691,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Password is detached from all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -691,9 +704,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Password is detached from all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -705,10 +717,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Password is detached from " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "attatt") {
@@ -721,9 +736,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Attachment is attached to all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -735,9 +749,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Attachment is attached to all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -749,10 +762,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Attachment is attached to " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "rematt") {
@@ -765,9 +781,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Attachment is detached from all machines globally.</p>";
+
+							$er++;
 						}
 					}
 					elsif($q->param('where') && $q->param('where') eq "domain") {
@@ -779,9 +794,8 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
-						}
-						else {
-							$PAGE .= "<p class=\"info\">Attachment is detached from all machines in " . $arg->{domain} . ".</p>";
+
+							$er++;
 						}
 					}
 					else {
@@ -793,10 +807,13 @@ sub editMachineNode {
 							if($SESSION_ERR && $SESSION_ERR ne "") {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
+
+							$er++;
 						}
-						else {
-							$PAGE .= "<p class=\"info\">Attachment is detached fom " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-						}
+					}
+
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
 				elsif($q->param('verb') eq "ping") {
@@ -848,7 +865,26 @@ sub editMachineNode {
 		}
 	}
 
-	if($q->param('verb') && $q->param('verb') eq "update") {
+	if($q->param('disposed') == 1) {
+		my $er = 0;
+		my @r = &sendCommand({ command => "deleteMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose " . $arg->{node} . "." . $arg->{domain} . ".</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+
+			$er++;
+		}
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "update") {
+		my $er = 0;
 		my @r = ();
 		my @i = ('model', 'descr', 'sernum', 'secnum', 'location', 'warranty', 'addinfo');
 
@@ -868,13 +904,18 @@ sub editMachineNode {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
 
+				$er++;
+
 				last;
 			}
 		}
 
-		$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . " is updated.</p>";
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "service") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -904,6 +945,8 @@ sub editMachineNode {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
@@ -921,27 +964,16 @@ sub editMachineNode {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . " is updated.</p>";
-		}
-	}
-
-	if($q->param('disposed') == 1) {
-		my @r = &sendCommand({ command => "deleteMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
-
-		if(checkError({ packet => \@r }) != 0) {
-			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose " . $arg->{node} . "." . $arg->{domain} . ".</p>";
-
-			if($SESSION_ERR && $SESSION_ERR ne "") {
-				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
-		}
-		else {
-			$PAGE .= "<p class=\"info\">" . $arg->{node} . "." . $arg->{domain} . " is disposed.</p>";
 		}
 	}
 	else {
@@ -2290,6 +2322,7 @@ sub editMachineNote {
 	my @l = ('Review existing notes', 'Add new note');
 
 	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -2307,6 +2340,12 @@ sub editMachineNote {
 				if($SESSION_ERR && $SESSION_ERR ne "") {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
+
+				$er++;
+			}
+
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
 		}
 	}

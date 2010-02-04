@@ -12,6 +12,7 @@ sub editProviderNew {
 	my ($arg) = @_;
 
 	if($q->param('verb') && $q->param('verb') eq "create") {
+		my $er = 0;
 		my $na = "";
 		my $st = "";
 		my $zi = "";
@@ -80,11 +81,15 @@ sub editProviderNew {
 								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 							}
 
+							$er++;
+
 							last;
 						}
 					}
 
-					$PAGE .= "<p class=\"info\">New service provider '" . $na . "' created.</p>";
+					if($er == 0) {
+						&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+					}
 				}
 				else {
 					$PAGE .= "<p class=\"warning\">Error occurred while trying to create new service provider.</p>";
@@ -470,7 +475,26 @@ sub editProviderNode {
 
 	my @l = ('Service provider info');
 
-	if($q->param('verb') && $q->param('verb') eq "update") {
+	if($q->param('disposed') == 1) {
+		my $er = 0;
+		my @r = &sendCommand({ command => "deleteProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose service provider.</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+
+			$er++;
+		}
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "update") {
+		my $er = 0;
 		my $na = "";
 		my $st = "";
 		my $zi = "";
@@ -535,11 +559,15 @@ sub editProviderNode {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
 
-				$PAGE .= "<p class=\"info\">Service provider '" . $na . "' is updated.</p>";
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
 			}
 			else {
 				$PAGE .= "<p class=\"warning\">Error occurred while trying to update service provider.</p>";
@@ -548,21 +576,6 @@ sub editProviderNode {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
 			}
-		}
-	}
-
-	if($q->param('disposed') == 1) {
-		my @r = &sendCommand({ command => "deleteProvider", item => $arg->{node}, domain => "", param => "", option => "" });
-
-		if(checkError({ packet => \@r }) != 0) {
-			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose service provider.</p>";
-
-			if($SESSION_ERR && $SESSION_ERR ne "") {
-				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
-			}
-		}
-		else {
-			$PAGE .= "<p class=\"info\">Service provider is disposed.</p>";
 		}
 	}
 	else {
@@ -968,6 +981,7 @@ sub editProviderNote {
 	my @l = ('Review existing notes', 'Add new note');
 
 	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -985,6 +999,12 @@ sub editProviderNote {
 				if($SESSION_ERR && $SESSION_ERR ne "") {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
+
+				$er++;
+			}
+
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
 		}
 	}

@@ -12,6 +12,7 @@ sub editPeripheralNew {
 	my ($arg) = @_;
 
 	if($q->param('verb') && $q->param('verb') eq "create") {
+		my $er = 0;
 		my $ca = "";
 		my $ma = "";
 		my $mo = "";
@@ -85,11 +86,15 @@ sub editPeripheralNew {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
 
-				$PAGE .= "<p class=\"info\">New " . $ca . " '" . $ma . "/" . $mo . "' created.</p>";
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
 			}
 			else {
 				$PAGE .= "<p class=\"warning\">Error occurred while trying to create new peripheral.</p>";
@@ -443,6 +448,7 @@ sub editPeripheralNode {
 		@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
+			my $er = 0;
 			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
 
 			if($q->param('verb') eq "attdev") {
@@ -455,9 +461,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is attached to all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -469,10 +474,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is attached to " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "remdev") {
@@ -485,9 +493,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is detached from all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -499,10 +506,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is detached from " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "attper") {
@@ -515,9 +525,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is attached to all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -529,10 +538,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is attached to " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "remper") {
@@ -545,9 +557,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is detached from all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -559,10 +570,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Peripheral is detached from " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "attser") {
@@ -575,9 +589,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Service is attached to all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -589,10 +602,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Service is attached to " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "remser") {
@@ -605,9 +621,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Service is detached from all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -619,10 +634,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Service is detached from " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "attpwd") {
@@ -635,9 +653,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Password is attached to all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -649,10 +666,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Password is attached to " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "rempwd") {
@@ -665,9 +685,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Password is detached from all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -679,10 +698,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Password is detached from " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "attatt") {
@@ -695,9 +717,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Attachment is attached to all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -709,10 +730,13 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Attachment is attached to " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 			elsif($q->param('verb') eq "rematt") {
@@ -725,9 +749,8 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
-					}
-					else {
-						$PAGE .= "<p class=\"info\">Attachment is detached from all peripherals globally.</p>";
+
+						$er++;
 					}
 				}
 				else {
@@ -739,16 +762,38 @@ sub editPeripheralNode {
 						if($SESSION_ERR && $SESSION_ERR ne "") {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
+
+						$er++;
 					}
-					else {
-						$PAGE .= "<p class=\"info\">Attachment is detached fom " . $s[7] . " " . $s[5] . ".</p>";
-					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 				}
 			}
 		}
 	}
 
-	if($q->param('verb') && $q->param('verb') eq "update") {
+	if($q->param('disposed') == 1) {
+		my $er = 0;
+		my @r = &sendCommand({ command => "deletePeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose peripheral.</p>";
+
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			}
+
+			$er++;
+		}
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+		}
+	}
+	elsif($q->param('verb') && $q->param('verb') eq "update") {
+		my $er = 0;
 		my $ca = "";
 		my $ma = "";
 		my $mo = "";
@@ -818,14 +863,19 @@ sub editPeripheralNode {
 						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 					}
 
+					$er++;
+
 					last;
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Peripheral " . $ca . " '" . $ma . "/" . $mo . "' is updated.</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+			}
 		}
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "service") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -855,6 +905,8 @@ sub editPeripheralNode {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
@@ -872,27 +924,16 @@ sub editPeripheralNode {
 							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 						}
 
+						$er++;
+
 						last;
 					}
 				}
 			}
 
-			$PAGE .= "<p class=\"info\">Peripheral " . $s[6] . " '" . $s[7] . "/" . $s[5] . "' is updated.</p>";
-		}
-	}
-
-	if($q->param('disposed') == 1) {
-		my @r = &sendCommand({ command => "deletePeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
-
-		if(checkError({ packet => \@r }) != 0) {
-			$PAGE .= "<p class=\"warning\">Error occurred while trying to dispose peripheral.</p>";
-
-			if($SESSION_ERR && $SESSION_ERR ne "") {
-				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
-		}
-		else {
-			$PAGE .= "<p class=\"info\">Peripheral is disposed.</p>";
 		}
 	}
 	else {
@@ -2261,6 +2302,7 @@ sub editPeripheralNote {
 	my @l = ('Review existing notes', 'Add new note');
 
 	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
+		my $er = 0;
 		my @r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
@@ -2278,6 +2320,12 @@ sub editPeripheralNote {
 				if($SESSION_ERR && $SESSION_ERR ne "") {
 					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 				}
+
+				$er++;
+			}
+
+			if($er == 0) {
+				&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 			}
 		}
 	}

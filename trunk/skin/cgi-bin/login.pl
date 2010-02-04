@@ -38,7 +38,7 @@ if($q->param('uid')) {
 		$PAGE .= "<p>&nbsp;</p>";
 		$PAGE .= "<p>If page is not redirected automatically, please click <a href=\"" . $p . ".pl\">here</a>.</p>";
 
-		&htmlPage({ template => "login", redirect => $p, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU, cookie => \@c });
+		&htmlPage({ template => "login", redirect => $p . ".pl", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU, cookie => \@c });
 	}
 }
 else {

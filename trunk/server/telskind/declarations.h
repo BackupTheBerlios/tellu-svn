@@ -153,6 +153,13 @@ extern char *changeOwnPassword(struct threadInfo *);
 extern char *changeUserPassword(struct threadInfo *);
 extern char *isAuthLDAP(struct threadInfo *);
 extern char *isUserAdmin(struct threadInfo *);
+extern char *pullPrivilegeLevel(struct threadInfo *);
+extern char *newPrivilegeLevel(struct threadInfo *);
+extern char *newDefaultPrivilegeLevel(struct threadInfo *);
+extern char *pushPrivilegeLevel(struct threadInfo *);
+extern char *pushDefaultPrivilegeLevel(struct threadInfo *);
+extern char *checkDefaultPrivilegeLevel(struct threadInfo *);
+extern char *deletePrivilegeLevel(struct threadInfo *);
 extern char *fetchAccess(int, int, struct threadInfo *);
 
 // worker_device.c
@@ -349,21 +356,13 @@ extern char *listDisposedProvider(struct threadInfo *);
 extern char *fetchService(int, int, struct threadInfo *);
 extern char *fetchProvider(int, int, struct threadInfo *);
 
-// worker_skingroup.c
-extern char *listGroup(struct threadInfo *);
-extern char *pullGroup(struct threadInfo *);
-extern char *searchGroup(struct threadInfo *);
-extern char *newGroup(struct threadInfo *);
-extern char *pushGroup(struct threadInfo *);
-extern char *deleteGroup(struct threadInfo *);
-extern char *fetchGroup(int, int, struct threadInfo *);
-
 // worker_skinuser.c
 extern char *listUser(struct threadInfo *);
 extern char *pullUser(struct threadInfo *);
 extern char *searchUser(struct threadInfo *);
 extern char *newUser(struct threadInfo *);
-extern char *pushUser(struct threadInfo *);
+extern char *pushOwnUser(struct threadInfo *);
+extern char *pushUserUser(struct threadInfo *);
 extern char *deleteUser(struct threadInfo *);
 extern char *fetchUser(int, int, struct threadInfo *);
 

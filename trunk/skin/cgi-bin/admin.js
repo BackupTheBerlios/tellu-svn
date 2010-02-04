@@ -15,10 +15,10 @@ sub adminModifyFuncs {
 
 	$r .= "function toggleUpdateButton(param) {" . $CONFIG_LINEFEED;
 	$r .= " if(document." . $arg->{form} . ".disposed.checked) {" . $CONFIG_LINEFEED;
-	$r .= "  document." . $arg->{form} . ".submit.value = 'Dispose';" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".submit2.value = 'Dispose';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= " else {" . $CONFIG_LINEFEED;
-	$r .= "  document." . $arg->{form} . ".submit.value = 'Update';" . $CONFIG_LINEFEED;
+	$r .= "  document." . $arg->{form} . ".submit2.value = 'Update';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
 

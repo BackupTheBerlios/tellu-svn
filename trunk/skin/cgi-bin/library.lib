@@ -10,7 +10,7 @@ if($pack eq "" && $f eq "" && $line eq "") {
 
 sub headPrepare {
 	$SELF = $0;
-	$SELF =~ s/^.*\///;
+	$SELF =~ s/^.*\/|^.*\\//;
 	$CALLER = $SELF;
 	$CALLER =~ s/\..*$//;
 
@@ -21,7 +21,7 @@ sub headPrepare {
 	$SESSION_ERR = "";
 
 	if($ENV{'REMOTE_USER'}) {
-		if($ENV{'REMOTE_USER'} eq "") {
+		if(!$ENV{'REMOTE_USER'} || $ENV{'REMOTE_USER'} eq "") {
 			$SESSION_UID = "dummy";
 		}
 		else {
@@ -509,7 +509,7 @@ sub htmlPage {
 
 	if($arg->{cookie}) {
 		if($arg->{redirect}) {
-			print STDOUT $q->header( -location => $arg->{redirect} . ".pl", -status => "302", -type => $HTML_CONTYPE, -charset => $HTML_CHARSET, -cookie => $arg->{cookie} );
+			print STDOUT $q->header( -location => $arg->{redirect}, -status => "302", -type => $HTML_CONTYPE, -charset => $HTML_CHARSET, -cookie => $arg->{cookie} );
 		}
 		else {
 			print STDOUT $q->header( -type => $HTML_CONTYPE, -charset => $HTML_CHARSET, -cookie => $arg->{cookie} );
@@ -517,7 +517,7 @@ sub htmlPage {
 	}
 	else {
 		if($arg->{redirect}) {
-			print STDOUT $q->header( -location => $arg->{redirect} . ".pl", -status => "302", -type => $HTML_CONTYPE, -charset => $HTML_CHARSET );
+			print STDOUT $q->header( -location => $arg->{redirect}, -status => "302", -type => $HTML_CONTYPE, -charset => $HTML_CHARSET );
 		}
 		else {
 			print STDOUT $q->header( -type => $HTML_CONTYPE, -charset => $HTML_CHARSET );
