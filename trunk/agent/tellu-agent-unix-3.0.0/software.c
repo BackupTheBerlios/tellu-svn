@@ -14,6 +14,7 @@
 char *softGetInstalled(struct paramInfo * pi) {
 #if defined(__linux__)
 	int i, l, r, o;
+	unsigned long long p;
 
 	char *newBuffer, *tmpBuffer;
 	char *endLine, *thisLine;
@@ -163,6 +164,14 @@ char *softGetInstalled(struct paramInfo * pi) {
 							}
 
 							strncpy(newStore.size, endLine, t);
+
+							// Convert rpm package size to kilobytes
+							if(newStore.type == PACK_TYPE_RPM) {
+								p = (unsigned long long) atoll(newStore.size);
+								p /= 1000;
+
+								snprintf(newStore.size, sizeof(newStore.size), "%llu%c", p, 0);
+							}
 
 							endLine = strchr(endLine, '\t');
 							endLine++;
