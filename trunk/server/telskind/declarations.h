@@ -154,6 +154,7 @@ extern char *changeUserPassword(struct threadInfo *);
 extern char *isAuthLDAP(struct threadInfo *);
 extern char *isUserAdmin(struct threadInfo *);
 extern char *pullPrivilegeLevel(struct threadInfo *);
+extern char *pullDomainPrivilegeLevel(struct threadInfo *);
 extern char *newPrivilegeLevel(struct threadInfo *);
 extern char *newDefaultPrivilegeLevel(struct threadInfo *);
 extern char *pushPrivilegeLevel(struct threadInfo *);

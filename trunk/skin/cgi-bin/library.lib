@@ -419,16 +419,26 @@ sub htmlSelectRadio {
 	my ($arg) = @_;
 
 	my $r = "";
+	my $s = "";
 
 	if(!$arg->{columns}) {
 		$arg->{columns} = $HTMLRADIO_COLUMNS;
 	}
 
+	if($arg->{suffix}) {
+		$s = $arg->{suffix};
+	}
+
 	if($arg->{disabled}) {
-		$r = $q->radio_group( -id => "radio", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns}, -disabled => $arg->{disabled} );
+		$r = $q->radio_group( -id => "radio" . $s, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns}, -disabled => $arg->{disabled} );
 	}
 	else {
-		$r = $q->radio_group( -id => "radio", -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns} );
+		if($arg->{onclick}) {
+			$r = $q->radio_group( -id => "radio" . $s, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns}, -onclick => $arg->{onclick} );
+		}
+		else {
+			$r = $q->radio_group( -id => "radio" . $s, -name => $arg->{name}, -values => $arg->{value}, -labels => $arg->{label}, -default => $arg->{select}, -columns => $arg->{columns} );
+		}
 	}
 
 	return $r;

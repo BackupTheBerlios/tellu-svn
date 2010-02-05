@@ -1049,6 +1049,175 @@ sub editAdminUser {
 	}
 }
 
+sub editAdminPrivileges {
+	my ($arg) = @_;
+
+	my @r = ();
+
+	if($q->param('submit2') && $q->param('submit2') eq "Update") {
+		my $er = 0;
+
+		for(my $i = 1; ; $i++) {
+			if(!$q->param('domain' . $i) || $q->param('domain' . $i) eq "") {
+				last;
+			}
+
+			@r = &sendCommand({ command => "pushPrivilegeLevel", item => $q->param('select'), domain => "", param => $q->param('domain' . $i), option => $q->param('radio' . $i) });
+
+			if(checkError({ packet => \@r }) != 0) {
+				$er++;
+
+				last;
+			}
+		}
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF . "?action=admin&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+		}
+	}
+
+	my @o = ();
+	my @t = ();
+	my %l = ();
+	my $m = "";
+	my $p = "";
+
+	@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "perm", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		if($r[3] && $r[3] ne "") {
+			foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+				my ($f, $g) = split(/$ITEM_SEPARATOR/, $e);
+
+				if($f < 32) {
+					push @t, $f;
+					$l{$f} = "";
+				}
+			}
+		}
+	}
+
+	@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		foreach my $e (split(/$ITEM_DELIMITER/, $r[3])) {
+			$e =~ s/$ITEM_SEPARATOR$//;
+
+			push @o, $e;
+		}
+	}
+
+	@r = &sendCommand({ command => "pullPrivilegeLevel", item => $q->param('select'), domain => "", param => "perm", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		my $p = 2;
+		my $s = 0;
+
+		$p = $r[3] if($r[3] && $r[3] ne "");
+		$p = 16 if($p > 16);
+
+		my $ev = 0;
+		my $i = 1;
+		my $c = @t;
+		my $d = "";
+
+		$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\" width=\"10%\"><a href=\"#\">Selection</a></td>";
+		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\" width=\"20%\"><a href=\"#\">Privilege</a></td>";
+		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"#\">Domain</a></td>";
+		$PAGE .= "</tr>";
+
+		if(@o) {
+			while(@o) {
+				$d = shift(@o);
+
+				@r = &sendCommand({ command => "pullDomainPrivilegeLevel", item => $q->param('select'), domain => "", param => $d, option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					$s = $p;
+
+					if($r[3] && $r[3] ne "") {
+						$s = $r[3];
+					}
+					else {
+						@r = &sendCommand({ command => "newPrivilegeLevel", item => $q->param('select'), domain => "", param => $d, option => $s });
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+
+					if($ev == 0) {
+						$PAGE .= "<td class=\"c2\">" . &htmlSelectRadio({ name => "radio" . $i, value => \@t, label => \%l, select => $s, columns => $c, suffix => $i, onclick => "togglePrivilegeName('p" . $i . "', 'radio" . $i . "'); return true;" }) . "</td>";
+						$PAGE .= "<td id=\"p" . $i . "\" class=\"c2\" valign=\"middle\">";
+
+						if($s == 2) {
+							$PAGE .= "Read";
+						}
+						elsif($s == 4) {
+							$PAGE .= "Read/Modify";
+						}
+						elsif($s == 8) {
+							$PAGE .= "Read/Modify/Delete";
+						}
+						elsif($s == 16) {
+							$PAGE .= "Read/Modify/Delete/Restore";
+						}
+						else {
+							$PAGE .= "No access";
+						}
+
+						$PAGE .= "</td>";
+						$PAGE .= "<td class=\"c2\" valign=\"middle\">" . $d . "</td>";
+					}
+					else {
+						$PAGE .= "<td class=\"c1\">" . &htmlSelectRadio({ name => "radio" . $i, value => \@t, label => \%l, select => $s, columns => $c, suffix => $i, onclick => "togglePrivilegeName('p" . $i . "', 'radio" . $i . "'); return true;" }) . "</td>";
+						$PAGE .= "<td id=\"p" . $i . "\" class=\"c1\" valign=\"middle\">";
+
+						if($s == 2) {
+							$PAGE .= "Read";
+						}
+						elsif($s == 4) {
+							$PAGE .= "Read/Modify";
+						}
+						elsif($s == 8) {
+							$PAGE .= "Read/Modify/Delete";
+						}
+						elsif($s == 16) {
+							$PAGE .= "Read/Modify/Delete/Restore";
+						}
+						else {
+							$PAGE .= "No access";
+						}
+
+						$PAGE .= "</td>";
+						$PAGE .= "<td class=\"c1\" valign=\"middle\">" . $d . "</td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= &htmlHiddenField({ name => "domain" . $i, value => $d });
+
+					$ev ^= 1;
+
+					$i++;
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= &htmlButtonSubmit({ name => "submit2", value => "Update" });
+		}
+		else {
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td class=\"c2\">n/a</td><td class=\"c2\">n/a</td><td class=\"c2\">n/a</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "</table>";
+		}
+	}
+}
+
 sub editAdminService {
 	my ($arg) = @_;
 

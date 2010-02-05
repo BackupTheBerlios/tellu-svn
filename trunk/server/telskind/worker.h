@@ -183,6 +183,7 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_READ, "isAuthLDAP", NULL, isAuthLDAP, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "isUserAdmin", NULL, isUserAdmin, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullPrivilegeLevel", NULL, pullPrivilegeLevel, replyFree },
+	{ PRIVILEGE_LEVEL_SUPERVISOR, "pullDomainPrivilegeLevel", NULL, pullDomainPrivilegeLevel, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "newPrivilegeLevel", NULL, newPrivilegeLevel, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "newDefaultPrivilegeLevel", NULL, newDefaultPrivilegeLevel, replyFree },
 	{ PRIVILEGE_LEVEL_SUPERVISOR, "pushPrivilegeLevel", NULL, pushPrivilegeLevel, replyFree },
