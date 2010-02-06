@@ -315,6 +315,7 @@
 #define TABLEKEY_MACHINE_PORT "node_id,tcp"
 #define TABLEKEY_MACHINE_PROC "node_id,cmdline,name,state,pid,ppid,threads,vmdata,vmexe,vmhwm,vmlib,vmpeak,vmpte,vmrss,vmsize,vmstk,rchar,wchar,syscr,syscw,rbyte,wbyte,uid,gid"
 #define TABLEKEY_MACHINE_RUN "node_id,procs,threads"
+#define TABLEKEY_MACHINE_USER "node_id,uid,grp,gecos,homedir"
 #define TABLEKEY_MACHINE_UTIL "node_id,load1,load2,load3,uptime1,uptime2"
 #define TABLEKEY_MACHINE_SOFTWARE "node_id,type,name,version,size,url"
 #define TABLEKEY_MACHINE_SYSTEM "node_id,bbmanufacturer,bbproduct,bbversion,sysfamily,sysmanufacturer,sysproduct,sysversion"

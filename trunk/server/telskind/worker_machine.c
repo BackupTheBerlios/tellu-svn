@@ -509,6 +509,14 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						0
+					);
+				}
 				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_UTIL) == 0) {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -631,6 +639,15 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLEKEY_MACHINE_RUN " FROM " TABLECOL_MACHINE_RUN " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc3Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
 						ti->commandInfo.esc3Buffer,
 						0
 					);
@@ -769,6 +786,16 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLEKEY_MACHINE_RUN " FROM " TABLECOL_MACHINE_RUN " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc3Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc3Buffer,
 						0
@@ -1328,6 +1355,14 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DISPOSED " = '1')%c",
+						0
+					);
+				}
 				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_UTIL) == 0) {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -1450,6 +1485,15 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLEKEY_MACHINE_RUN " FROM " TABLECOL_MACHINE_RUN " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1')%c",
+						ti->commandInfo.esc3Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1')%c",
 						ti->commandInfo.esc3Buffer,
 						0
 					);
@@ -1588,6 +1632,16 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLEKEY_MACHINE_RUN " FROM " TABLECOL_MACHINE_RUN " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc3Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1')%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc3Buffer,
 						0
@@ -2108,6 +2162,15 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
 				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_UTIL) == 0) {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -2242,6 +2305,15 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLEKEY_MACHINE_RUN " FROM " TABLECOL_MACHINE_RUN " WHERE " TABLECOL_MACHINE_NID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer, TABLECOL_MACHINE_USER) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLEKEY_MACHINE_USER " FROM " TABLECOL_MACHINE_USER " WHERE " TABLECOL_MACHINE_NID " = '%s'%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
