@@ -76,8 +76,8 @@
 <p>Once you have all required libraries and headers reachable, you can build all server programs and <i>telmon</i> at once with following script seen below, here you need to tune paths to suit your environment. If you are using some common Linux distribution for example, setting `<i>/usr</i>' as a parameter for all those `<i>--with-*</i>' switches is probably enough.</p>
 
 <pre>
- tar -zxvf tellu-server-3.0.0.tar.gz
- cd tellu-server-3.0.0
+ $ tar -zxvf tellu-server-3.0.0.tar.gz
+ $ cd tellu-server-3.0.0
 
  for i in telinfo tellud telmon telmond telskind; do
 	(cd $i && ./configure \
@@ -89,6 +89,26 @@
 		make clean && make && make install ) || exit 1 ;
  done
 </pre>
+
+<p>On <a href="http://en.wikipedia.org/wiki/Berkeley_Software_Distribution" target="_blank">BSD</a> you might want to do this:</p>
+
+<pre>
+ $ tar -zxvf tellu-server-3.0.0.tar.gz
+ $ cd tellu-server-3.0.0
+
+ for i in telinfo tellud telmon telmond telskind; do
+	(cd $i && ./configure \
+		--prefix=/usr/local \
+		--with-pthreads=/usr/local \
+		--with-mysql=/usr/local \
+		--with-openldap=/usr/local \
+		--with-motif=/usr/local \
+		--with-x11=/usr/local && \
+		make clean && make && make install ) || exit 1 ;
+ done
+</pre>
+
+<p><a href="http://www.netbsd.org" target="_blank">NetBSD</a> users should set `<i>/usr/pkg</i>' instead of `<i>/usr/local</i>'.</p>
 
 <p>If you don't want to use script above, remember that it is VERY important to run `<i>make clean</i>' before `<i>make</i>' and `<i>make install</i>', because there is some common source files shared between servers in `<i>common</i>' directory, and if some common file compiled for one server is linked to another it may cause fatal conflicts. So please always remember `<i>make clean</i>' before `<i>make</i>'.</p>
 
