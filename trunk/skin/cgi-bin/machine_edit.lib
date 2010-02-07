@@ -885,28 +885,60 @@ sub editMachineNode {
 	}
 	elsif($q->param('verb') && $q->param('verb') eq "update") {
 		my $er = 0;
+		my $dn = "";
 		my @r = ();
 		my @i = ('model', 'descr', 'sernum', 'secnum', 'location', 'warranty', 'addinfo');
 
-		if($q->param('acq_day') && $q->param('acq_day') ne "" && $q->param('acq_month') && $q->param('acq_month') ne "" && $q->param('acq_year') && $q->param('acq_year') ne "") {
-			my $ac = $q->param('acq_year') . "-" . $q->param('acq_month') . "-" . $q->param('acq_day') . " 00:00:00";
+		if($q->param('domain') && $q->param('domain') ne "") {
+			$dn = $q->param('domain');
+		}
+		elsif($q->param('ext_domain') && $q->param('ext_domain') ne "") {
+			$dn = $q->param('ext_domain');
+		}
+		else {
+			$PAGE .= "<p class=\"warning\">Machine domain cannot be empty.</p>";
 
-			@r = sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => 'acquired', option => $ac });
+			$er++;
 		}
 
-		foreach my $i (@i) {
-			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => $i, option => cleanHtml({ string => $q->param($i) }) });
+		if($er == 0) {
+			if($q->param('acq_day') && $q->param('acq_day') ne "" && $q->param('acq_month') && $q->param('acq_month') ne "" && $q->param('acq_year') && $q->param('acq_year') ne "") {
+				my $ac = $q->param('acq_year') . "-" . $q->param('acq_month') . "-" . $q->param('acq_day') . " 00:00:00";
 
-			if(checkError({ packet => \@r }) != 0) {
-				$PAGE .= "<p class=\"warning\">Error occurred while trying to update machine.</p>";
+				@r = sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => 'acquired', option => $ac });
+			}
 
-				if($SESSION_ERR && $SESSION_ERR ne "") {
-					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+			foreach my $i (@i) {
+				@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => $i, option => cleanHtml({ string => $q->param($i) }) });
+
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to update machine.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					$er++;
+
+					last;
 				}
+			}
 
-				$er++;
+			if($dn ne $arg->{domain}) {
+				@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => "domain", option => cleanHtml({ string => $dn }) });
 
-				last;
+				if(checkError({ packet => \@r }) != 0) {
+					$PAGE .= "<p class=\"warning\">Error occurred while trying to update machine.</p>";
+
+					if($SESSION_ERR && $SESSION_ERR ne "") {
+						$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+					}
+
+					$er++;
+				}
+				else {
+					&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
 			}
 		}
 
@@ -978,10 +1010,12 @@ sub editMachineNode {
 	}
 	else {
 		if(!$q->param('leaf') || $q->param('leaf') == 0) {
+			my @dn = ();
 			my @oa = ();
 			my @od = ();
 			my @oy = ();
 			my @wa = ();
+			my %dn = ();
 			my %ol = ();
 			my %wl = ();
 
@@ -1024,6 +1058,26 @@ sub editMachineNode {
 				}
 			}
 
+			@r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				foreach my $s (@s) {
+					my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+					$p[0] = cleanNull({ string => $p[0] });
+
+					$dn{$p[0]}++ if($p[0] ne "");
+				}
+			}
+
+			while((my $key, $val) = each %dn) {
+				push @dn, $key;
+			}
+
+			@dn = sort { uc($a) cmp uc($b) } @dn;
+
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
 
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
@@ -1058,6 +1112,26 @@ sub editMachineNode {
 				$s[8] = cleanNull({ string => $s[8] });
 				$s[17] = cleanNull({ string => $s[17] });
 				$s[18] = cleanNull({ string => $s[18] });
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Machine&nbsp;domain&nbsp;&sup1;:</td>";
+				$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "domain", value => $arg->{domain}, style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@dn) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing domain name", -values => \@dn, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_domain", value => \@t, select => $arg->{domain}, onchange => "toggleDomainField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
 
 				$PAGE .= "<tr class=\"top\">";
 				$PAGE .= "<td></td><td></td>";
@@ -1135,6 +1209,15 @@ sub editMachineNode {
 				$PAGE .= "<tr class=\"top\">";
 				$PAGE .= "<td align=\"right\">Additional&nbsp;info:</td>";
 				$PAGE .= "<td>" . &htmlInputField({ name => "addinfo", value => $s[17] }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"top\">";
