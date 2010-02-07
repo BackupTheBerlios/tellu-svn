@@ -3,8 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "declarations.h"
 #include "defines.h"

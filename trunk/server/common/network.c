@@ -3,9 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <netdb.h>
-#include <asm/param.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 

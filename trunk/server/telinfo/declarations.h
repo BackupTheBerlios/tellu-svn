@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+
 // cmdline.c
 extern void cmdRead(char **, int);
 

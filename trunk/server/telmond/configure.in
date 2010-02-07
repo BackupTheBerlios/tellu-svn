@@ -28,12 +28,13 @@ dnl
 AC_ARG_WITH(mysql,
 	[  --with-mysql=DIR        where MySQL is installed],
 	[CFLAGS=$CFLAGS" -I$withval/include -I$withval/include/mysql"
-		LDFLAGS=$LDFLAGS" -L$withval/lib"
+		LDFLAGS=$LDFLAGS" -L$withval/lib -L$withval/lib/mysql"
 		LIBS=$LIBS" -lmysqlclient"])
 AC_ARG_WITH(pthreads,
 	[  --with-pthreads=DIR     where POSIX threads is installed],
 	[CFLAGS=$CFLAGS" -I$withval/include"
-		LDFLAGS=$LDFLAGS" -L$withval/lib"])
+		LDFLAGS=$LDFLAGS" -L$withval/lib"
+		LIBS=$LIBS" -lpthread"])
 
 dnl
 dnl Checks for header files.
@@ -57,22 +58,6 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([gethostbyaddr gethostbyname gethostname gettimeofday inet_ntoa memset setlocale socket strchr strerror strncasecmp sysinfo uname])
-
-dnl
-dnl Checks for libraries.
-dnl
-AC_CHECK_LIB([pthread], [pthread_create],
-	[LIBS=$LIBS" -lpthread"],
-	[AC_CHECK_LIB([c_r], [pthread_create],
-		[LIBS=$LIBS" -lc_r"],
-		[AC_CHECK_LIB([pthreads -lpthread], [pthread_create],
-			[LIBS=$LIBS" -lpthreads -lpthread"],
-			AC_MSG_ERROR(telmond requires POSIX threads))
-		])
-	])
-AC_CHECK_LIB([mysqlclient], [mysql_init],
-	[],
-	AC_MSG_ERROR(telmond requires MySQL))
 
 dnl
 dnl Output Makefiles.

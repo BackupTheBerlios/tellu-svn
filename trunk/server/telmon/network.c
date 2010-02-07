@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <net/if.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 
 #include "declarations.h"
 #include "defines.h"
