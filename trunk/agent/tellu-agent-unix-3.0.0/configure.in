@@ -60,16 +60,6 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([gethostbyaddr gethostbyname gethostname getmntent inet_ntoa memset select socket strchr strerror strncasecmp strrchr sysinfo uname])
 
 dnl
-dnl Checks for libraries.
-dnl
-AC_CHECK_LIB([dbus-1], [dbus_bus_get],
-	[],
-	AC_MSG_ERROR(tellu requires DBus))
-AC_CHECK_LIB([hal], [libhal_ctx_new],
-	[],
-	AC_MSG_ERROR(tellu requires HAL))
-
-dnl
 dnl Force some mandatory libraries.
 dnl
 LIBS=$LIBS" -lc"
