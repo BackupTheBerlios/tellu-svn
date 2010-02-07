@@ -12,7 +12,6 @@
 
 
 char *softGetInstalled(struct paramInfo * pi) {
-#if defined(__linux__)
 	int i, l, r, o;
 	unsigned long long p;
 
@@ -22,12 +21,12 @@ char *softGetInstalled(struct paramInfo * pi) {
 	char newTemp[DATA_STRING_SIZE];
 
 	const char *newBins[] = {
-		PACK_DPKG_1, PACK_DPKG_2, PACK_RPM_1, PACK_RPM_2,
+		PACK_DPKG_1, PACK_DPKG_2, PACK_RPM_1, PACK_RPM_2, PACK_PKG_1, PACK_PKG_2,
 		NULL
 	};
 
 	unsigned int newTypes[] = {
-		PACK_TYPE_DPKG, PACK_TYPE_DPKG, PACK_TYPE_RPM, PACK_TYPE_RPM
+		PACK_TYPE_DPKG, PACK_TYPE_DPKG, PACK_TYPE_RPM, PACK_TYPE_RPM, PACK_TYPE_PKG, PACK_TYPE_PKG
 	};
 
 	size_t t;
@@ -235,8 +234,6 @@ char *softGetInstalled(struct paramInfo * pi) {
 	unlink(newTemp);
 
 	return(newBuffer);
-#endif
-	return(NULL);
 }
 
 void softFreeInstalled(char *intBuffer) {

@@ -163,9 +163,12 @@
 #define PACK_DPKG_2 PACK_ENVS " dpkg-query -W -f='${Package}\t${Version}\t${Installed-Size}\t${Homepage}\n' 2>/dev/null"
 #define PACK_RPM_1 PACK_ENVS " /usr/bin/rpm -qa --queryformat '%{NAME}\t%{VERSION}\t%{SIZE}\t%{URL}\n' 2>/dev/null"
 #define PACK_RPM_2 PACK_ENVS " rpm -qa --queryformat '%{NAME}\t%{VERSION}\t%{SIZE}\t%{URL}\n' 2>/dev/null"
+#define PACK_PKG_1 PACK_ENVS " pkg_info -a -I 2>/dev/null | cut -f 1 -d ' ' | while read a; do b=$(pkg_info -d $a 2>/dev/null | grep '^WWW:' | sed -e 's/^WWW://'); c=$(pkg_info -s $a 2>/dev/null | grep 'blocks)$' | sed -e 's/[^0-9].*$//'); echo -e \"$a\t\t$c\t$b\"; done"
+#define PACK_PKG_2 PACK_ENVS " /usr/sbin/pkg_info -a -I 2>/dev/null | cut -f 1 -d ' ' | while read a; do b=$(/usr/sbin/pkg_info -d $a 2>/dev/null | grep '^WWW:' | sed -e 's/^WWW://'); c=$(/usr/sbin/pkg_info -s $a 2>/dev/null | grep 'blocks)$' | sed -e 's/[^0-9].*$//'); echo -e \"$a\t\t$c\t$b\"; done"
 
 #define PACK_TYPE_DPKG 1
 #define PACK_TYPE_RPM 2
+#define PACK_TYPE_PKG 4
 
 #define PROC_GENERAL "/proc"
 
