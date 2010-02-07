@@ -1123,7 +1123,7 @@ sub editAdminPrivileges {
 
 		$PAGE .= "<table class=\"default\" cellpadding=\"3\" cellspacing=\"1\">";
 		$PAGE .= "<tr class=\"top\">";
-		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\" width=\"10%\"><a href=\"#\">Selection</a></td>";
+		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\" width=\"10%\"><a href=\"#\">Toggle</a></td>";
 		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\" width=\"20%\"><a href=\"#\">Privilege</a></td>";
 		$PAGE .= "<td class=\"header\" onMouseOver=\"this.className='select'\" onMouseOut=\"this.className='header'\"><a href=\"#\">Domain</a></td>";
 		$PAGE .= "</tr>";
