@@ -3,6 +3,9 @@
 
 #define CONFIG_DEFAULT_FILE "tellu.conf"
 
+#define CONFIG_DEFAULT_PATH_1 "/usr/local/etc"
+#define CONFIG_DEFAULT_PATH_2 "."
+
 #define CONFIG_SPACE_SIZE 1024
 #define CONFIG_STRING_SIZE 10240
 

@@ -8,75 +8,89 @@
 
 
 int config(char *configFile) {
-	int i, k;
+	int i, j, k;
+
 	char *newArgument;
 	char newLine[CONFIG_SPACE_SIZE * 3];
 
+	const char *newDirs[] = {
+		CONFIG_DEFAULT_PATH_1, CONFIG_DEFAULT_PATH_2,
+		NULL
+	};
+
 	FILE *newFile;
 
-	if((newFile = fopen(configFile, "r")) != NULL) {
-		k = 1;
+	for(j = 0; ; j++) {
+		if(newDirs[j] == NULL) {
+			break;
+		}
 
-		while(fgets(newLine, sizeof(newLine) - 1, newFile) != NULL) {
-			if(newLine[0] == '\r' || newLine[0] == '\n' || newLine[0] == '#' || newLine[0] == '%' || newLine[0] == ';') {
+		snprintf(newLine, sizeof(newLine), "%s/%s%c", newDirs[j], configFile, 0);
+
+		if((newFile = fopen(newLine, "r")) != NULL) {
+			k = 1;
+
+			while(fgets(newLine, sizeof(newLine) - 1, newFile) != NULL) {
+				if(newLine[0] == '\r' || newLine[0] == '\n' || newLine[0] == '#' || newLine[0] == '%' || newLine[0] == ';') {
+					k++;
+
+					continue;
+				}
+
+				for(i = 0; ; i++) {
+					if(mainConfigs[i].confKeyword == NULL) {
+						break;
+					}
+
+					if(strncasecmp(mainConfigs[i].confKeyword, newLine, strlen(mainConfigs[i].confKeyword)) == 0) {
+						if((newArgument = configParse(newLine)) == NULL) {
+							continue;
+						}
+
+						if(newArgument == (char *) -1) {
+							fprintf(stderr, "Keyword %s at line %d requires an argument of type %d.\n", mainConfigs[i].confKeyword, k, mainConfigs[i].confArgType);
+
+							continue;
+						}
+
+						switch(mainConfigs[i].confArgType) {
+							case CONFIG_TYPE_BOOLEAN:
+								if((configBoolean(newArgument, &mainConfigs[i].confArgInt)) != 0) {
+									fprintf(stderr, "Keyword %s at line %d requires a boolean (yes/no/1/0) argument.\n", mainConfigs[i].confKeyword, k);
+
+									continue;
+								}
+
+								break;
+							case CONFIG_TYPE_INTEGER:
+								if((configInteger(newArgument, &mainConfigs[i].confArgInt)) != 0) {
+									fprintf(stderr, "Keyword %s at line %d requires a numeral (0-9) argument.\n", mainConfigs[i].confKeyword, k);
+
+									continue;
+								}
+
+								break;
+							case CONFIG_TYPE_STRING:
+								configString(newArgument, mainConfigs[i].confArgStr);
+
+								break;
+							default:
+								fprintf(stderr, "Unknown argument type %d for keyword %s at line %d.\n", mainConfigs[i].confArgType, mainConfigs[i].confKeyword, k);
+
+								break;
+						}
+					}
+				}
+
 				k++;
-
-				continue;
 			}
 
-			for(i = 0; ; i++) {
-				if(mainConfigs[i].confKeyword == NULL) {
-					break;
-				}
-
-				if(strncasecmp(mainConfigs[i].confKeyword, newLine, strlen(mainConfigs[i].confKeyword)) == 0) {
-					if((newArgument = configParse(newLine)) == NULL) {
-						continue;
-					}
-
-					if(newArgument == (char *) -1) {
-						fprintf(stderr, "Keyword %s at line %d requires an argument of type %d.\n", mainConfigs[i].confKeyword, k, mainConfigs[i].confArgType);
-
-						continue;
-					}
-
-					switch(mainConfigs[i].confArgType) {
-						case CONFIG_TYPE_BOOLEAN:
-							if((configBoolean(newArgument, &mainConfigs[i].confArgInt)) != 0) {
-								fprintf(stderr, "Keyword %s at line %d requires a boolean (yes/no/1/0) argument.\n", mainConfigs[i].confKeyword, k);
-
-								continue;
-							}
-
-							break;
-						case CONFIG_TYPE_INTEGER:
-							if((configInteger(newArgument, &mainConfigs[i].confArgInt)) != 0) {
-								fprintf(stderr, "Keyword %s at line %d requires a numeral (0-9) argument.\n", mainConfigs[i].confKeyword, k);
-
-								continue;
-							}
-
-							break;
-						case CONFIG_TYPE_STRING:
-							configString(newArgument, mainConfigs[i].confArgStr);
-
-							break;
-						default:
-							fprintf(stderr, "Unknown argument type %d for keyword %s at line %d.\n", mainConfigs[i].confArgType, mainConfigs[i].confKeyword, k);
-
-							break;
-					}
-				}
+			if(fclose(newFile) == -1) {
+				warningMessage(ERROR_SLIGHT, "Error occurred while trying to close file");
 			}
 
-			k++;
+			return(0);
 		}
-
-		if(fclose(newFile) == -1) {
-			warningMessage(ERROR_SLIGHT, "Error occurred while trying to close file");
-		}
-
-		return(0);
 	}
 
 	return(-1);
