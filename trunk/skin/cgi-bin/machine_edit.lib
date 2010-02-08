@@ -1186,7 +1186,7 @@ sub editMachineNode {
 
 				if($my == 0 && $mm == 0 && $md == 0) {
 					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "acq_day", value => \@od, select => $nd });
-					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_month", value => \@oa, label => \%ol, select => $nm });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_month", value => \@oa, label => \%ol, select => $MONTHCON{$nm} });
 					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "acq_year", value => \@oy, select => $ny })  . "</td>";
 				}
 				else {
@@ -1365,7 +1365,7 @@ sub editMachineNode {
 
 				if($my == 0 && $mm == 0 && $md == 0) {
 					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selthin", name => "dosd_day", value => \@od, select => $nd, disabled => $ds });
-					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $nm, disabled => $ds });
+					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_month", value => \@oa, label => \%ol, select => $MONTHCON{$nm}, disabled => $ds });
 					$PAGE .= "&nbsp;" . &htmlSelectMenu({ style => "selthin", name => "dosd_year", value => \@oy, select => $ny, disabled => $ds })  . "</td>";
 				}
 				else {
