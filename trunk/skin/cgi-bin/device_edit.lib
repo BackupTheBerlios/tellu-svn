@@ -20,9 +20,6 @@ sub editDeviceNew {
 		if($q->param('category') && $q->param('category') ne "") {
 			$ca = $q->param('category');
 		}
-		elsif($q->param('ext_category') && $q->param('ext_category') ne "") {
-			$ca = $q->param('ext_category');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Device category cannot be empty.</p>";
 		}
@@ -30,18 +27,12 @@ sub editDeviceNew {
 		if($q->param('manufacturer') && $q->param('manufacturer') ne "") {
 			$ma = $q->param('manufacturer');
 		}
-		elsif($q->param('ext_manufacturer') && $q->param('ext_manufacturer') ne "") {
-			$ma = $q->param('ext_manufacturer');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Device manufacturer cannot be empty.</p>";
 		}
 
 		if($q->param('model') && $q->param('model') ne "") {
 			$mo = $q->param('model');
-		}
-		elsif($q->param('ext_model') && $q->param('ext_model') ne "") {
-			$mo = $q->param('ext_model');
 		}
 		else {
 			$PAGE .= "<p class=\"warning\">Device model cannot be empty.</p>";
@@ -801,9 +792,6 @@ sub editDeviceNode {
 		if($q->param('category') && $q->param('category') ne "") {
 			$ca = $q->param('category');
 		}
-		elsif($q->param('ext_category') && $q->param('ext_category') ne "") {
-			$ca = $q->param('ext_category');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Device category cannot be empty.</p>";
 		}
@@ -811,18 +799,12 @@ sub editDeviceNode {
 		if($q->param('manufacturer') && $q->param('manufacturer') ne "") {
 			$ma = $q->param('manufacturer');
 		}
-		elsif($q->param('ext_manufacturer') && $q->param('ext_manufacturer') ne "") {
-			$ma = $q->param('ext_manufacturer');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Device manufacturer cannot be empty.</p>";
 		}
 
 		if($q->param('model') && $q->param('model') ne "") {
 			$mo = $q->param('model');
-		}
-		elsif($q->param('ext_model') && $q->param('ext_model') ne "") {
-			$mo = $q->param('ext_model');
 		}
 		else {
 			$PAGE .= "<p class=\"warning\">Device model cannot be empty.</p>";

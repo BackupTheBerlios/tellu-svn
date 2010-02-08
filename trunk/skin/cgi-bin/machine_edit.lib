@@ -26,9 +26,6 @@ sub editMachineNew {
 		if($q->param('domain') && $q->param('domain') ne "") {
 			$dn = $q->param('domain');
 		}
-		elsif($q->param('ext_domain') && $q->param('ext_domain') ne "") {
-			$dn = $q->param('ext_domain');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Domain name cannot be empty.</p>";
 		}
@@ -891,9 +888,6 @@ sub editMachineNode {
 
 		if($q->param('domain') && $q->param('domain') ne "") {
 			$dn = $q->param('domain');
-		}
-		elsif($q->param('ext_domain') && $q->param('ext_domain') ne "") {
-			$dn = $q->param('ext_domain');
 		}
 		else {
 			$PAGE .= "<p class=\"warning\">Machine domain cannot be empty.</p>";

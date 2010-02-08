@@ -22,9 +22,6 @@ sub editProviderNew {
 		if($q->param('name') && $q->param('name') ne "") {
 			$na = $q->param('name');
 		}
-		elsif($q->param('ext_name') && $q->param('ext_name') ne "") {
-			$na = $q->param('ext_name');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Service provider name cannot be empty.</p>";
 		}
@@ -32,29 +29,17 @@ sub editProviderNew {
 		if($q->param('street') && $q->param('street') ne "") {
 			$st = $q->param('street');
 		}
-		elsif($q->param('ext_street') && $q->param('ext_street') ne "") {
-			$st = $q->param('ext_street');
-		}
 
 		if($q->param('zip') && $q->param('zip') ne "") {
 			$zi = $q->param('zip');
-		}
-		elsif($q->param('ext_zip') && $q->param('ext_zip') ne "") {
-			$zi = $q->param('ext_zip');
 		}
 
 		if($q->param('city') && $q->param('city') ne "") {
 			$ci = $q->param('city');
 		}
-		elsif($q->param('ext_city') && $q->param('ext_city') ne "") {
-			$ci = $q->param('ext_city');
-		}
 
 		if($q->param('country') && $q->param('country') ne "") {
 			$co = $q->param('country');
-		}
-		elsif($q->param('ext_country') && $q->param('ext_country') ne "") {
-			$co = $q->param('ext_country');
 		}
 
 		if($na && $na ne "") {
@@ -504,9 +489,6 @@ sub editProviderNode {
 		if($q->param('name') && $q->param('name') ne "") {
 			$na = $q->param('name');
 		}
-		elsif($q->param('ext_name') && $q->param('ext_name') ne "") {
-			$na = $q->param('ext_name');
-		}
 		else {
 			$PAGE .= "<p class=\"warning\">Service provider name cannot be empty.</p>";
 		}
@@ -514,29 +496,17 @@ sub editProviderNode {
 		if($q->param('street') && $q->param('street') ne "") {
 			$st = $q->param('street');
 		}
-		elsif($q->param('ext_street') && $q->param('ext_street') ne "") {
-			$st = $q->param('ext_street');
-		}
 
 		if($q->param('zip') && $q->param('zip') ne "") {
 			$zi = $q->param('zip');
-		}
-		elsif($q->param('ext_zip') && $q->param('ext_zip') ne "") {
-			$zi = $q->param('ext_zip');
 		}
 
 		if($q->param('city') && $q->param('city') ne "") {
 			$ci = $q->param('city');
 		}
-		elsif($q->param('ext_city') && $q->param('ext_city') ne "") {
-			$ci = $q->param('ext_city');
-		}
 
 		if($q->param('country') && $q->param('country') ne "") {
 			$co = $q->param('country');
-		}
-		elsif($q->param('ext_country') && $q->param('ext_country') ne "") {
-			$co = $q->param('ext_country');
 		}
 
 		if($na && $na ne "") {
