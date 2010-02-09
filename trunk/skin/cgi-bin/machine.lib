@@ -365,7 +365,7 @@ sub tableMachineBrief {
 		&tableMachineBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "software") {
-		my $t = "Class,Name,Version,Size,URL";
+		my $t = "Class,Name,Version,Size,URL (hotline)";
 		my $m = "4,0,0,3,1";
 
 		&tableMachineBriefs({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
@@ -709,7 +709,7 @@ sub tableMachineDetail {
 		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "software") {
-		my $t = "Class,Name,Version,Size,URL";
+		my $t = "Class,Name,Version,Size,URL (hotline)";
 		my $m = "4,0,0,3,1";
 
 		&tableMachineDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
@@ -1012,7 +1012,7 @@ sub tableMachineListing {
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
 	elsif($arg->{slice} eq "software") {
-		my $t = "Node,Class,Name,Version,Size,URL";
+		my $t = "Node,Class,Name,Version,Size,URL (hotline)";
 		my $m = "21,4,0,0,3,1";
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
