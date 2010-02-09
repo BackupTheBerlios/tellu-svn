@@ -74,7 +74,7 @@ void pidCreate(void) {
 		warningMessage(ERROR_FATAL, "Error occurred while trying to create process id file");
 	}
 
-	snprintf(thatLine, sizeof(thatLine), "%u%c", getpid(), 0);
+	snprintf(thatLine, sizeof(thatLine), "%u%c", (unsigned int) getpid(), 0);
 
 	if(fwrite(thatLine, strlen(thatLine), 1, pidFile) < 1) {
 		if(fclose(pidFile) == -1) {
