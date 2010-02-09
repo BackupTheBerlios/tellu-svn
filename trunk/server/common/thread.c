@@ -103,6 +103,9 @@ int threadWake(struct threadInfo * ti) {
 }
 
 void threadStack(int numThreads) {
+#if defined(__OpenBSD__)
+	return;
+#else
 	long i;
 
 	struct rlimit newLimit;
@@ -122,6 +125,7 @@ void threadStack(int numThreads) {
 
 		setrlimit(RLIMIT_STACK, &newLimit);
 	}
+#endif
 }
 
 void beginProcess(struct threadInfo * ti) {
