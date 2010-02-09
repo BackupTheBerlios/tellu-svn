@@ -1505,6 +1505,7 @@ sub editAdminSkinstat {
 	else {
 		my @r = &sendCommand({ command => "list" . $arg->{select}, item => "", domain => "", param => "", option => "" });
 		my @l = ();
+		my %l = ();
 
 		if(checkError({ packet => \@r }) == 0) {
 			my @s = split(/$ITEM_DELIMITER/, $r[3]);
@@ -1512,11 +1513,17 @@ sub editAdminSkinstat {
 			foreach my $s (@s) {
 				my @i = split(/$ITEM_SEPARATOR/, $s);
 
-				push @l, $i[0] . " " . $i[1];
+				$l{$i[0] . " " . $i[1]}++;
 			}
 		}
 
+		while((my $key, $val) = each %l) {
+			push @l, $key;
+		}
+
 		if(@l) {
+			@l = sort { uc($a) cmp uc($b) } @l;
+
 			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
 			$PAGE .= "<tr class=\"middle\">";
 
