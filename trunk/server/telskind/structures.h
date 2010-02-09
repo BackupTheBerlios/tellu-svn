@@ -56,9 +56,9 @@ struct threadHandlerInfo {
 struct threadDirectoryInfo {
 	int i, v;								// Thread local variables
 	int *a;									// Thread local variables
-	int *ldapPort, *ldapBool;						// Thread directory variable pointers
+	int *ldapBool;								// Thread directory variable pointers
 	char *d;								// Thread directory dn pointer
-	char *ldapHostname;							// Thread directory hostname pointer
+	char *ldapUri;								// Thread directory uri pointer
 	char *ldapUsername;							// Thread directory bind username pointer
 	char *ldapPassword;							// Thread directory bind password pointer
 	char *ldapAttr;								// Thread directory bind attribute pointer

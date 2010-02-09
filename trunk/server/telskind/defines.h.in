@@ -63,8 +63,7 @@
 #define HANDLER_ARRAY_PARAM 8
 #define HANDLER_ARRAY_OPTION 9
 
-#define LDAP_MYHOSTNAME "localhost"
-#define LDAP_MYPORT LDAP_PORT
+#define LDAP_MYURI "ldap://localhost:389"
 #define LDAP_MYUSERNAME ""
 #define LDAP_MYPASSWORD ""
 #define LDAP_MYATTR "uid"

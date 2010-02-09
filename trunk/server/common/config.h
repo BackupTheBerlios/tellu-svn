@@ -10,7 +10,7 @@ char configAgentPassword[CONFIG_SPACE_SIZE];
 char configStorageEngine[CONFIG_SPACE_SIZE];
 char configPlainFile[CONFIG_SPACE_SIZE];
 
-char configLdapHostname[CONFIG_SPACE_SIZE];
+char configLdapUri[CONFIG_SPACE_SIZE];
 char configLdapUsername[CONFIG_SPACE_SIZE];
 char configLdapPassword[CONFIG_SPACE_SIZE];
 char configLdapAttr[CONFIG_SPACE_SIZE];
@@ -45,8 +45,7 @@ struct mainConfig mainConfigs[] = {
 	{ "auth_ldap", NULL, CONFIG_TYPE_BOOLEAN_NO, CONFIG_TYPE_BOOLEAN },
 	{ "auth_internal", NULL, CONFIG_TYPE_BOOLEAN_YES, CONFIG_TYPE_BOOLEAN },
 
-	{ "ldap_hostname", configLdapHostname, 0, CONFIG_TYPE_STRING },
-	{ "ldap_port", NULL, 389, CONFIG_TYPE_INTEGER },
+	{ "ldap_uri", configLdapUri, 0, CONFIG_TYPE_STRING },
 	{ "ldap_username", configLdapUsername, 0, CONFIG_TYPE_STRING },
 	{ "ldap_password", configLdapPassword, 0, CONFIG_TYPE_STRING },
 	{ "ldap_searchattr", configLdapAttr, 0, CONFIG_TYPE_STRING },

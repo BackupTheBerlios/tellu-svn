@@ -24,12 +24,8 @@ int ldapLogin(char *thisUid, char *thisPwd, struct threadInfo * ti) {
 		return(-1);
 	}
 
-	if((ti->directoryInfo.ldapHostname = configFetch("ldap_hostname", &ti->directoryInfo.i)) == NULL) {
-		ti->directoryInfo.ldapHostname = LDAP_MYHOSTNAME;
-	}
-
-	if((ti->directoryInfo.ldapPort = configFetch("ldap_port", &ti->directoryInfo.i)) == NULL) {
-		*ti->directoryInfo.ldapPort = LDAP_MYPORT;
+	if((ti->directoryInfo.ldapUri = configFetch("ldap_uri", &ti->directoryInfo.i)) == NULL) {
+		ti->directoryInfo.ldapUri = LDAP_MYURI;
 	}
 
 	if((ti->directoryInfo.ldapUsername = configFetch("ldap_username", &ti->directoryInfo.i)) == NULL) {
@@ -52,7 +48,7 @@ int ldapLogin(char *thisUid, char *thisPwd, struct threadInfo * ti) {
 		ti->directoryInfo.ldapFilter = LDAP_MYFILTER;
 	}
 
-	if((ti->directoryInfo.l = ldap_init(ti->directoryInfo.ldapHostname, *ti->directoryInfo.ldapPort)) == NULL) {
+	if(ldap_initialize(&ti->directoryInfo.l, ti->directoryInfo.ldapUri) != LDAP_SUCCESS) {
 		ldapMessage(ti, ERROR_SLIGHT, "Error occurred while trying to initialize LDAP connection", NULL);
 
 		return(-1);
