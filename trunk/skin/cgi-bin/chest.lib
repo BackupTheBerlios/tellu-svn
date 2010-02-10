@@ -71,18 +71,9 @@ sub checkError {
 		return(0);
 	}
 	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_LOGINNEEDED) {
-		require "access.lib";
+		require "logout.pl";
 
-		&formAccessLogin({ message => $arg->{packet}[3] });
-
-		my @c = ();
-
-		$c[0] = &headCookieSet({ name => "tellu_cid", value => "" });
-		$c[1] = &headCookieSet({ name => "tellu_uid", value => "" });
-
-		&htmlPage({ template => "login", title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => "", content => $PAGE, slices => $MENU, cookie => \@c });
-
-		exit(0);
+		&doLogout();
 	}
 	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_PERMISSIONDENIED) {
 		$SESSION_ERR = $arg->{packet}[3];
