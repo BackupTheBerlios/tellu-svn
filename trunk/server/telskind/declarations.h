@@ -224,6 +224,7 @@ extern char *removeFile(struct threadInfo *);
 extern char *removeDomainFile(struct threadInfo *);
 extern char *removeGlobalFile(struct threadInfo *);
 extern char *attachedFile(struct threadInfo *);
+extern char *checkFile(struct threadInfo *);
 extern char *fetchFile(int, int, struct threadInfo *);
 
 // worker_help.c

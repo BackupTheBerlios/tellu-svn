@@ -242,6 +242,19 @@ char *attachedFile(struct threadInfo * ti) {
 	}
 }
 
+char *checkFile(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Check if download is allowed
+	return(fetchFile(16, QUERY_TYPE_PULL, ti));
+}
+
 char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 	int (*dbConnect)(struct threadStorageInfo *);
 	void (*dbDisconnect)(struct threadStorageInfo *);
@@ -729,6 +742,18 @@ char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 					"SELECT DISTINCT " TABLEKEY_FILES_LIST " FROM " TABLE_FILES " WHERE " TABLECOL_FILES_OWNER " = '%s' ORDER BY %s%c",
 					ti->commandInfo.esc1Buffer,
 					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 16:
+				// Check if download is allowed
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLECOL_FILES_RAND " FROM " TABLE_FILES " WHERE (" TABLECOL_FILES_OWNER " = '%s' OR " TABLECOL_FILES_PUBLIC " = '1') AND " TABLECOL_FILES_RAND " = '%s'%c",
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc2Buffer,
 					0
 				);
 

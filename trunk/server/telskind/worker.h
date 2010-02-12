@@ -46,6 +46,7 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_WRITE, "removeDomainFile", NULL, removeDomainFile, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "removeGlobalFile", NULL, removeGlobalFile, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "attachedFile", NULL, attachedFile, replyFree },
+	{ PRIVILEGE_LEVEL_READ, "checkFile", NULL, checkFile, replyFree },
 
 	{ PRIVILEGE_LEVEL_READ, "listPassword", NULL, listPassword, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "listMyPassword", NULL, listMyPassword, replyFree },
