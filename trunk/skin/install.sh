@@ -61,7 +61,7 @@ done
 echo ""
 echo "------------------------------------------------------------------------------"
 echo ""
-echo "This is Tellu Skin installer v3.0.0"
+echo "This is Tellu Skin installer v3.0.1"
 echo "Copyright (c) 2010, Jani Salonen. All Rights Reserved."
 echo ""
 echo "------------------------------------------------------------------------------"

@@ -9,7 +9,7 @@ if($pack eq "" && $f eq "" && $line eq "") {
 }
 
 $APP_NAME = "skin";
-$APP_VERSION = "3.0.0-noarch";
+$APP_VERSION = "3.0.1-noarch";
 $APP_PACKET = "request";
 
 $CMD_DELIMITER = "|";
