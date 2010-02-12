@@ -11,6 +11,247 @@ if($pack eq "" && $f eq "" && $line eq "") {
 require "chest.lib";
 require "network.lib";
 
+sub doSearch {
+	my ($arg) = @_;
+
+	if($arg->{search} && $arg->{search} ne "") {
+		if($arg->{command} eq "searchMachine" || $arg->{command} eq "searchDisposedMachine") {
+			require "machine.lib";
+			require "machine.js";
+
+			my @p = ('daemon', 'dev', 'disk', 'nic', 'node', 'port', 'proc', 'software', 'system', 'user');
+			my @w = ();
+			my %n = ();
+			my $n = 0;
+
+			foreach my $p (@p) {
+				my @r = &sendCommand({ command => $arg->{command}, item => $arg->{search}, domain => "", param => $p, option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						if(!$n{$i[0]} || $n{$i[0]} == 0) {
+							push @w, $s;
+
+							$n++;
+						}
+
+						$n{$i[0]}++;
+					}
+				}
+			}
+
+			if($arg->{disposed} && $arg->{disposed} != 0) {
+				$SCRIPT = &machineListingDisposedFuncs();
+			}
+			else {
+				$SCRIPT = &machineListingFuncs();
+			}
+
+			&tableMachineListing({ data => join($ITEM_DELIMITER, @w), slice => "node", sort => $q->param('sort'), order => $q->param('order') });
+
+			$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounted({ data => $n }) . "</p>";
+		}
+		elsif($arg->{command} eq "searchDevice") {
+			require "device.lib";
+			require "device.js";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+			my @w = ();
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+				my $n = 0;
+
+				foreach my $s (@s) {
+					my @i = split(/$ITEM_SEPARATOR/, $s);
+
+					if($arg->{disposed}) {
+						if($i[7] == $arg->{disposed}) {
+							push @w, $s;
+
+							$n++;
+						}
+					}
+					else {
+						if($i[7] == 0) {
+							push @w, $s;
+
+							$n++;
+						}
+					}
+				}
+
+				if($arg->{disposed} && $arg->{disposed} != 0) {
+					$SCRIPT = &deviceListingDisposedFuncs();
+				}
+				else {
+					$SCRIPT = &deviceListingFuncs();
+				}
+
+				&tableDeviceListing({ data => join($ITEM_DELIMITER, @w), slice => "dev", sort => $arg->{sort}, order => $arg->{order} });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounted({ data => $n }) . "</p>";
+			}
+		}
+		elsif($arg->{command} eq "searchPeripheral") {
+			require "peripheral.lib";
+			require "peripheral.js";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+			my @w = ();
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+				my $n = 0;
+
+				foreach my $s (@s) {
+					my @i = split(/$ITEM_SEPARATOR/, $s);
+
+					if($arg->{disposed}) {
+						if($i[7] == $arg->{disposed}) {
+							push @w, $s;
+
+							$n++;
+						}
+					}
+					else {
+						if($i[7] == 0) {
+							push @w, $s;
+
+							$n++;
+						}
+					}
+				}
+
+				if($arg->{disposed} && $arg->{disposed} != 0) {
+					$SCRIPT = &peripheralListingDisposedFuncs();
+				}
+				else {
+					$SCRIPT = &peripheralListingFuncs();
+				}
+
+				&tablePeripheralListing({ data => join($ITEM_DELIMITER, @w), slice => "per", sort => $arg->{sort}, order => $arg->{order} });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounted({ data => $n }) . "</p>";
+			}
+		}
+		elsif($arg->{command} eq "searchProvider") {
+			require "service.lib";
+			require "service.js";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+			my @w = ();
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+				my $n = 0;
+
+				foreach my $s (@s) {
+					my @i = split(/$ITEM_SEPARATOR/, $s);
+
+					if($arg->{disposed}) {
+						if($i[7] == $arg->{disposed}) {
+							push @w, $s;
+
+							$n++;
+						}
+					}
+					else {
+						if($i[7] == 0) {
+							push @w, $s;
+
+							$n++;
+						}
+					}
+				}
+
+				if($arg->{disposed} && $arg->{disposed} != 0) {
+					$SCRIPT = &serviceListingDisposedFuncs();
+				}
+				else {
+					$SCRIPT = &serviceListingFuncs();
+				}
+
+				&tableProviderListing({ data => join($ITEM_DELIMITER, @w), slice => "ser", sort => $arg->{sort}, order => $arg->{order} });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounted({ data => $n }) . "</p>";
+			}
+		}
+		elsif($arg->{command} eq "searchFaction") {
+			require "machine.lib";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				$SCRIPT = "";
+
+				&tableMachineDetail({ data => $r[3], slice => "grp", sort => $q->param('sort'), order => $q->param('order') });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
+			}
+		}
+		elsif($arg->{command} eq "searchFile") {
+			require "machine.lib";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				$SCRIPT = "";
+
+				&tableMachineDetail({ data => $r[3], slice => "fle", sort => $q->param('sort'), order => $q->param('order') });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
+			}
+		}
+		elsif($arg->{command} eq "searchPassword") {
+			require "machine.lib";
+			require "personal.js";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				$SCRIPT = &passwordFuncs({ slice => "pwd" });
+
+				&tableMachineDetail({ data => $r[3], slice => "pwd", sort => $q->param('sort'), order => $q->param('order') });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
+			}
+		}
+	}
+}
+
+sub searchCounter {
+	my ($arg) = @_;
+
+	my $n = split(/$ITEM_DELIMITER/, $arg->{data});
+
+	my $r = &searchCounted({ data => $n });
+
+	return $r;
+}
+
+sub searchCounted {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	if(!$arg->{data} || $arg->{data} == 0) {
+		$r = "no entries";
+	}
+	elsif($arg->{data} == 1) {
+		$r = $NUMWORDS{$arg->{data}} . " entry";
+	}
+	else {
+		$r = $NUMWORDS{$arg->{data}} . " entries";
+	}
+
+	return $r;
+}
+
 sub tableSearchSlice {
 	my ($arg) = @_;
 

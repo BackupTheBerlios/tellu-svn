@@ -86,10 +86,7 @@ char *pushFile(struct threadInfo * ti) {
 char *searchFile(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -268,11 +265,11 @@ char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 
 	// Allocate memory for buffers
 	ti->commandInfo.s =
-		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 4) +
-		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 4) +
-		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 4) +
-		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 4) +
-		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 4) +
+		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 10) +
 		CONFIG_SPACE_SIZE;
 
 	if((ti->commandInfo.statBuffer = malloc(ti->commandInfo.s + 1)) == NULL) {
@@ -417,10 +414,12 @@ char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_FILES_LIST " FROM " TABLE_FILES " WHERE (" TABLECOL_FILES_OWNER " = '%s' OR " TABLECOL_FILES_PUBLIC " = '1') AND %s LIKE '%%%s%%' ORDER BY %s%c",
+					"SELECT DISTINCT " TABLEKEY_FILES_LIST " FROM " TABLE_FILES " WHERE (" TABLECOL_FILES_OWNER " = '%s' OR " TABLECOL_FILES_PUBLIC " = '1') AND " TABLECOL_FILES_OWNER " LIKE '%%%s%%' OR " TABLECOL_FILES_NAME " LIKE '%%%s%%' OR " TABLECOL_FILES_FILE " LIKE '%%%s%%' OR " TABLECOL_FILES_DESCR " LIKE '%%%s%%' OR " TABLECOL_FILES_NOTE " LIKE '%%%s%%' ORDER BY " TABLECOL_FILES_NAME "%c",
 					ti->commandInfo.esc1Buffer,
 					ti->commandInfo.esc4Buffer,
-					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc4Buffer,
 					0
 				);

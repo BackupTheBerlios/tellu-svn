@@ -409,8 +409,8 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_help (
 );
 
 INSERT INTO skin_help (name, title, help, descr, note) VALUES('license', 'Tellu license', 'Tellu Release 3 is released under the original BSD license.<br /><br />
-Copyright (c) 2010, Jani Salonen &lt;jani@lasipalatsi.fi&gt;</br >
-All rights reserved.</br></br >
+Copyright (c) 2010, Jani Salonen &lt;jani@lasipalatsi.fi&gt;<br />
+All rights reserved.<br /><br />
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:<ul>
 <li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
 <li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>

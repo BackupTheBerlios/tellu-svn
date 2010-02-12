@@ -886,8 +886,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DAEMON " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_DAEMON " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -899,8 +898,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DEV " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_DEV " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -914,8 +912,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DISK " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_DISK " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -927,8 +924,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NIC " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_NIC " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -941,8 +937,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NODE " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_NODE " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -956,8 +951,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PORT " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_PORT " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
@@ -966,8 +960,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PROC " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_PROC " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -979,8 +972,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SOFTWARE " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_SOFTWARE " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -991,8 +983,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SYSTEM " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_SYSTEM " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1007,8 +998,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_USER " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_USER " AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1032,7 +1022,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DAEMON ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DAEMON ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1046,7 +1036,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DEV ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DEV ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1062,7 +1052,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DISK ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DISK ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1076,7 +1066,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NIC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NIC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1091,7 +1081,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NODE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NODE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1107,7 +1097,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PORT ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PORT ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc3Buffer,
@@ -1118,7 +1108,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PROC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PROC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1132,7 +1122,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SOFTWARE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SOFTWARE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1145,7 +1135,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SYSTEM ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SYSTEM ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1162,7 +1152,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_USER ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_USER ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1732,8 +1722,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DAEMON " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_DAEMON " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1745,8 +1734,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DEV " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_DEV " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1760,8 +1748,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DISK " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_DISK " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1773,8 +1760,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NIC " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_NIC " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1787,8 +1773,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NODE " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_NODE " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1802,8 +1787,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PORT " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_PORT " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
@@ -1812,8 +1796,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PROC " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_PROC " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1825,8 +1808,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SOFTWARE " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_SOFTWARE " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1837,8 +1819,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SYSTEM " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_SYSTEM " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1853,8 +1834,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_USER " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
-						ti->commandInfo.esc4Buffer,
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " " TABLESRC_MACHINE_USER " AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1878,7 +1858,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DAEMON ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DAEMON ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1892,7 +1872,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DEV ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DEV ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1908,7 +1888,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DISK ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_DISK ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1922,7 +1902,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NIC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NIC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1937,7 +1917,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NODE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_NODE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1953,7 +1933,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PORT ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PORT ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc3Buffer,
@@ -1964,7 +1944,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PROC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_PROC ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1978,7 +1958,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SOFTWARE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SOFTWARE ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -1991,7 +1971,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SYSTEM ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_SYSTEM ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,
@@ -2008,7 +1988,7 @@ char *fetchMachine(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
-						"SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_USER ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
+						"SELECT DISTINCT " TABLECOL_MACHINE_SEARCH " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NID " IN (SELECT DISTINCT " TABLECOL_MACHINE_NID " FROM %s " TABLESRC_MACHINE_USER ") AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '1'%c",
 						ti->commandInfo.esc4Buffer,
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc2Buffer,

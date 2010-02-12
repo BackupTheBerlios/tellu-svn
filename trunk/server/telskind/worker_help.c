@@ -27,10 +27,7 @@ char *pullHelp(struct threadInfo * ti) {
 char *searchHelp(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -63,11 +60,11 @@ char *fetchHelp(int getThis, int getType, struct threadInfo * ti) {
 
 	// Allocate memory for buffers
 	ti->commandInfo.s =
-		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 2) +
+		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 8) +
+		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 8) +
+		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 8) +
+		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 8) +
+		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 8) +
 		CONFIG_SPACE_SIZE;
 
 	if((ti->commandInfo.statBuffer = malloc(ti->commandInfo.s + 1)) == NULL) {
@@ -180,9 +177,11 @@ char *fetchHelp(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_HELP_HELP " FROM " TABLE_HELP " WHERE %s LIKE '%%%s%%' ORDER BY " TABLEORD_HELP_HELP "%c",
+					"SELECT DISTINCT " TABLEKEY_HELP_HELP " FROM " TABLE_HELP " WHERE " TABLECOL_HELP_TITLE " LIKE '%%%s%%' OR " TABLECOL_HELP_HELP " LIKE '%%%s%%' OR " TABLECOL_HELP_DESCR " LIKE '%%%s%%' OR " TABLECOL_HELP_NOTE " LIKE '%%%s%%' ORDER BY " TABLECOL_HELP_TITLE "%c",
 					ti->commandInfo.esc4Buffer,
-					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 

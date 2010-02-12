@@ -117,9 +117,9 @@ char *pushProvider(struct threadInfo * ti) {
 }
 
 char *searchService(struct threadInfo * ti) {
-	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -130,9 +130,9 @@ char *searchService(struct threadInfo * ti) {
 }
 
 char *searchProvider(struct threadInfo * ti) {
-	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -497,10 +497,10 @@ char *fetchService(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_SERVICE_SERVICE " FROM " TABLE_SERVICE " WHERE " TABLECOL_SERVICE_NAME " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DESCR " LIKE '%%%s%%' OR " TABLECOL_SERVICE_NOTE " LIKE '%%%s%%' ORDER BY " TABLEORD_SERVICE_NAME "%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
+					"SELECT DISTINCT " TABLEKEY_SERVICE_SEARCH " FROM " TABLE_SERVICE " WHERE " TABLECOL_SERVICE_NAME " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DESCR " LIKE '%%%s%%' OR " TABLECOL_SERVICE_NOTE " LIKE '%%%s%%' ORDER BY " TABLEORD_SERVICE_NAME "%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 
@@ -843,27 +843,27 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_SERVICE_DATA_DATA " FROM " TABLE_SERVICE_DATA " WHERE " TABLECOL_SERVICE_DATA_NAME " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_STREET " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_ZIP " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CITY " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_COUNTRY " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_TELE1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_TELE2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_FAX1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_FAX2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTPERSON " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTTELE1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTTELE2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTFAX1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTFAX2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTEMAIL1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTEMAIL2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_BRANDS " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_ADDINFO " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_DESCR " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_NOTE " LIKE '%%%s%%' ORDER BY " TABLEORD_SERVICE_DATA_NAME "%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
+					"SELECT DISTINCT " TABLEKEY_SERVICE_DATA_SEARCH " FROM " TABLE_SERVICE_DATA " WHERE " TABLECOL_SERVICE_DATA_NAME " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_STREET " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_ZIP " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CITY " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_COUNTRY " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_TELE1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_TELE2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_FAX1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_FAX2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTPERSON " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTTELE1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTTELE2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTFAX1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTFAX2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTEMAIL1 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_CONTEMAIL2 " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_BRANDS " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_ADDINFO " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_DESCR " LIKE '%%%s%%' OR " TABLECOL_SERVICE_DATA_NOTE " LIKE '%%%s%%' ORDER BY " TABLEORD_SERVICE_DATA_NAME "%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 

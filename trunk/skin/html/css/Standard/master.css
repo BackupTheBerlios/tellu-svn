@@ -18,6 +18,13 @@ p.info {
 	margin: 0 0 2em 0;
 }
 
+p.note {
+	font-size: 90%;
+	font-style: italic;
+	line-height: 1.5;
+	margin: 0 0 1em 0;
+}
+
 p.warning {
 	color: #aa2222;
 	font-weight: bold;

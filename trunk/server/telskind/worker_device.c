@@ -70,9 +70,9 @@ char *pushDevice(struct threadInfo * ti) {
 }
 
 char *searchDevice(struct threadInfo * ti) {
-	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -554,16 +554,16 @@ char *fetchDevice(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_DEVICE_DATA " FROM " TABLE_DEVICE " WHERE " TABLECOL_DEVICE_MODEL " LIKE '%%%s%%' OR " TABLECOL_DEVICE_CATEGORY " LIKE '%%%s%%' OR " TABLECOL_DEVICE_MANUFACTURER " LIKE '%%%s%%' OR " TABLECOL_DEVICE_SIZE " LIKE '%%%s%%' OR " TABLECOL_DEVICE_IPADDRESS " LIKE '%%%s%%' OR " TABLECOL_DEVICE_SERNUM " LIKE '%%%s%%' OR " TABLECOL_DEVICE_SECNUM " LIKE '%%%s%%' OR " TABLECOL_DEVICE_LOCATION " LIKE '%%%s%%' OR " TABLECOL_DEVICE_MOSD " LIKE '%%%s%%' ORDER BY " TABLEORD_DEVICE_NAME "%c",
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
-					ti->commandInfo.esc2Buffer,
+					"SELECT DISTINCT " TABLEKEY_DEVICE_SEARCH " FROM " TABLE_DEVICE " WHERE " TABLECOL_DEVICE_MODEL " LIKE '%%%s%%' OR " TABLECOL_DEVICE_CATEGORY " LIKE '%%%s%%' OR " TABLECOL_DEVICE_MANUFACTURER " LIKE '%%%s%%' OR " TABLECOL_DEVICE_SIZE " LIKE '%%%s%%' OR " TABLECOL_DEVICE_IPADDRESS " LIKE '%%%s%%' OR " TABLECOL_DEVICE_SERNUM " LIKE '%%%s%%' OR " TABLECOL_DEVICE_SECNUM " LIKE '%%%s%%' OR " TABLECOL_DEVICE_LOCATION " LIKE '%%%s%%' OR " TABLECOL_DEVICE_MOSD " LIKE '%%%s%%' ORDER BY " TABLEORD_DEVICE_NAME "%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 
