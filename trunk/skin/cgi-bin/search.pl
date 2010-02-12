@@ -44,6 +44,10 @@ $PAGE .= "<p>&nbsp;</p>";
 my $t = "Search";
 
 if($c && $c ne "") {
+	if($c !~ /^admin/ && $c !~ /^device_d/ && $c !~ /^device_c|^device/ && $c !~ /^faction/ && $c !~ /^machine_d/ && $c !~ /^machine_c|^machine/ && $c !~ /^peripheral_d/ && $c !~ /^peripheral_c|^peripheral/ && $c !~ /^personal/ && $c !~ /^service_d/ && $c !~ /^service_c|^service/) {
+		$c = &headCookieGet({ name => "tellu_search_caller" });
+	}
+
 	if($c =~ /^admin/) {
 		$t .= " from administrative items";
 
@@ -65,11 +69,6 @@ if($c && $c ne "") {
 		$t .= " from factions";
 
 		&doSearch({ caller => "Factions", command => "searchFaction", search => $w });
-	}
-	elsif($c =~ /^help/) {
-		$t .= " from help pages";
-
-		&doSearch({ caller => "Help pages", command => "searchHelp", search => $w });
 	}
 	elsif($c =~ /^machine_d/) {
 		$t .= " from disposed machines";
