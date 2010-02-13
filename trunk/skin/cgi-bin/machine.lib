@@ -511,7 +511,7 @@ sub tableMachineBriefs {
 			}
 		}
 		else {
-			$PAGE .= "n/a";
+			$PAGE .= "<font color=\"#808080\">n/a</font>";
 		}
 
 		$PAGE .= "</ul></td>";
@@ -799,13 +799,13 @@ sub tableMachineDetails {
 				$ev ^= 1;
 
 				if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
-					$PAGE .= "n/a";
+					$PAGE .= "<font color=\"#808080\">n/a</font>";
 				}
 				else {
 					my $r = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 					if(!$r || $r eq "") {
-						$PAGE .= "n/a";
+						$PAGE .= "<font color=\"#808080\">n/a</font>";
 					}
 					else {
 						$PAGE .= $r;
@@ -825,10 +825,10 @@ sub tableMachineDetails {
 
 		foreach my $t (@t) {
 			if($ev == 0) {
-				$PAGE .= "<td class=\"c1\">n/a</td>";
+				$PAGE .= "<td class=\"c1\"><font color=\"#808080\">n/a</font></td>";
 			}
 			else {
-				$PAGE .= "<td class=\"c2\">n/a</td>";
+				$PAGE .= "<td class=\"c2\"><font color=\"#808080\">n/a</font></td>";
 			}
 
 			$ev ^= 1;
@@ -1115,10 +1115,10 @@ sub tableMachineListings {
 
 				foreach my $t (@t) {
 					if($ev == 0) {
-						$PAGE .= "<td class=\"c1\">n/a</td>";
+						$PAGE .= "<td class=\"c1\"><font color=\"#808080\">n/a</font></td>";
 					}
 					else {
-						$PAGE .= "<td class=\"c2\">n/a</td>";
+						$PAGE .= "<td class=\"c2\"><font color=\"#808080\">n/a</font></td>";
 					}
 
 					$ev ^= 1;
@@ -1163,13 +1163,13 @@ sub tableMachineListings {
 					$ev ^= 1;
 
 					if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
-						$PAGE .= "n/a";
+						$PAGE .= "<font color=\"#808080\">n/a</font>";
 					}
 					else {
 						my $u = &itemClean({ item => $j[$k], flag => $m[$k], key => $arg->{key}, slice => $arg->{slice} });
 
 						if(!$u || $u eq "") {
-							$PAGE .= "n/a";
+							$PAGE .= "<font color=\"#808080\">n/a</font>";
 						}
 						else {
 							$PAGE .= $u;
@@ -1190,10 +1190,10 @@ sub tableMachineListings {
 
 		foreach my $t (@t) {
 			if($ev == 0) {
-				$PAGE .= "<td class=\"c1\">n/a</td>";
+				$PAGE .= "<td class=\"c1\"><font color=\"#808080\">n/a</font></td>";
 			}
 			else {
-				$PAGE .= "<td class=\"c2\">n/a</td>";
+				$PAGE .= "<td class=\"c2\"><font color=\"#808080\">n/a</font></td>";
 			}
 
 			$ev ^= 1;

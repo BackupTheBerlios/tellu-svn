@@ -252,7 +252,7 @@ sub itemClean {
 		}
 	}
 	elsif($arg->{flag} == 10) {
-		$r = "n/a";
+		$r = "<font color=\"#808080\">n/a</font>";
 	}
 	elsif($arg->{flag} == 11) {
 		$r = int($arg->{item} / 100) * 100;
@@ -298,7 +298,7 @@ sub itemClean {
 		my @n = split(/\|/, $arg->{item});
 
 		if($pr eq "acadapter" || $pr eq "battery" || $pr eq "btacl" || $pr eq "bthci" || $pr eq "btsco" || $pr eq "killswitch" || $pr eq "panel" || $pr eq "lightsensor" || $pr eq "mmc" || $pr eq "mmchost" || $pr eq "netbluetooth" || $pr eq "netirda" || $pr eq "serial" || $pr eq "v4l") {
-			$r .= "n/a";
+			$r .= "<font color=\"#808080\">n/a</font>";
 		}
 		elsif($pr eq "button" || $pr eq "camera" || $pr eq "ide" || $pr eq "idehost" || $pr eq "ieee1394" || $pr eq "ieee1394host" || $pr eq "input" || $pr eq "inputjoystick" || $pr eq "inputkeyboard" || $pr eq "inputkeymap" || $pr eq "inputkeypad" || $pr eq "inputkeys" || $pr eq "inputmouse" || $pr eq "inputswitch" || $pr eq "inputtablet") {
 			$r .= "Device:&nbsp;" . $n[0] . "<br />";
@@ -386,7 +386,7 @@ sub itemClean {
 		}
 
 		if($r eq "") {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 	}
 	elsif($arg->{flag} == 19) {
@@ -416,12 +416,12 @@ sub itemClean {
 		}
 
 		if($r eq "") {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 	}
 	elsif($arg->{flag} == 20) {
 		if($arg->{item} =~ /^0/) {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 		else {
 			$arg->{item} =~ s/\s+.*//;
@@ -509,7 +509,7 @@ sub itemClean {
 		}
 
 		if($r eq "") {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 	}
 	elsif($arg->{flag} == 23) {
@@ -539,7 +539,7 @@ sub itemClean {
 		}
 
 		if($r eq "") {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 	}
 	elsif($arg->{flag} == 24) {
@@ -603,7 +603,7 @@ sub itemClean {
 		}
 
 		if($r eq "") {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 	}
 	elsif($arg->{flag} == 27) {
@@ -640,7 +640,7 @@ sub itemClean {
 	}
 	elsif($arg->{flag} == 31) {
 		if($arg->{item} =~ /^0/) {
-			$r = "n/a";
+			$r = "<font color=\"#808080\">n/a</font>";
 		}
 		else {
 			my ($o, $t) = split(/\s+/, $arg->{item}, 2);

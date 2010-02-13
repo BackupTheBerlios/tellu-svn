@@ -1210,7 +1210,7 @@ sub editAdminPrivileges {
 		}
 		else {
 			$PAGE .= "<tr class=\"top\">";
-			$PAGE .= "<td class=\"c2\">n/a</td><td class=\"c2\">n/a</td><td class=\"c2\">n/a</td>";
+			$PAGE .= "<td class=\"c2\"><font color=\"#808080\">n/a</font></td><td class=\"c2\"><font color=\"#808080\">n/a</font></td><td class=\"c2\"><font color=\"#808080\">n/a</font></td>";
 			$PAGE .= "</tr>";
 
 			$PAGE .= "</table>";
@@ -1669,13 +1669,13 @@ sub tableAdminDetails {
 				$ev ^= 1;
 
 				if(!$j[$k] || $j[$k] eq "" || $j[$k] eq "(null)") {
-					$PAGE .= "n/a";
+					$PAGE .= "<font color=\"#808080\">n/a</font>";
 				}
 				else {
 					my $r = &itemClean({ item => $j[$k], flag => $m[$k] });
 
 					if(!$r || $r eq "") {
-						$PAGE .= "n/a";
+						$PAGE .= "<font color=\"#808080\">n/a</font>";
 					}
 					else {
 						$PAGE .= $r;
@@ -1695,10 +1695,10 @@ sub tableAdminDetails {
 
 		foreach my $t (@t) {
 			if($ev == 0) {
-				$PAGE .= "<td class=\"c1\">n/a</td>";
+				$PAGE .= "<td class=\"c1\"><font color=\"#808080\">n/a</font></td>";
 			}
 			else {
-				$PAGE .= "<td class=\"c2\">n/a</td>";
+				$PAGE .= "<td class=\"c2\"><font color=\"#808080\">n/a</font></td>";
 			}
 
 			$ev ^= 1;
