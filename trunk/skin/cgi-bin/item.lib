@@ -708,6 +708,9 @@ sub itemClean {
 
 		$r = "<a href=\"javascript:popupFaction('" . $n . "', '" . $arg->{slice} . "', '" . $p[0] . "', '" . $p[1] . "');\" style=\"color: #000000;\">" . $m . "</a>";
 	}
+	elsif($arg->{flag} == 34) {
+		$r = $arg->{item} . "%";
+	}
 
 	return $r;
 }

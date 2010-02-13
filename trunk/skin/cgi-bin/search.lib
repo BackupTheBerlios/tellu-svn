@@ -21,6 +21,7 @@ sub doSearch {
 
 			my @p = ('daemon', 'dev', 'disk', 'nic', 'node', 'port', 'proc', 'software', 'system', 'user');
 			my @w = ();
+			my @v = ();
 			my %n = ();
 			my $n = 0;
 
@@ -44,6 +45,25 @@ sub doSearch {
 				}
 			}
 
+			my $h = 0;
+
+			while((my $k, $v) = each %n) {
+				$h = $v if($v > $h);
+			}
+
+			my $t = 100 / $h;
+
+			while((my $k, $v) = each %n) {
+				$n{$k} = int($v * $t);
+			}
+
+			foreach my $s (@w) {
+				my @i = split(/$ITEM_SEPARATOR/, $s);
+
+				push @i, $n{$i[0]};
+				push @v, join($ITEM_SEPARATOR, @i);
+			}
+
 			if($arg->{disposed} && $arg->{disposed} != 0) {
 				$SCRIPT .= &machineListingDisposedFuncs();
 			}
@@ -51,7 +71,7 @@ sub doSearch {
 				$SCRIPT .= &machineListingFuncs();
 			}
 
-			&tableMachineListing({ data => join($ITEM_DELIMITER, @w), slice => "node", sort => $q->param('sort'), order => $q->param('order') });
+			&tableMachineListing({ data => join($ITEM_DELIMITER, @v), slice => "nper", sort => $q->param('sort'), order => $q->param('order') });
 
 			$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounted({ data => $n }) . "</p>";
 		}

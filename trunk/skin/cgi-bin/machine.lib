@@ -987,6 +987,12 @@ sub tableMachineListing {
 
 		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
+	elsif($arg->{slice} eq "nper") {
+		my $t = "Node,System,Release,Distribution,Platform,Occurrence";
+		my $m = "21,0,0,0,0,34";
+
+		&tableMachineListings({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
+	}
 	elsif($arg->{slice} eq "system") {
 		my $t = "Node,Baseboard manufacturer,Baseboard product,Baseboard version,System family,System manufacturer,System product,System version";
 		my $m = "21,0,0,0,0,0,0,0";
