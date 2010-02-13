@@ -93,9 +93,15 @@ if($c && $c ne "") {
 	elsif($c =~ /^personal/) {
 		$t .= " from personal items";
 
+		my $k = "";
+
+		if($q->param('key') && $q->param('key') ne "") {
+			$k = $q->param('key');
+		}
+
 		&doSearch({ caller => "My factions", command => "searchFaction", search => $w });
 		&doSearch({ caller => "My files", command => "searchFile", search => $w });
-		&doSearch({ caller => "My passwords", command => "searchPassword", search => $w });
+		&doSearch({ caller => "My passwords", command => "searchPassword", search => $w, key => $k });
 	}
 	elsif($c =~ /^service_d/) {
 		$t .= " from disposed services";

@@ -229,7 +229,7 @@ sub doSearch {
 			if(checkError({ packet => \@r }) == 0) {
 				$SCRIPT .= &passwordFuncs({ slice => "pwd" });
 
-				&tableMachineDetail({ data => $r[3], slice => "pwd", sort => $q->param('sort'), order => $q->param('order') });
+				&tableMachineDetail({ data => $r[3], slice => "pwd", sort => $q->param('sort'), order => $q->param('order'), key => $arg->{key} });
 
 				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
 			}
