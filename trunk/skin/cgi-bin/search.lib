@@ -45,10 +45,10 @@ sub doSearch {
 			}
 
 			if($arg->{disposed} && $arg->{disposed} != 0) {
-				$SCRIPT = &machineListingDisposedFuncs();
+				$SCRIPT .= &machineListingDisposedFuncs();
 			}
 			else {
-				$SCRIPT = &machineListingFuncs();
+				$SCRIPT .= &machineListingFuncs();
 			}
 
 			&tableMachineListing({ data => join($ITEM_DELIMITER, @w), slice => "node", sort => $q->param('sort'), order => $q->param('order') });
@@ -86,10 +86,10 @@ sub doSearch {
 				}
 
 				if($arg->{disposed} && $arg->{disposed} != 0) {
-					$SCRIPT = &deviceListingDisposedFuncs();
+					$SCRIPT .= &deviceListingDisposedFuncs();
 				}
 				else {
-					$SCRIPT = &deviceListingFuncs();
+					$SCRIPT .= &deviceListingFuncs();
 				}
 
 				&tableDeviceListing({ data => join($ITEM_DELIMITER, @w), slice => "dev", sort => $arg->{sort}, order => $arg->{order} });
@@ -128,10 +128,10 @@ sub doSearch {
 				}
 
 				if($arg->{disposed} && $arg->{disposed} != 0) {
-					$SCRIPT = &peripheralListingDisposedFuncs();
+					$SCRIPT .= &peripheralListingDisposedFuncs();
 				}
 				else {
-					$SCRIPT = &peripheralListingFuncs();
+					$SCRIPT .= &peripheralListingFuncs();
 				}
 
 				&tablePeripheralListing({ data => join($ITEM_DELIMITER, @w), slice => "per", sort => $arg->{sort}, order => $arg->{order} });
@@ -170,10 +170,10 @@ sub doSearch {
 				}
 
 				if($arg->{disposed} && $arg->{disposed} != 0) {
-					$SCRIPT = &serviceListingDisposedFuncs();
+					$SCRIPT .= &serviceListingDisposedFuncs();
 				}
 				else {
-					$SCRIPT = &serviceListingFuncs();
+					$SCRIPT .= &serviceListingFuncs();
 				}
 
 				&tableProviderListing({ data => join($ITEM_DELIMITER, @w), slice => "ser", sort => $arg->{sort}, order => $arg->{order} });
@@ -183,15 +183,30 @@ sub doSearch {
 		}
 		elsif($arg->{command} eq "searchFaction") {
 			require "machine.lib";
+			require "faction.js";
 
 			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+			my @w = ();
 
 			if(checkError({ packet => \@r }) == 0) {
-				$SCRIPT = "";
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
+				my $n = 0;
 
-				&tableMachineDetail({ data => $r[3], slice => "grp", sort => $q->param('sort'), order => $q->param('order') });
+				foreach my $s (@s) {
+					my @i = split(/$ITEM_SEPARATOR/, $s);
 
-				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
+					$i[2] = $i[0] . "|" . $i[2];
+
+					push @w, join($ITEM_SEPARATOR, @i);
+
+					$n++;
+				}
+
+				$SCRIPT .= &factionListingFuncs();
+
+				&tableMachineDetail({ data => join($ITEM_DELIMITER, @w), slice => "grp", sort => $q->param('sort'), order => $q->param('order') });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounted({ data => $n }) . "</p>";
 			}
 		}
 		elsif($arg->{command} eq "searchFile") {
@@ -200,8 +215,6 @@ sub doSearch {
 			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
-				$SCRIPT = "";
-
 				&tableMachineDetail({ data => $r[3], slice => "fle", sort => $q->param('sort'), order => $q->param('order') });
 
 				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
@@ -214,7 +227,7 @@ sub doSearch {
 			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
-				$SCRIPT = &passwordFuncs({ slice => "pwd" });
+				$SCRIPT .= &passwordFuncs({ slice => "pwd" });
 
 				&tableMachineDetail({ data => $r[3], slice => "pwd", sort => $q->param('sort'), order => $q->param('order') });
 

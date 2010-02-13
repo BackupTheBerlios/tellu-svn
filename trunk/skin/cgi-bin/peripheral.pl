@@ -374,6 +374,8 @@ sub peripheralThing {
 					}
 				}
 				elsif($arg->{leaf} == 6) {
+					require "faction.js";
+
 					@r = &sendCommand({ command => "pullPeripheral", item => $arg->{node}, domain => "", param => "", option => "" });
 
 					if(checkError({ packet => \@r }) == 0) {
@@ -389,10 +391,16 @@ sub peripheralThing {
 
 								if(checkError({ packet => \@r }) == 0) {
 									if($r[3] && $r[3] ne "") {
-										push @w, $r[3];
+										my @i = split(/$ITEM_SEPARATOR/, $r[3]);
+
+										$i[2] = $s . "|" . $i[2];
+
+										push @w, join($ITEM_SEPARATOR, @i);
 									}
 								}
 							}
+
+							$SCRIPT = &factionListingFuncs();
 
 							&tablePeripheralDetail({ data => join($ITEM_DELIMITER, @w), slice => $arg->{slice}, leaf => $arg->{leaf}, sort => $arg->{sort}, order => $arg->{order} });
 						}
@@ -427,7 +435,7 @@ sub peripheralThing {
 
 			$c[0] = &headCookieSet({ name => $arg->{cookie}, value => $arg->{value} });
 
-			&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &passwordFuncs({ slice => "incs", leaf => "2" }), header => $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => $SCRIPT . &passwordFuncs({ slice => "incs", leaf => "2" }), header => $t, subheader => $u, content => $PAGE, slices => $MENU, cookie => \@c });
 		}
 		else {
 			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });

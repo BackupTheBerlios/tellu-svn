@@ -344,7 +344,7 @@ sub tablePeripheralDetail {
 	}
 	elsif($arg->{slice} eq "grp" || ($arg->{slice} eq "incs" && $arg->{leaf} == 6)) {
 		my $t = "Owner,Name,Temporary,Public,Description,Additional info";
-		my $m = "0,0,9,9,0,0";
+		my $m = "0,33,9,9,0,0";
 
 		&tablePeripheralDetails({ slice => $arg->{slice}, sort => $arg->{sort}, order=> $arg->{order}, data => $arg->{data}, title => $t, modifier => $m });
 	}
