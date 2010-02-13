@@ -1094,7 +1094,7 @@ sub editPeripheralNode {
 				$s[13] = cleanNull({ string => $s[13] });
 				$s[14] = cleanNull({ string => $s[14] });
 				$s[15] = cleanNull({ string => $s[15] });
-				$s[24] = cleanNull({ string => $s[24] });
+				$s[24] = cleanNull({ string => $s[24], fixfeed => 1 });
 				$s[25] = cleanNull({ string => $s[25] });
 
 				$PAGE .= "<tr class=\"top\">";

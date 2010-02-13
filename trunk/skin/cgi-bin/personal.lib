@@ -530,7 +530,7 @@ sub editPersonalFaction {
 						$s[1] = cleanNull({ string => $s[1] });
 						$s[2] = cleanNull({ string => $s[2] });
 						$s[5] = cleanNull({ string => $s[5] });
-						$s[6] = cleanNull({ string => $s[6] });
+						$s[6] = cleanNull({ string => $s[6], fixfeed => 1 });
 
 						$PAGE .= "<tr class=\"top\">";
 						$PAGE .= "<td></td><td></td>";
@@ -709,7 +709,7 @@ sub editPersonalFaction {
 						$s[1] = cleanNull({ string => $s[1] });
 						$s[2] = cleanNull({ string => $s[2] });
 						$s[5] = cleanNull({ string => $s[5] });
-						$s[6] = cleanNull({ string => $s[6] });
+						$s[6] = cleanNull({ string => $s[6], fixfeed => 1 });
 
 						$PAGE .= "<tr class=\"top\">";
 						$PAGE .= "<td></td><td></td>";
@@ -1441,7 +1441,7 @@ sub editPersonalFile {
 						$s[1] = cleanNull({ string => $s[1] });
 						$s[2] = cleanNull({ string => $s[2] });
 						$s[6] = cleanNull({ string => $s[6] });
-						$s[7] = cleanNull({ string => $s[7] });
+						$s[7] = cleanNull({ string => $s[7], fixfeed => 1 });
 
 						$PAGE .= "<tr class=\"top\">";
 						$PAGE .= "<td></td><td></td>";
@@ -1604,7 +1604,7 @@ sub editPersonalFile {
 						$s[1] = cleanNull({ string => $s[1] });
 						$s[2] = cleanNull({ string => $s[2] });
 						$s[6] = cleanNull({ string => $s[6] });
-						$s[7] = cleanNull({ string => $s[7] });
+						$s[7] = cleanNull({ string => $s[7], fixfeed => 1 });
 
 						$PAGE .= "<tr class=\"top\">";
 						$PAGE .= "<td></td><td></td>";
@@ -2036,7 +2036,7 @@ sub editPersonalPwds {
 						$s[3] = cleanNull({ string => $s[3] });
 						$s[4] = cleanNull({ string => $s[4] });
 						$s[7] = cleanNull({ string => $s[7] });
-						$s[8] = cleanNull({ string => $s[8] });
+						$s[8] = cleanNull({ string => $s[8], fixfeed => 1 });
 
 						$PAGE .= "<tr class=\"top\">";
 						$PAGE .= "<td></td><td></td>";
@@ -2243,7 +2243,7 @@ sub editPersonalPwds {
 						$s[3] = cleanNull({ string => $s[3] });
 						$s[4] = cleanNull({ string => $s[4] });
 						$s[7] = cleanNull({ string => $s[7] });
-						$s[8] = cleanNull({ string => $s[8] });
+						$s[8] = cleanNull({ string => $s[8], fixfeed => 1 });
 
 						$PAGE .= "<tr class=\"top\">";
 						$PAGE .= "<td></td><td></td>";

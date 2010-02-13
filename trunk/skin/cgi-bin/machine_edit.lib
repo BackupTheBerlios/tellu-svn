@@ -1104,7 +1104,7 @@ sub editMachineNode {
 				$s[6] = cleanNull({ string => $s[6] });
 				$s[7] = cleanNull({ string => $s[7] });
 				$s[8] = cleanNull({ string => $s[8] });
-				$s[17] = cleanNull({ string => $s[17] });
+				$s[17] = cleanNull({ string => $s[17], fixfeed => 1 });
 				$s[18] = cleanNull({ string => $s[18] });
 
 				$PAGE .= "<tr class=\"top\">";

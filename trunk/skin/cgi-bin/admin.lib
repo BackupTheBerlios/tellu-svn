@@ -970,7 +970,7 @@ sub editAdminUser {
 		if(checkError({ packet => \@r }) == 0) {
 			@s = split(/$ITEM_SEPARATOR/, $r[3]);
 
-			$s[1] = cleanNull({ string => $s[1] });
+			$s[1] = cleanNull({ string => $s[1], fixfeed => 1 });
 
 			$PAGE .= "<tr class=\"middle\">";
 			$PAGE .= "<td align=\"right\">Description:</td>";

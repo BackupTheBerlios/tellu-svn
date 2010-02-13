@@ -711,8 +711,8 @@ sub editProviderNode {
 				$s[19] = cleanNull({ string => $s[19] });
 				$s[20] = cleanNull({ string => $s[20] });
 				$s[21] = cleanNull({ string => $s[21] });
-				$s[22] = cleanNull({ string => $s[22] });
-				$s[23] = cleanNull({ string => $s[23] });
+				$s[22] = cleanNull({ string => $s[22], fixfeed => 1 });
+				$s[23] = cleanNull({ string => $s[23], fixfeed => 1 });
 				$s[24] = cleanNull({ string => $s[24] });
 
 				$PAGE .= "<tr class=\"top\">";
