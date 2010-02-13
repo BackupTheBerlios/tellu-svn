@@ -33,6 +33,43 @@ sub headPrepare {
 		$SESSION_UID = &headCookieGet({ name => "tellu_uid" });
 	}
 
+	my %c = fetch CGI::Cookie;
+	my $c = keys %c;
+
+	if($c > 29) {
+		my @c = ();
+		my $i = 0;
+
+		if($CALLER =~ /_d_popup$/) {
+			foreach $c (keys %c) {
+				if($c =~ /_popup_/ && $c !~ /_d_popup_/) {
+					print STDOUT "Set-Cookie: " . &headCookieSet({ name => $c, value => '', expire => '-1d' }) . $CONFIG_LINEFEED;
+				}
+			}
+		}
+		elsif($CALLER =~ /_popup$/) {
+			foreach $c (keys %c) {
+				if($c =~ /_d_popup_/ || $c =~ /_d_/) {
+					print STDOUT "Set-Cookie: " . &headCookieSet({ name => $c, value => '', expire => '-1d' }) . $CONFIG_LINEFEED;
+				}
+			}
+		}
+		elsif($CALLER =~ /_d$/) {
+			foreach $c (keys %c) {
+				if($c =~ /_d_popup_/ || $c =~ /_popup_/) {
+					print STDOUT "Set-Cookie: " . &headCookieSet({ name => $c, value => '', expire => '-1d' }) . $CONFIG_LINEFEED;
+				}
+			}
+		}
+		else {
+			foreach $c (keys %c) {
+				if($c =~ /_d_popup_/ || $c =~ /_d_/ || $c =~ /_popup_/) {
+					print STDOUT "Set-Cookie: " . &headCookieSet({ name => $c, value => '', expire => '-1d' }) . $CONFIG_LINEFEED;
+				}
+			}
+		}
+	}
+
 	if($CONFIG_DEBUG != 0) {
 		$PAGE .= $q->Dump();
 
@@ -57,7 +94,14 @@ sub headCookieGet {
 sub headCookieSet {
 	my ($arg) = @_;
 
-	my $r = $q->cookie( -name => $arg->{name}, -value => $arg->{value}, -path => '/' );
+	my $r = "";
+
+	if($arg->{expire} && $arg->{expire} ne "") {
+		$r = $q->cookie( -name => $arg->{name}, -value => $arg->{value}, -path => '/', expires => $arg->{expire} );
+	}
+	else {
+		$r = $q->cookie( -name => $arg->{name}, -value => $arg->{value}, -path => '/' );
+	}
 
 	return $r;
 }
