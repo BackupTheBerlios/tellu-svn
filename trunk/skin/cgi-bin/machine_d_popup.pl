@@ -31,7 +31,7 @@ my $u = "";
 
 my $s = $q->param('slice');
 
-if(!$s || $s eq "") {
+if(!$s || $s eq "" || $s eq "nper") {
 	$s = "node";
 
 	@r = &sendCommand({ command => "pullDisposedMachine", item => $n, domain => $d, param => $s, option => "" });

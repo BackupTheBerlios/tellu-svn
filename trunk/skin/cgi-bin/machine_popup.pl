@@ -31,7 +31,7 @@ my $u = "";
 
 my $s = $q->param('slice');
 
-if(!$s || $s eq "" || $s eq "incs") {
+if(!$s || $s eq "" || $s eq "incs" || $s eq "nper") {
 	$s = "node";
 
 	@r = &sendCommand({ command => "pullMachine", item => $n, domain => $d, param => $s, option => "" });
