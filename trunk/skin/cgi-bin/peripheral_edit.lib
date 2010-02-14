@@ -189,7 +189,9 @@ sub editPeripheralNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$dc{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$dc{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -207,7 +209,9 @@ sub editPeripheralNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$dm{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$dm{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -225,7 +229,9 @@ sub editPeripheralNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$do{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$do{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -1012,7 +1018,9 @@ sub editPeripheralNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$dc{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$dc{$m}++ if($m && $m ne "");
 				}
 			}
 
@@ -1030,7 +1038,9 @@ sub editPeripheralNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$dm{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$dm{$m}++ if($m && $m ne "");
 				}
 			}
 
@@ -1048,7 +1058,9 @@ sub editPeripheralNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$do{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$do{$m}++ if($m && $m ne "");
 				}
 			}
 

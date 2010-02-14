@@ -105,8 +105,12 @@ sub editProviderNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			push @ti, $p;
-			$ti{$p} = $m;
+			$m = cleanNull({ string => $m });
+
+			if($m && $m ne "") {
+				push @ti, $p;
+				$ti{$p} = $m;
+			}
 		}
 	}
 
@@ -129,7 +133,9 @@ sub editProviderNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$na{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$na{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -147,7 +153,9 @@ sub editProviderNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$st{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$st{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -165,7 +173,9 @@ sub editProviderNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$zi{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$zi{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -183,7 +193,9 @@ sub editProviderNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$ci{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$ci{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -201,7 +213,9 @@ sub editProviderNew {
 		foreach my $s (@s) {
 			my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-			$co{$m}++;
+			$m = cleanNull({ string => $m });
+
+			$co{$m}++ if($m && $m ne "");
 		}
 	}
 
@@ -561,8 +575,12 @@ sub editProviderNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					push @ti, $p;
-					$ti{$p} = $m;
+					$m = cleanNull({ string => $m });
+
+					if($m && $m ne "") {
+						push @ti, $p;
+						$ti{$p} = $m;
+					}
 				}
 			}
 
@@ -585,7 +603,9 @@ sub editProviderNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$na{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$na{$m}++ if($m && $m ne "");
 				}
 			}
 
@@ -603,7 +623,9 @@ sub editProviderNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$st{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$st{$m}++ if($m && $m ne "");
 				}
 			}
 
@@ -621,7 +643,9 @@ sub editProviderNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$zi{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$zi{$m}++ if($m && $m ne "");
 				}
 			}
 
@@ -639,7 +663,9 @@ sub editProviderNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$ci{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$ci{$m}++ if($m && $m ne "");
 				}
 			}
 
@@ -657,7 +683,9 @@ sub editProviderNode {
 				foreach my $s (@s) {
 					my ($p, $m) = split(/$ITEM_SEPARATOR/, $s);
 
-					$co{$m}++;
+					$m = cleanNull({ string => $m });
+
+					$co{$m}++ if($m && $m ne "");
 				}
 			}
 
