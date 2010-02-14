@@ -30,10 +30,7 @@ char *pullLog(struct threadInfo * ti) {
 char *searchLog(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -67,10 +64,7 @@ char *pullHistory(struct threadInfo * ti) {
 char *searchHistory(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -133,11 +127,11 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 
 	// Allocate memory for buffers
 	ti->commandInfo.s =
-		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 2) +
+		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 18) +
+		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 18) +
+		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 18) +
+		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 18) +
+		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 18) +
 		CONFIG_SPACE_SIZE;
 
 	if((ti->commandInfo.statBuffer = malloc(ti->commandInfo.s + 1)) == NULL) {
@@ -251,9 +245,16 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE %s LIKE '%%%s%%' ORDER BY " TABLEORD_LOG_LOG "%c",
+					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_NODE " LIKE '%%%s%%' OR " TABLECOL_LOG_DOMAIN " LIKE '%%%s%%' OR " TABLECOL_LOG_SYS " LIKE '%%%s%%' OR " TABLECOL_LOG_REL " LIKE '%%%s%%' OR " TABLECOL_LOG_UID " LIKE '%%%s%%' OR " TABLECOL_LOG_GRP " LIKE '%%%s%%' OR " TABLECOL_LOG_PROC " LIKE '%%%s%%' OR " TABLECOL_LOG_PROCVER " LIKE '%%%s%%' OR " TABLECOL_LOG_NOTE " LIKE '%%%s%%' ORDER BY " TABLEORD_LOG_LOG "%c",
 					ti->commandInfo.esc4Buffer,
-					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 
@@ -285,9 +286,16 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE %s LIKE '%%%s%%' ORDER BY " TABLEORD_HIST_HIST "%c",
+					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_NODE " LIKE '%%%s%%' OR " TABLECOL_HIST_DOMAIN " LIKE '%%%s%%' OR " TABLECOL_HIST_SYS " LIKE '%%%s%%' OR " TABLECOL_HIST_REL " LIKE '%%%s%%' OR " TABLECOL_HIST_UID " LIKE '%%%s%%' OR " TABLECOL_HIST_GRP " LIKE '%%%s%%' OR " TABLECOL_HIST_PROC " LIKE '%%%s%%' OR " TABLECOL_HIST_PROCVER " LIKE '%%%s%%' OR " TABLECOL_HIST_CONNS " LIKE '%%%s%%' ORDER BY " TABLEORD_HIST_HIST "%c",
 					ti->commandInfo.esc4Buffer,
-					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
 					0
 				);
 

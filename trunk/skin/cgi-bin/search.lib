@@ -254,6 +254,28 @@ sub doSearch {
 				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
 			}
 		}
+		elsif($arg->{command} eq "searchHistory") {
+			require "admin.lib";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				&tableAdminDetail({ data => $r[3], slice => "History", sort => $q->param('sort'), order => $q->param('order') });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
+			}
+		}
+		elsif($arg->{command} eq "searchLog") {
+			require "admin.lib";
+
+			my @r = &sendCommand({ command => $arg->{command}, item => "", domain => "", param => $arg->{search}, option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				&tableAdminDetail({ data => $r[3], slice => "Log", sort => $q->param('sort'), order => $q->param('order') });
+
+				$PAGE .= "<p class=\"note\">" . $arg->{caller} . ", " . &searchCounter({ data => $r[3] }) . "</p>";
+			}
+		}
 	}
 }
 
@@ -279,7 +301,12 @@ sub searchCounted {
 		$r = $NUMWORDS{$arg->{data}} . " entry";
 	}
 	else {
-		$r = $NUMWORDS{$arg->{data}} . " entries";
+		if($NUMWORDS{$arg->{data}}) {
+			$r = $NUMWORDS{$arg->{data}} . " entries";
+		}
+		else {
+			$r = $arg->{data} . " entries";
+		}
 	}
 
 	return $r;

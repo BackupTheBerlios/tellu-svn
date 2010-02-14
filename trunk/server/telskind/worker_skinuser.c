@@ -28,9 +28,9 @@ char *pullUser(struct threadInfo * ti) {
 }
 
 char *searchUser(struct threadInfo * ti) {
-	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
-	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
 		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
 
 		return(ti->dataBuffer);
@@ -123,11 +123,11 @@ char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
 
 	// Allocate memory for buffers
 	ti->commandInfo.s =
-		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 2) +
-		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 2) +
+		(ti->handlerArrays[HANDLER_ARRAY_UID].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_ITEM].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_PARAM].size * 10) +
+		(ti->handlerArrays[HANDLER_ARRAY_OPTION].size * 10) +
 		CONFIG_SPACE_SIZE;
 
 	if((ti->commandInfo.statBuffer = malloc(ti->commandInfo.s + 1)) == NULL) {
@@ -301,6 +301,18 @@ char *fetchUser(int getThis, int getType, struct threadInfo * ti) {
 
 				break;
 			case 3:
+				// Search from users
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+"SELECT " TABLEKEY_USER_LIST " FROM " TABLE_USERS " WHERE " TABLECOL_USER_UID " LIKE '%%%s%%' OR " TABLECOL_USER_GECOS " LIKE '%%%s%%' OR " TABLECOL_USER_HOMEPAGE " LIKE '%%%s%%' OR " TABLECOL_USER_DESCR " LIKE '%%%s%%' OR " TABLECOL_USER_NOTE " LIKE '%%%s%%' ORDER BY " TABLECOL_USER_UID "%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
 
 				break;
 			case 4:

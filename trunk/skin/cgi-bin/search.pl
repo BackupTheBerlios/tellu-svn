@@ -49,11 +49,22 @@ if($c && $c ne "") {
 	}
 
 	if($c =~ /^admin/) {
-		$t .= " from administrative items";
+		my @r = &sendCommand({ command => "isUserAdmin", item => "", domain => "", param => "", option => "" });
 
-		&doSearch({ caller => "Histories", command => "searchHistory", search => $w });
-		&doSearch({ caller => "Logs", command => "searchLog", search => $w });
-		&doSearch({ caller => "Users", command => "searchUser", search => $w });
+		if(checkError({ packet => \@r }) == 0) {
+			$t .= " from administrative items";
+
+			if($r[3] && $r[3] == 64) {
+				&doSearch({ caller => "Histories", command => "searchHistory", search => $w });
+				&doSearch({ caller => "Logs", command => "searchLog", search => $w });
+			}
+			else {
+				$PAGE .= "<p>Permission denied: please contact your system administrator or help desk if you need to have an access to this resource.</p>";
+			}
+		}
+		else {
+			&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
+		}
 	}
 	elsif($c =~ /^device_d/) {
 		$t .= " from disposed devices";
