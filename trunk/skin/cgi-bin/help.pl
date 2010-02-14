@@ -16,10 +16,9 @@ require "help.lib";
 my @c = ();
 my @r = ();
 
-my $h = &headCookieGet({ name => "tellu_help_action" });
+my $t = "Help";
 
 if($q->param('action')) {
-	my $t = "Help";
 	@r = &sendCommand({ command => "pullHelp", item => "", domain => "", param => $q->param('action'), option => "" });
 
 	if(checkError({ packet => \@r }) == 0) {
@@ -31,18 +30,13 @@ if($q->param('action')) {
 			$t = $s[1];
 		}
 
-$PAGE .= "$s[2] <br>";
-
-		$c[0] = &headCookieSet({ name => "tellu_help_action", value => $s[0] });
-
-		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU, cookie => \@c });
+		$PAGE .= cleanNull({ string => $s[2] });
 	}
 	else {
 		&htmlPage({ title => $WINDOW_TITLE . " - " . $SESSION_ERR, script => "", header => $SESSION_ERR, content => $PAGE, slices => $MENU });
 	}
 }
-else {
-	# DISPLAY SOMETHING?
-}
+
+&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 
 exit(0);
