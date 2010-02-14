@@ -233,7 +233,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_PROC " = '%s' AND " TABLECOL_LOG_PROCVER " = '%s' ORDER BY " TABLEORD_LOG_LOG " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
+					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_PROC " = '%s' AND " TABLECOL_LOG_PROCVER " = '%s' AND " TABLECOL_LOG_NOTE " != '0 connections served, all workers idling' ORDER BY " TABLEORD_LOG_LOG " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc5Buffer,
 					0
@@ -245,7 +245,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE " TABLECOL_LOG_NODE " LIKE '%%%s%%' OR " TABLECOL_LOG_DOMAIN " LIKE '%%%s%%' OR " TABLECOL_LOG_SYS " LIKE '%%%s%%' OR " TABLECOL_LOG_REL " LIKE '%%%s%%' OR " TABLECOL_LOG_UID " LIKE '%%%s%%' OR " TABLECOL_LOG_GRP " LIKE '%%%s%%' OR " TABLECOL_LOG_PROC " LIKE '%%%s%%' OR " TABLECOL_LOG_PROCVER " LIKE '%%%s%%' OR " TABLECOL_LOG_NOTE " LIKE '%%%s%%' ORDER BY " TABLEORD_LOG_LOG "%c",
+					"SELECT DISTINCT " TABLEKEY_LOG_LOG " FROM " TABLE_LOG " WHERE (" TABLECOL_LOG_NODE " LIKE '%%%s%%' OR " TABLECOL_LOG_DOMAIN " LIKE '%%%s%%' OR " TABLECOL_LOG_SYS " LIKE '%%%s%%' OR " TABLECOL_LOG_REL " LIKE '%%%s%%' OR " TABLECOL_LOG_UID " LIKE '%%%s%%' OR " TABLECOL_LOG_GRP " LIKE '%%%s%%' OR " TABLECOL_LOG_PROC " LIKE '%%%s%%' OR " TABLECOL_LOG_PROCVER " LIKE '%%%s%%' OR " TABLECOL_LOG_NOTE " LIKE '%%%s%%') AND " TABLECOL_LOG_NOTE " != '0 connections served, all workers idling' ORDER BY " TABLEORD_LOG_LOG " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc4Buffer,
@@ -274,7 +274,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_PROC " = '%s' AND " TABLECOL_HIST_PROCVER " = '%s' ORDER BY " TABLEORD_HIST_HIST " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
+					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_PROC " = '%s' AND " TABLECOL_HIST_PROCVER " = '%s' AND " TABLECOL_HIST_CONNS " != '0' ORDER BY " TABLEORD_HIST_HIST " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc5Buffer,
 					0
@@ -286,7 +286,7 @@ char *fetchLog(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE " TABLECOL_HIST_NODE " LIKE '%%%s%%' OR " TABLECOL_HIST_DOMAIN " LIKE '%%%s%%' OR " TABLECOL_HIST_SYS " LIKE '%%%s%%' OR " TABLECOL_HIST_REL " LIKE '%%%s%%' OR " TABLECOL_HIST_UID " LIKE '%%%s%%' OR " TABLECOL_HIST_GRP " LIKE '%%%s%%' OR " TABLECOL_HIST_PROC " LIKE '%%%s%%' OR " TABLECOL_HIST_PROCVER " LIKE '%%%s%%' OR " TABLECOL_HIST_CONNS " LIKE '%%%s%%' ORDER BY " TABLEORD_HIST_HIST "%c",
+					"SELECT DISTINCT " TABLEKEY_HIST_HIST " FROM " TABLE_HIST " WHERE (" TABLECOL_HIST_NODE " LIKE '%%%s%%' OR " TABLECOL_HIST_DOMAIN " LIKE '%%%s%%' OR " TABLECOL_HIST_SYS " LIKE '%%%s%%' OR " TABLECOL_HIST_REL " LIKE '%%%s%%' OR " TABLECOL_HIST_UID " LIKE '%%%s%%' OR " TABLECOL_HIST_GRP " LIKE '%%%s%%' OR " TABLECOL_HIST_PROC " LIKE '%%%s%%' OR " TABLECOL_HIST_PROCVER " LIKE '%%%s%%' OR " TABLECOL_HIST_CONNS " LIKE '%%%s%%') AND " TABLECOL_HIST_CONNS " != '0' ORDER BY " TABLEORD_HIST_HIST " DESC LIMIT " QUERY_PULL_LIMIT_S "%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc4Buffer,
