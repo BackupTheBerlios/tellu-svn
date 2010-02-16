@@ -46,12 +46,13 @@ sub doSearch {
 			}
 
 			my $h = 0;
+			my $t = 0;
 
 			while((my $k, $v) = each %n) {
 				$h = $v if($v > $h);
 			}
 
-			my $t = 100 / $h;
+			$t = 100 / $h if($h > 0);
 
 			while((my $k, $v) = each %n) {
 				$n{$k} = int($v * $t);
