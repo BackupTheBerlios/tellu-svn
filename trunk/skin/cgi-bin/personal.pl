@@ -42,18 +42,30 @@ if($q->param('action') || $q->param('slice')) {
 	}
 	elsif($q->param('action') eq "listg" || $q->param('slice') eq "grp") {
 		require "machine.lib";
+		require "faction.js";
 
 		$t = "My factions";
 
 		my @r = &sendCommand({ command => "listFaction", item => "", domain => "", param => "name", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
-			$PAGE .= "<p>&nbsp;</p>";
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-			&tableMachineDetail({ data => $r[3], slice => "grp", sort => $q->param('sort'), order => $q->param('order') });
+			foreach my $s (@s) {
+				my @i = split(/$ITEM_SEPARATOR/, $s);
+
+				$i[2] = $i[0] . "|" . $i[2];
+
+				push @w, join($ITEM_SEPARATOR, @i);
+			}
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$SCRIPT .= &factionListingFuncs();
+
+			&tableMachineDetail({ data => join($ITEM_DELIMITER, @w), slice => "grp", sort => $q->param('sort'), order => $q->param('order') });
 		}
 
-		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &modifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => $SCRIPT . &modifyFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}
 	elsif($q->param('action') eq "listf" || $q->param('slice') eq "fle") {
 		require "machine.lib";
