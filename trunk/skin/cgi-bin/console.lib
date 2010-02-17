@@ -1074,7 +1074,7 @@ sub tableConsoleSlice {
 
 	$MENU .= "<table class=\"plain\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/console/console.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/console/console.png\"></td>";
 	$MENU .= "<td class=\"c3\">TEL<br />console</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";

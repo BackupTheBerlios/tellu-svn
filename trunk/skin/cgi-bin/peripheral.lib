@@ -742,7 +742,7 @@ sub tablePeripheralBriefSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/summary.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/peripheral/summary.png\"></td>";
 	$MENU .= "<td class=\"c3\">Summary</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
@@ -762,7 +762,7 @@ sub tablePeripheralListingSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/listing.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/peripheral/listing.png\"></td>";
 	$MENU .= "<td class=\"c3\">Listing</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
@@ -782,7 +782,7 @@ sub tablePeripheralDetailSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/peripheral/peripheral.png\"></td>";
 	$MENU .= "<td class=\"c3\">Active<br />peripherals</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
@@ -807,7 +807,7 @@ sub tableDPeripheralDetailSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral_d.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/peripheral/peripheral_d.png\"></td>";
 	$MENU .= "<td class=\"c3\">Disposed<br />peripherals</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
@@ -830,7 +830,7 @@ sub tablePeripheralSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/peripheral/peripheral.png\"></td>";
 	$MENU .= "<td class=\"c3\">Active<br />peripherals</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
@@ -844,7 +844,7 @@ sub tableDPeripheralSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" src=\"/pics/peripheral/peripheral_d.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/peripheral/peripheral_d.png\"></td>";
 	$MENU .= "<td class=\"c3\">Disposed<br />peripherals</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
