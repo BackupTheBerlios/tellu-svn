@@ -1,0 +1,164 @@
+html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+p {
+	line-height: 1.5;
+	margin: 0 0 2em 0;
+}
+
+p.info {
+	line-height: 1.5;
+	margin: 0 0 2em 0;
+}
+
+p.note {
+	font-size: 110%;
+	font-style: italic;
+	line-height: 1.5;
+	margin: 0 0 1em 0;
+}
+
+p.warning {
+	color: #aa2222;
+	font-weight: bold;
+	line-height: 1.5;
+	margin: 0 0 2em 0;
+}
+
+h1 {
+	border-bottom: 1px dotted #333333;
+	color: #000000;
+	font-size: 200%;
+}
+
+h2 {
+	border-bottom: 1px dotted #333333;
+	color: #000000;
+	font-size: 180%;
+}
+
+h3 {
+	border-bottom: 1px dotted #333333;
+	color: #000000;
+	font-size: 160%;
+}
+
+h4 {
+	border-bottom: 1px dotted #333333;
+	color: #000000;
+	font-size: 140%;
+}
+
+#mainpage {
+	background: #abcdef;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-size: 100%;
+	padding: 0;
+}
+
+#mainarea {
+	background: #abcdef;
+	margin: 10px 20px 10px 170px;
+	position: absolute;
+	width: 84%;
+}
+
+#mainmenu {
+	background: #333333;
+	margin: 0;
+	position: absolute;
+	width: 150px;
+}
+
+#menugap {
+	background: #abcdef url("/pics/shadowb.png") repeat-x;
+	margin: 0;
+	position: relative;
+	height: 14px;
+	z-index: -1;
+}
+
+#maingap {
+	background: #abcdef url("/pics/shadowb.png") repeat-x;
+	margin: 0;
+	position: absolute;
+	height: 14px;
+	width: 150px;
+	z-index: -1;
+}
+
+#logo {
+	border: none;
+	padding: 10px;
+}
+
+#slices {
+	background: #333333;
+	list-style: none;
+	margin: 16px 0 0 0;
+	padding: 0;
+}
+
+#slices li {
+	margin: 0;
+	padding: 0;
+}
+
+#slices a {
+	background: #333333;
+	border-bottom: 1px solid #202020;
+	border-top: 1px solid #424242;
+	color: #f0f0f0;
+	display: block;
+	margin: 0;
+	padding: 6px 12px;
+	text-decoration: none;
+}
+
+#slices a:focus {
+	background: #2580a2 url("/pics/triangle.png") left center no-repeat;
+	color: #f0f0f0;
+	padding-bottom: 6px;
+}
+
+#slices a:hover {
+	background: #2580a2 url("/pics/triangle.png") left center no-repeat;
+	color: #f0f0f0;
+	padding-bottom: 6px;
+}
+
+#sliceb {
+	background: #abcdef url("/pics/shadowb.png") left top repeat-x;
+	height: 12px;
+}
+
+#slicec {
+	background: #abcdef url("/pics/shadowbc.png") left top no-repeat;
+	height: 12px;
+	width: 8px;
+}
+
+#slicer {
+	background: #abcdef url("/pics/shadowr.png") left top repeat-y;
+	width: 8px;
+}
+
+#sliceu {
+	background: #333333 url("/pics/shadowb.png") repeat-x;
+	height: 14px;
+	width: 142px;
+}
+
+#slicet {
+	background: #abcdef url("/pics/shadowc.png") left top no-repeat;
+	height: 14px;
+	width: 8px;
+}

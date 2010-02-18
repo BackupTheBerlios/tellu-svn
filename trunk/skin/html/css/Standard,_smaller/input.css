@@ -1,0 +1,331 @@
+optgroup.header {
+	background: #c0c0c0;
+	color: #000000;
+	font-style: normal;
+	font-weight: bold;
+}
+
+option {
+	background: #e8e8e8;
+	color: #000000;
+	font-size: 80%;
+	font-style: normal;
+	font-weight: normal;
+}
+
+#radio {
+	padding: 4px;
+}
+
+#tick {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	margin: 4px;
+	padding: 2px;
+}
+
+#tick:focus {
+	border: inset 2px #ffffff;
+}
+
+#select {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	width: 300px;
+}
+
+#select:disabled {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+	width: 300px;
+}
+
+#selreq {
+	background: #e8e8e8;
+	border: solid 2px #bb6666;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	width: 300px;
+}
+
+#selreq:disabled {
+	background: #e8e8e8;
+	border: solid 2px #bb6666;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+	width: 300px;
+}
+
+#selthin {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	width: 100px;
+}
+
+#selthin:disabled {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+	width: 100px;
+}
+
+#file {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+}
+
+#file:disabled {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+}
+
+#file:focus {
+	background: #e8e8e8;
+	border: inset 2px #ffffff;
+	color: #000000;
+	font-style: normal;
+	padding: 6px;
+}
+
+#text {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+}
+
+#text:disabled {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #808080;
+	font-style: italic;
+	padding: 6px;
+}
+
+#text:focus {
+	background: #e8e8e8;
+	border: inset 2px #ffffff;
+	color: #000000;
+	font-style: normal;
+	padding: 6px;
+}
+
+#textreq {
+	background: #e8e8e8;
+	border: solid 2px #bb6666;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+}
+
+#textreq:disabled {
+	background: #e8e8e8;
+	border: solid 2px #bb6666;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+}
+
+#textreq:focus {
+	background: #e8e8e8;
+	border: inset 2px #bb6666;
+	color: #000000;
+	font-style: normal;
+	padding: 6px;
+}
+
+#pwd {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+}
+
+#pwd:disabled {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+}
+
+#pwd:focus {
+	background: #e8e8e8;
+	border: inset 2px #ffffff;
+	color: #000000;
+	font-style: normal;
+	padding: 6px;
+}
+
+#pwdreq {
+	background: #e8e8e8;
+	border: solid 2px #bb6666;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+}
+
+#pwdreq:disabled {
+	background: #e8e8e8;
+	border: solid 2px #bb6666;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+}
+
+#pwdreq:focus {
+	background: #e8e8e8;
+	border: inset 2px #bb6666;
+	color: #000000;
+	font-style: normal;
+	padding: 6px;
+}
+
+#search {
+	background: #e8e8e8;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-size: 70%;
+	font-style: normal;
+	padding: 6px;
+	width: 170px;
+}
+
+#textarea {
+	background: #e8e8e8 url("/pics/paper.png") repeat;
+	border: solid 2px #ffffff;
+	color: #000000;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+}
+
+#textarea:disabled {
+	background: #e8e8e8 url("/pics/paper.png") repeat;
+	border: solid 2px #ffffff;
+	color: #808080;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: italic;
+	padding: 6px;
+}
+
+#textarea:focus {
+	background: #e8e8e8 url("/pics/paper.png") repeat;
+	border: inset 2px #ffffff;
+	color: #000000;
+	font-style: normal;
+	padding: 6px;
+}
+
+#normal {
+	background: #444444;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	text-align: center;
+	width: 150px;
+}
+
+#normal:focus {
+	background: #2580a2;
+	border: inset 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
+
+#normal:hover {
+	background: #2580a2;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
+
+#submit {
+	background: #444444;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	text-align: center;
+	width: 150px;
+}
+
+#submit:focus {
+	background: #2580a2;
+	border: inset 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
+
+#submit:hover {
+	background: #2580a2;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
+
+#button {
+	background: #444444;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-family: Lucida Sans, Tahoma, Verdana, Helvetica, sans-serif;
+	font-style: normal;
+	padding: 6px;
+	text-align: center;
+	width: 60px;
+}
+
+#button:focus {
+	background: #2580a2;
+	border: inset 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
+
+#button:hover {
+	background: #2580a2;
+	border: solid 2px #ffffff;
+	color: #f0f0f0;
+	font-style: normal;
+}
