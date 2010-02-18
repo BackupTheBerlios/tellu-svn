@@ -207,11 +207,16 @@ void mysqlExpire(struct threadStorageInfo * db) {
 
 	if(mysqlConnect(db) == 0) {
 		if((db->queryBuffer = malloc(CONFIG_SPACE_SIZE + 1)) != NULL) {
+			if((db->mysqlBool = configFetch("session_timeout", &db->i)) == NULL) {
+				*db->mysqlBool = TIMER_RESOLUTION_SESSION_FLUSH;
+			}
+
 			// Flush expired session entries
 			snprintf(
 				db->queryBuffer,
 				CONFIG_SPACE_SIZE,
-				"DELETE FROM " TABLE_SESSION " WHERE UNIX_TIMESTAMP(" TABLECOL_SESSION_ACCESS ") < UNIX_TIMESTAMP() - " TIMER_RESOLUTION_SESSION_FLUSH "%c",
+				"DELETE FROM " TABLE_SESSION " WHERE UNIX_TIMESTAMP(" TABLECOL_SESSION_ACCESS ") < UNIX_TIMESTAMP() - %d%c",
+				*db->mysqlBool,
 				0
 			);
 
@@ -254,7 +259,6 @@ void mysqlExpire(struct threadStorageInfo * db) {
 			mysqlPush(db, db->queryBuffer);
 
 			// Flush disposed services
-
 			snprintf(
 				db->queryBuffer,
 				CONFIG_SPACE_SIZE,

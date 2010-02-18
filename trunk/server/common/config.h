@@ -52,6 +52,8 @@ struct mainConfig mainConfigs[] = {
 	{ "ldap_searchbase", configLdapBase, 0, CONFIG_TYPE_STRING },
 	{ "ldap_searchfilter", configLdapFilter, 0, CONFIG_TYPE_STRING },
 
+	{ "session_timeout", NULL, TIMER_RESOLUTION_SESSION_FLUSH, CONFIG_TYPE_INTEGER },
+
 	{ "info_stdout", NULL, CONFIG_TYPE_BOOLEAN_NO, CONFIG_TYPE_BOOLEAN },
 	{ "info_stderr", NULL, CONFIG_TYPE_BOOLEAN_NO, CONFIG_TYPE_BOOLEAN },
 	{ "info_syslog", NULL, CONFIG_TYPE_BOOLEAN_NO, CONFIG_TYPE_BOOLEAN },
