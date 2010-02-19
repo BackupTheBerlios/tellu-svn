@@ -48,4 +48,24 @@ sub adminModifyFuncs {
 	return $r;
 }
 
+sub adminPreviewFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "function buttonPreview(param, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " var i = document.getElementsByName(param);" . $CONFIG_LINEFEED;
+	$r .= " var j = i[0].value;" . $CONFIG_LINEFEED;
+	$r .= " for(var k = 0; k < i[0].length; k++) {" . $CONFIG_LINEFEED;
+	$r .= "  if(i[0][k].selected) {" . $CONFIG_LINEFEED;
+	$r .= "   var l = i[0][k].value;" . $CONFIG_LINEFEED;
+	$r .= "   window.open('admin_theme_preview.pl?theme=' +l+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "   break;" . $CONFIG_LINEFEED;
+	$r .= "  }" . $CONFIG_LINEFEED;
+	$r .= " }" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
 1;

@@ -75,9 +75,11 @@ sub checkError {
 		return(0);
 	}
 	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_LOGINNEEDED) {
-		require "logout.pl";
+		$SESSION_ERR = $arg->{packet}[3];
 
-		&doLogout();
+		$PAGE .= "<p>Login required: you need login succesfully before you can access to this resource.</p>";
+
+		return(-1);
 	}
 	elsif(int($arg->{packet}[0]) == $ERROR_SLIGHT && int($arg->{packet}[1]) == $ERROR_CLASS_AUTH && int($arg->{packet}[2]) == $ERROR_CODE_AUTH_PERMISSIONDENIED) {
 		$SESSION_ERR = $arg->{packet}[3];

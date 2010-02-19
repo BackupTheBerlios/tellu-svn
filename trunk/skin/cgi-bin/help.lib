@@ -8,9 +8,6 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
-require "chest.lib";
-require "network.lib";
-
 sub tableHelpSlice {
 	my ($arg) = @_;
 

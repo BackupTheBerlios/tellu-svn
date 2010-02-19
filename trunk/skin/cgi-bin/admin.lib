@@ -8,9 +8,6 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
-require "chest.lib";
-require "network.lib";
-require "prefs.lib";
 require "item.lib";
 
 sub editAdminAccount {
@@ -238,10 +235,39 @@ sub editAdminAccount {
 		my $p = "";
 
 		if($q->param('submit2') && $q->param('submit2') eq "Set popup size") {
-			my @r = &sendCommand({ command => "pushUser", item => "", domain => "", param => "prefs", option => "ps:" . $q->param('popup') });
+			my @r = &sendCommand({ command => "pullUser", item => $SESSION_UID, domain => "", param => "prefs", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
-				&htmlPage({ redirect => $SELF . "?action=admin&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				my @i = split(/$ITEM_SEPARATOR/, $r[3]);
+				my @n = ();
+
+				@i = split(/\|/, $i[1]);
+
+				foreach my $i (@i) {
+					my ($c, $d) = split(/:/, $i, 2);
+
+					if($c eq "ps") {
+						$d = $q->param('popup');
+					}
+
+					push @n, $c . ":" . $d;
+				}
+
+				@r = &sendCommand({ command => "pushUser", item => "", domain => "", param => "prefs", option => join('|', @n) });
+
+				if(checkError({ packet => \@r }) == 0) {
+					&htmlPage({ redirect => $SELF . "?action=admin&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
+				else {
+					$m = "Error occurred while trying to change popup window size";
+
+					if($r[3] && $r[3] ne "") {
+						$m .= ": " . $r[3];
+					}
+					else {
+						$m .= ".";
+					}
+				}
 			}
 			else {
 				$m = "Error occurred while trying to change popup window size";
@@ -301,6 +327,121 @@ sub editAdminAccount {
 		$PAGE .= "<tr class=\"middle\">";
 		$PAGE .= "<td align=\"right\">&nbsp;</td>";
 		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit2", value => "Set popup size" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "</table>";
+	}
+	elsif($arg->{select} eq "Set theme") {
+		my @o = ();
+		my @t = ();
+		my %l = ();
+		my $m = "";
+		my $p = "";
+
+		if($q->param('submit2') && $q->param('submit2') eq "Set theme") {
+			my @r = &sendCommand({ command => "pullUser", item => $SESSION_UID, domain => "", param => "prefs", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @i = split(/$ITEM_SEPARATOR/, $r[3]);
+				my @n = ();
+
+				@i = split(/\|/, $i[1]);
+
+				foreach my $i (@i) {
+					my ($c, $d) = split(/:/, $i, 2);
+
+					if($c eq "th") {
+						$d = $q->param('theme');
+					}
+
+					push @n, $c . ":" . $d;
+				}
+
+				@r = &sendCommand({ command => "pushUser", item => "", domain => "", param => "prefs", option => join('|', @n) });
+
+				if(checkError({ packet => \@r }) == 0) {
+					&htmlPage({ redirect => $SELF . "?action=admin&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
+				else {
+					$m = "Error occurred while trying to change theme";
+
+					if($r[3] && $r[3] ne "") {
+						$m .= ": " . $r[3];
+					}
+					else {
+						$m .= ".";
+					}
+				}
+			}
+			else {
+				$m = "Error occurred while trying to change theme";
+
+				if($r[3] && $r[3] ne "") {
+					$m .= ": " . $r[3];
+				}
+				else {
+					$m .= ".";
+				}
+			}
+		}
+
+		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td width=\"20%\"></td><td width=\"80%\"></td>";
+		$PAGE .= "</tr>";
+
+		if($m && $m ne "") {
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td>" . $m . "</td>";
+			$PAGE .= "</tr>";
+
+			$PAGE .= "<tr class=\"top\">";
+			$PAGE .= "<td></td><td></td>";
+			$PAGE .= "</tr>";
+		}
+
+		if(opendir(DIR, $DIR_TEMPLATE)) {
+			my @f = grep { ! /^\./ && -d $DIR_TEMPLATE . "/" . $_ } readdir(DIR);
+
+			closedir(DIR);
+
+			@f = sort { uc($a) cmp uc($b) } @f;
+
+			$p = &prefsTheme();
+
+			foreach my $f (@f) {
+				my $g = $f;
+
+				$g =~ s/_/ /go;
+
+				push @o, $f;
+				$l{$f} = $g;
+			}
+		}
+
+		my @p = split(/,/, &prefsPopup(), 2);
+
+		$t[0] = $q->optgroup( -name => "Available themes", -values => \@o, -labels => \%l, -class => "header" );
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">Theme:</td>";
+		$PAGE .= "<td>" . &htmlSelectMenu({ name => "theme", value => \@t, select => $p });
+		$PAGE .= "&nbsp;";
+		$PAGE .= &htmlButtonAction({ name => "preview", style => "button", value => "Preview", function => "buttonPreview('theme', '" . $p[0] . "', '" . $p[1] . "'); return true;" }) . "</td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"top\">";
+		$PAGE .= "<td></td><td></td>";
+		$PAGE .= "</tr>";
+
+		$PAGE .= "<tr class=\"middle\">";
+		$PAGE .= "<td align=\"right\">&nbsp;</td>";
+		$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit2", value => "Set theme" }) . "</td>";
 		$PAGE .= "</tr>";
 
 		$PAGE .= "<tr class=\"top\">";

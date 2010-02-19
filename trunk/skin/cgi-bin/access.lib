@@ -8,8 +8,6 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
-require "network.lib";
-
 sub formAccessLogin {
 	my ($arg) = @_;
 

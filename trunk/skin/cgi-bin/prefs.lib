@@ -56,4 +56,32 @@ sub prefsPopup {
 	return $r;
 }
 
+sub prefsTheme {
+	my ($arg) = @_;
+
+	my $r = "Standard";
+
+	my @r = &sendCommand({ command => "pullUser", item => $SESSION_UID, domain => "", param => "prefs", option => "" });
+
+	if(checkError({ packet => \@r }) == 0) {
+		if($r[3] && $r[3] ne "") {
+			my @i = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			@i = split(/\|/, $i[1]);
+
+			foreach my $i (@i) {
+				my ($c, $d) = split(/:/, $i, 2);
+
+				if($c eq "th") {
+					$r = $d;
+
+					last;
+				}
+			}
+		}
+	}
+
+	return $r;
+}
+
 1;

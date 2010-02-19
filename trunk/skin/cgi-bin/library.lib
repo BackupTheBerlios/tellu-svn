@@ -8,6 +8,10 @@ if($pack eq "" && $f eq "" && $line eq "") {
 	exit(0);
 }
 
+require "chest.lib";
+require "network.lib";
+require "prefs.lib";
+
 sub headPrepare {
 	$SELF = $0;
 	$SELF =~ s/^.*\/|^.*\\//;
@@ -531,12 +535,17 @@ sub htmlPage {
 	my ($arg) = @_;
 
 	my $t = "master";
+	my $h = &prefsTheme();
 
 	if($arg->{template} && $arg->{template} ne "") {
 		$t = $arg->{template};
 	}
 
-	my @p = &htmlTemplate({ theme => "Standard", template => $t });
+	if($arg->{theme} && $arg->{theme} ne "") {
+		$h = $arg->{theme};
+	}
+
+	my @p = &htmlTemplate({ theme => $h, template => $t });
 
 	@p = grep { $_ =~ s/<!--caller-->/$CALLER/go } @p;
 	@p = grep { $_ =~ s/<!--charset-->/$HTML_CHARSET/go } @p;

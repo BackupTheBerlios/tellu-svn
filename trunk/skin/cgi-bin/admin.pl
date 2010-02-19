@@ -63,7 +63,7 @@ if($x == 0) {
 
 		my @t = ();
 
-		$t[0] = $q->optgroup( -name => "My account", -values => [ "Change password", "Set front page", "Set popup windows" ], -class => "header" );
+		$t[0] = $q->optgroup( -name => "My account", -values => [ "Change password", "Set front page", "Set popup windows", "Set theme" ], -class => "header" );
 
 		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
@@ -100,7 +100,7 @@ if($x == 0) {
 
 		$PAGE .= &htmlFormEnd();
 
-		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &adminPreviewFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}
 	else {
 		&htmlPage({ title => $WINDOW_TITLE, script => "", header => "&nbsp;", content => $PAGE, slices => $MENU });
@@ -112,7 +112,7 @@ else {
 
 		my @t = ();
 
-		$t[0] = $q->optgroup( -name => "My account", -values => [ "Change password", "Set front page", "Set popup windows" ], -class => "header" );
+		$t[0] = $q->optgroup( -name => "My account", -values => [ "Change password", "Set front page", "Set popup windows", "Set theme" ], -class => "header" );
 
 		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
@@ -149,7 +149,7 @@ else {
 
 		$PAGE .= &htmlFormEnd();
 
-		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+		&htmlPage({ title => $WINDOW_TITLE . " - " . $t, script => &adminPreviewFuncs({ form => "modifyForm" }), header => $t, content => $PAGE, slices => $MENU });
 	}
 	elsif($q->param('leaf') == 1) {
 		$t = "Manage users";
