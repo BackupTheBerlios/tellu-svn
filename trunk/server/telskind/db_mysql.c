@@ -258,7 +258,25 @@ void mysqlExpire(struct threadStorageInfo * db) {
 
 			mysqlPush(db, db->queryBuffer);
 
-			// Flush disposed services
+			// Flush other disposed items
+			snprintf(
+				db->queryBuffer,
+				CONFIG_SPACE_SIZE,
+				"DELETE FROM " TABLE_DEVICE " WHERE " TABLECOL_DEVICE_DISPOSED " >= '2'%c",
+				0
+			);
+
+			mysqlPush(db, db->queryBuffer);
+
+			snprintf(
+				db->queryBuffer,
+				CONFIG_SPACE_SIZE,
+				"DELETE FROM " TABLE_PERIPHERAL " WHERE " TABLECOL_PERIPHERAL_DISPOSED " >= '2'%c",
+				0
+			);
+
+			mysqlPush(db, db->queryBuffer);
+
 			snprintf(
 				db->queryBuffer,
 				CONFIG_SPACE_SIZE,
