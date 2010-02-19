@@ -24989,7 +24989,7 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_users (
 	name		VARCHAR(64),						# user logon name
 	gecos		VARCHAR(64),						# user real name
 	homepage	VARCHAR(64) NOT NULL DEFAULT 'machine',			# user homepage
-	prefs		VARCHAR(255) NOT NULL DEFAULT 'ps:800x600',		# user preferences
+	prefs		VARCHAR(255) NOT NULL DEFAULT 'ps:800x600|th:Standard',	# user preferences
 	password	VARCHAR(64),						# user password
 	locked		BOOL DEFAULT FALSE,					# user account is locked or not
 	descr		TEXT NOT NULL,						# user description
