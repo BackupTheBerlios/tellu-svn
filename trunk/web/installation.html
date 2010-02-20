@@ -76,8 +76,8 @@
 <p>Once you have all required libraries and headers reachable, you can build all server programs and <i>telmon</i> at once with following script seen below, here you need to tune paths to suit your environment. If you are using some common Linux distribution for example, setting `<i>/usr</i>' as a parameter for all those `<i>--with-*</i>' switches is probably enough.</p>
 
 <pre>
- $ tar -zxvf tellu-server-3.0.0.tar.gz
- $ cd tellu-server-3.0.0
+ $ tar -zxvf tellu-server-X.Y.Z.tar.gz
+ $ cd tellu-server-X.Y.Z
 
  for i in telinfo tellud telmon telmond telskind; do
 	(cd $i && ./configure \
@@ -93,8 +93,8 @@
 <p>On <a href="http://en.wikipedia.org/wiki/Berkeley_Software_Distribution" target="_blank">BSD</a> you might want to do this:</p>
 
 <pre>
- $ tar -zxvf tellu-server-3.0.0.tar.gz
- $ cd tellu-server-3.0.0
+ $ tar -zxvf tellu-server-X.Y.Z.tar.gz
+ $ cd tellu-server-X.Y.Z
 
  for i in telinfo tellud telmon telmond telskind; do
 	(cd $i && ./configure \
@@ -125,8 +125,8 @@
 <p>Now initialize Tellu database by <i>cd</i>'ing to the directory where you unpacked Tellu server package and <i>tellu_db.sql</i> file can be find, and by issuing command (<i>$ denotes shell prompt, so don't type it</i>):
 
 <pre>
- $ tar -zxvf tellu-server-3.0.0.tar.gz
- $ cd tellu-server-3.0.0
+ $ tar -zxvf tellu-server-X.Y.Z.tar.gz
+ $ cd tellu-server-X.Y.Z
  $ mysql -h MYSQLHOST -u root -p < tellu_db.sql
 </pre>
 
@@ -190,25 +190,25 @@
 
 <h2>Building the Windows Agent</h2>
 
-<p>Ready to run executable Agent is located in `<i>tellu-agent-windows-3.0.0/Release</i>' directory after uncompressing the `<i>tellu-agent-windows-3.0.0.tar.gz</i>' package. There are some free tools to unpack <i>.tar.gz</i> packages, for example <a href="http://www.7-zip.org" target="_blank">7-Zip</a> and <a href="http://www.powerarchiver.com" target="_blank">PowerArchiver</a>. Agent is compiled using <b>Visual Studio 9</b>, which only create executables for <b>Windows 2000</b> and later. If you need to run Agent on <b>Windows 95</b>/<b>98</b> and/or <b>NT</b> machines, you need to compile Agent by yourself. I will not provide detailed compiling instructions here, because I cannot possibly know which kind of compiler you use. Basically Agent should be compilable using some earlier <b>Visual Studio</b> version, which will produce executable binary for your needs.</p>
+<p>Ready to run executable Agent is located in `<i>tellu-agent-windows-X.Y.Z/Release</i>' directory after uncompressing the `<i>tellu-agent-windows-X.Y.Z.tar.gz</i>' package. There are some free tools to unpack <i>.tar.gz</i> packages, for example <a href="http://www.7-zip.org" target="_blank">7-Zip</a> and <a href="http://www.powerarchiver.com" target="_blank">PowerArchiver</a>. Agent is compiled using <b>Visual Studio 9</b>, which only create executables for <b>Windows 2000</b> and later. If you need to run Agent on <b>Windows 95</b>/<b>98</b> and/or <b>NT</b> machines, you need to compile Agent by yourself. I will not provide detailed compiling instructions here, because I cannot possibly know which kind of compiler you use. Basically Agent should be compilable using some earlier <b>Visual Studio</b> version, which will produce executable binary for your needs.</p>
 
 <h2>Configuring the Agent</h2>
 
-<p>Before starting Tellu Agent you need to check the configuration file, `<i>tellu.conf</i>', it is located in `<i>tellu-agent-windows-3.0.0/Release</i>' directory. It is normal <a href="http://en.wikipedia.org/wiki/ASCII" target="_blank">ASCII</a>-text file, so you can use <i>Notepad</i> for example to modify it. Parameters which needs modification are at least `<i>tellud_server</i>', `<i>tellud_port</i>' and possibly `<i>domain_override</i>'. Do not touch other parameters yet. Set `<i>tellud_server</i>' parameter to server name where <i>tellud</i> is running, and `<i>tellud_port</i>' to the port which <i>tellud</i> listens (<i>by default this is 1700</i>). If agent is unable to resolve the domain name, you need to set `<i>domain_override</i>' parameter as well.</p>
+<p>Before starting Tellu Agent you need to check the configuration file, `<i>tellu.conf</i>', it is located in `<i>tellu-agent-windows-X.Y.Z/Release</i>' directory. It is normal <a href="http://en.wikipedia.org/wiki/ASCII" target="_blank">ASCII</a>-text file, so you can use <i>Notepad</i> for example to modify it. Parameters which needs modification are at least `<i>tellud_server</i>', `<i>tellud_port</i>' and possibly `<i>domain_override</i>'. Do not touch other parameters yet. Set `<i>tellud_server</i>' parameter to server name where <i>tellud</i> is running, and `<i>tellud_port</i>' to the port which <i>tellud</i> listens (<i>by default this is 1700</i>). If agent is unable to resolve the domain name, you need to set `<i>domain_override</i>' parameter as well.</p>
 
 <h2>Starting the Agent</h2>
 
-<p>Now you can start up the Agent in `<i>tellu-agent-windows-3.0.0/Release</i>' directory by double clicking it. If you don't see any error dialogs after couple of seconds, Agent has successfully collected machine data and sent them to Tellu server. You can open <i>Task Manager</i> to ensure that Agent has vanished from the task list and terminated its operation. Run Agent on every machine whose data you want to collect, either once or periodically. You can inject Agent in login scripts, create scheduled at-job, or whatever is suitable mechanism to run Agent in your environment.</p>
+<p>Now you can start up the Agent in `<i>tellu-agent-windows-X.Y.Z/Release</i>' directory by double clicking it. If you don't see any error dialogs after couple of seconds, Agent has successfully collected machine data and sent them to Tellu server. You can open <i>Task Manager</i> to ensure that Agent has vanished from the task list and terminated its operation. Run Agent on every machine whose data you want to collect, either once or periodically. You can inject Agent in login scripts, create scheduled at-job, or whatever is suitable mechanism to run Agent in your environment.</p>
 
 <a name="4"></a><h1><font size="+2">S</font>KIN <font size="+2">I</font>NSTALLATION</h1>
 
 <h2>Installing the Skin</h2>
 
-<p>Please use supplied installer script, found in `<i>tellu-skin-3.0.0.tar.gz</i>' package after unpacking it.</p>
+<p>Please use supplied installer script, found in `<i>tellu-skin-X.Y.Z.tar.gz</i>' package after unpacking it.</p>
 
 <pre>
- $ tar -zxvf tellu-skin-3.0.0.tar.gz
- $ cd tellu-skin-3.0.0
+ $ tar -zxvf tellu-skin-X.Y.Z.tar.gz
+ $ cd tellu-skin-X.Y.Z
  $ ./install.sh
 </pre>
 
