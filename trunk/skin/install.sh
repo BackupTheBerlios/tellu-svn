@@ -457,6 +457,8 @@ for i in cgi-bin files html templates; do
 done
 
 (cd "$INSTDIR"/cgi-bin/ && ln -sf admin.pl admin)
+(cd "$INSTDIR"/html/css/ && ln -sf Standard_sans Standard)
+(cd "$INSTDIR"/templates/ && ln -sf Standard_sans Standard)
 
 echo "Setting file ownerships in '$INSTDIR'"
 
