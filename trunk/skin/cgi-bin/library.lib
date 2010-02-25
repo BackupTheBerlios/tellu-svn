@@ -602,6 +602,13 @@ sub htmlTemplate {
 
 		close(FILE);
 	}
+	else {
+		if(open(FILE, $DIR_TEMPLATE . "/Standard/" . $arg->{template} . ".html")) {
+			@p = <FILE>;
+
+			close(FILE);
+		}
+	}
 
 	return("@p");
 }
