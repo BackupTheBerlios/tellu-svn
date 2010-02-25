@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="author" content="Jani Salonen">
+<meta name="distribution" content="global">
+<meta name="robots" content="index,follow">
+<link rel="stylesheet" type="text/css" href="css/default.css" title="default" media="screen">
+<link rel="stylesheet" type="text/css" href="css/print.css" title="print" media="print">
+<title>Tellu Inventory Management - Screenshots</title>
+
+<script type="text/javascript">
+<!--
+
+ function popup(param) {
+  window.open('pics/' + param + '', '', 'toolbar=yes,scrollbars=yes,resizable=yes,height=868,width=1220');
+ }
+
+// -->
+</script>
+</head>
+
+<body>
+
+<div id="linkarea">
+
+<a href="index.html">Front page</a> | <a href="download.html">Download</a> | <a href="installation.html">Installation</a> | <u>Updating</u> | <a href="screenshots.html">Screenshots</a> | <a href="faq.html">FAQ</a> | <a href="author.html">Author</a> | <a href="license.html">License</a>
+
+</div>
+<div id="jumparea">
+
+<p>Jump to: <a href="#1">Update from 3.0.0 to 3.0.1</a></p>
+
+</div>
+<div id="mainpage">
+
+<a name="1"></a><h1><font size="+2">U</font>pdate from <font size="+2">3.0.0</font> to <font size="+2">3.0.1</font></h1>
+
+<p><i>Estimated service maintenance break for upgrading 3.0.0 to 3.0.1 is about 15 minutes.</i></p>
+
+<h2>Upgrading the servers</h2>
+
+<p>First, stop running servers and back up your existing server configuration files, you can use method like this for example:</p>
+
+<pre>
+ $ /etc/init.d/tellu.init.d stop
+ $ cd <b>PREFIX</b>/etc/
+ $ mv tellud.conf tellud.conf.300
+ $ mv telmond.conf telmond.conf.300
+ $ mv telskind.conf telskind.conf.300
+</pre>
+
+<p>Now compile and install new server package as you did when you installed Tellu servers for first time. See compiling instructions <a href="installation.html#1">here</a>. All you have to do is to compile and install new servers in place, <b>do not reinitialize the database</b>. After succesful installation, review new configuration files in `<i>PREFIX/etc</i>' and change them to suit your environment, use old configuration files as a reference. Then, start new servers and proceed to upgrading the Skin.</p>
+
+<h2>Upgrading the Skin</h2>
+
+<p>Install new Skin as described <a href="installation.html#4">here</a>. It is not absolutely necessary to back up old Skin installation first (<i>although it is highly recommended</i>), you can install new Skin overwriting the old one.</p>
+
+<p class="footer">Copyright &copy; 2010, Jani Salonen &lt;jani at lasipalatsi piste fi&gt;. All rights reserved.</p>
+</div>
+
+</body>
+
+</html>
