@@ -301,7 +301,7 @@ echo "Now we need to know the port number which telskind listens."
 
 SKINP=""
 
-for i in /etc /usr/etc /usr/local/etc /opt/tellu/etc /opt/tellu3/etc /home/salojan/source/tellu/current/src/server/telskind; do
+for i in /etc /usr/etc /usr/local/etc /opt/tellu/etc /opt/tellu3/etc; do
 	if [ -r "$i/telskind.conf" ]; then
 		SKINP=`grep '^listen_port' "$i/telskind.conf" 2>/dev/null | cut -f 2 -d '=' | tr -d ' ' | tr -d '\t'`
 
@@ -456,9 +456,9 @@ for i in cgi-bin files html templates; do
 	fi
 done
 
-(cd "$INSTDIR"/cgi-bin/ && ln -sf admin.pl admin)
-(cd "$INSTDIR"/html/css/ && ln -sf Standard_sans Standard)
-(cd "$INSTDIR"/templates/ && ln -sf Standard_sans Standard)
+(cd "$INSTDIR"/cgi-bin/ && rm -f admin 2>/dev/null ; ln -sf admin.pl admin)
+(cd "$INSTDIR"/html/css/ && rm -rf Standard 2>/dev/null ; ln -sf Standard_sans Standard)
+(cd "$INSTDIR"/templates/ && rm -rf Standard 2>/dev/null ; ln -sf Standard_sans Standard)
 
 echo "Setting file ownerships in '$INSTDIR'"
 
