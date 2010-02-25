@@ -240,6 +240,7 @@ sub editAdminAccount {
 			if(checkError({ packet => \@r }) == 0) {
 				my @i = split(/$ITEM_SEPARATOR/, $r[3]);
 				my @n = ();
+				my $f = 0;
 
 				@i = split(/\|/, $i[1]);
 
@@ -248,9 +249,15 @@ sub editAdminAccount {
 
 					if($c eq "ps") {
 						$d = $q->param('popup');
+
+						$f++;
 					}
 
 					push @n, $c . ":" . $d;
+				}
+
+				if($f == 0) {
+					push @n, "ps:" . $q->param('popup');
 				}
 
 				@r = &sendCommand({ command => "pushUser", item => "", domain => "", param => "prefs", option => join('|', @n) });
@@ -348,6 +355,7 @@ sub editAdminAccount {
 			if(checkError({ packet => \@r }) == 0) {
 				my @i = split(/$ITEM_SEPARATOR/, $r[3]);
 				my @n = ();
+				my $f = 0;
 
 				@i = split(/\|/, $i[1]);
 
@@ -356,9 +364,15 @@ sub editAdminAccount {
 
 					if($c eq "th") {
 						$d = $q->param('theme');
+
+						$f++;
 					}
 
 					push @n, $c . ":" . $d;
+				}
+
+				if($f == 0) {
+					push @n, "th:" . $q->param('theme');
 				}
 
 				@r = &sendCommand({ command => "pushUser", item => "", domain => "", param => "prefs", option => join('|', @n) });
