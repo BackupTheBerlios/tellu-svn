@@ -360,7 +360,7 @@ echo "it out by yourself and input it when installer asks for it."
 
 SKINW=""
 
-for i in /etc /usr/etc /usr/local/etc /opt/tellu/etc /opt/tellu3/etc /home/salojan/source/tellu/current/src/server/telskind; do
+for i in /etc /usr/etc /usr/local/etc /opt/tellu/etc /opt/tellu3/etc; do
 	if [ -r "$i/telskind.conf" ]; then
 		SKINW=`grep '^agent_password' "$i/telskind.conf" 2>/dev/null | cut -f 2 -d '=' | tr -d ' ' | tr -d '\t'`
 
