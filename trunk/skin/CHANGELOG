@@ -1,0 +1,10 @@
+Changes between 3.0.0 and 3.0.1:
+ + added search module
+ + added possibility to edit machine's domain name
+ + added security checking when downloading an attachment
+ + added additional user selectable themes
+ * fixed wrongly selected machine's aquired date
+ * fixed page redirection mechanism
+ * fixed log and history views to work with multiple server versions
+ * fixed session expiration
+ * fixed/workaround 30 cookie limit in Opera browser

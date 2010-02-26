@@ -1,0 +1,4 @@
+Changes between 3.0.0 and 3.0.1:
+ + added possibility to configure session timeout
+ * fixed openbsd compilation issue
+ - changed ldap_init to ldap_initialize
