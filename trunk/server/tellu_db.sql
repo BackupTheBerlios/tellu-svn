@@ -24905,16 +24905,16 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services (
 	INDEX		(name)
 );
 
-INSERT INTO skin_services (name, creator, descr, note) VALUES('1st level support', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('2nd level support', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('3rd level support', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Courier', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Guarding', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Hosting', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Installing', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Maintenance', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Owner', 'tellud 3.0.0-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Repair', 'tellud 3.0.0-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('1st level support', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('2nd level support', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('3rd level support', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Courier', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Guarding', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Hosting', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Installing', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Maintenance', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Owner', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Repair', 'tellud 3.0.2-unix', '', '');
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_services_data (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# service id

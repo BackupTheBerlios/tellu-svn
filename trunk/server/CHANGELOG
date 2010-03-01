@@ -1,3 +1,5 @@
+Changes between 3.0.1 and 3.0.2:
+
 Changes between 3.0.0 and 3.0.1:
  + added possibility to configure session timeout
  * fixed openbsd compilation issue

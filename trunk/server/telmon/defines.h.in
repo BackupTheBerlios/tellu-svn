@@ -1,7 +1,7 @@
 #include "globines.h"
 
 #define APPLICATION_NAME "telmon"
-#define APPLICATION_VERSION "3.0.0-unix"
+#define APPLICATION_VERSION "3.0.2-unix"
 #define APPLICATION_YEAR "2010"
 #define APPLICATION_COPYRIGHT "Jani Salonen <jani@lasipalatsi.fi>"
 
