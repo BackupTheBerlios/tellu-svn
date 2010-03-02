@@ -1435,8 +1435,14 @@ sub tableMachineOS {
 		$p = "amigaos";
 	}
 	elsif($arg->{system} =~ /Linux/i) {
-		if($arg->{distro} =~ /Cent/i) {
+		if($arg->{distro} =~ /Arch/i) {
+			$p = "linux_arch";
+		}
+		elsif($arg->{distro} =~ /Cent/i) {
 			$p = "linux_centos";
+		}
+		elsif($arg->{distro} =~ /Crux/i) {
+			$p = "linux_crux";
 		}
 		elsif($arg->{distro} =~ /Debian/i) {
 			$p = "linux_debian";
