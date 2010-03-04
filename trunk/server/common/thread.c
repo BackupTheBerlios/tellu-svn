@@ -12,6 +12,12 @@
 
 
 int threadInit(struct threadInfo * ti, void *threadProcess, void *threadArg) {
+	size_t i;
+
+	if((i = (size_t) sysconf(_SC_THREAD_STACK_MIN)) == -1) {
+		return(-1);
+	}
+
 	if(pthread_mutex_init(&ti->threadMutex, NULL) != 0) {
 		return(-1);
 	}
@@ -23,6 +29,13 @@ int threadInit(struct threadInfo * ti, void *threadProcess, void *threadArg) {
 	}
 
 	if(pthread_attr_init(&ti->threadAttr) != 0) {
+		pthread_cond_destroy(&ti->threadCond);
+		pthread_mutex_destroy(&ti->threadMutex);
+
+		return(-1);
+	}
+
+	if(pthread_attr_setstacksize(&ti->threadAttr, i) != 0) {
 		pthread_cond_destroy(&ti->threadCond);
 		pthread_mutex_destroy(&ti->threadMutex);
 

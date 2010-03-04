@@ -34,8 +34,6 @@ int main(int argc, char *argv[]) {
 	memset(pMainMainInfo, 0, sizeof(mainMainInfo));
 	memset(pMainThreadInfo, 0, sizeof(mainThreadInfo));
 
-	memset(&threadPool, 0, sizeof(threadPool));
-
 	/*
 	 *
 	 * Read command line and parse configuration file.
@@ -58,6 +56,18 @@ int main(int argc, char *argv[]) {
 	cmdRead(argv, argc);
 
 	nodeInitNames();
+
+	/*
+	 *
+	 * Initialize thread pool.
+	 *
+	 */
+
+	if((threadPool = malloc(sizeof(struct threadInfo) * THREAD_TELSKIND)) == NULL) {
+		warningMessage(ERROR_FATAL, "Error occurred while trying to allocate memory for thread pool");
+	}
+
+	memset(threadPool, 0, sizeof(struct threadInfo) * THREAD_TELSKIND);
 
 	/*
 	 *
@@ -353,6 +363,8 @@ mainLoop:
 
 	pidRemove();
 	shmRemove(DAEMON_TELSKIND);
+
+	free(threadPool);
 
 	exitProcess(0);
 	exit(0);
