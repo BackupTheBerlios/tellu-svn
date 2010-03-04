@@ -9,7 +9,7 @@
 
 
 char *memGetMemory(struct paramInfo * pi) {
-#if defined(__linux__)
+#if defined(__linux__) || (__NetBSD__)
 	int k;
 
 	char *newBuffer;

@@ -9,7 +9,7 @@
 
 
 char *loadGetLoad(struct paramInfo * pi) {
-#if defined(__linux__)
+#if defined(__linux__) || (__NetBSD__)
 	int i;
 
 	char *newBuffer;
