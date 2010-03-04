@@ -13,11 +13,13 @@
 
 int threadInit(struct threadInfo * ti, void *threadProcess, void *threadArg) {
 	size_t i;
-
+#if defined(__OpenBSD__)
+	i = 16384;
+#else
 	if((i = (size_t) sysconf(_SC_THREAD_STACK_MIN)) == -1) {
 		return(-1);
 	}
-
+#endif
 	if(pthread_mutex_init(&ti->threadMutex, NULL) != 0) {
 		return(-1);
 	}
