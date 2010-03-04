@@ -1,0 +1,26 @@
+#mainpage {
+	background: #ffffff;
+	color: #000000;
+}
+
+#mainarea {
+	background: #ffffff;
+	color: #000000;
+}
+
+#mainmenu {
+	margin: 0;
+	padding: 0;
+	width: 0;
+	height: 0;
+	position: absolute;
+	visibility: hidden;
+}
+
+.mainlink {
+	margin: 0;
+	padding: 0;
+	width: 0;
+	height: 0;
+	visibility: hidden;
+}
