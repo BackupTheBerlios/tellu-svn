@@ -65,7 +65,7 @@ sub tablePreviewSlice {
 
 	$MENU .= "<table class=\"logo\" cellpadding=\"0\" cellspacing=\"0\">";
 	$MENU .= "<tr class=\"middle\">";
-	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/personal/personal.png\"></td>";
+	$MENU .= "<td class=\"c3\" width=\"1\"><img alt=\"\" id=\"logo\" width=\"32\" height=\"32\" src=\"/pics/admin/preview.png\"></td>";
 	$MENU .= "<td class=\"c3\">Preview</td>";
 	$MENU .= "</tr>";
 	$MENU .= "</table>";
