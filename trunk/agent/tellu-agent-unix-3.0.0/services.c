@@ -25,7 +25,7 @@ char *servGetCount(struct paramInfo * pi) {
 	struct dirent *newEntry;
 
 	if((newDir = opendir(PROC_GENERAL)) == NULL) {
-		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open directory");
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open directory '" PROC_GENERAL "'");
 
 		return(NULL);
 	}
@@ -44,7 +44,7 @@ char *servGetCount(struct paramInfo * pi) {
 			snprintf(newName, sizeof(newName), "%s/%s/status%c", PROC_GENERAL, newEntry->d_name, 0);
 
 			if((newFile = fopen(newName, "r")) == NULL) {
-				warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+				warningMessage(ERROR_SLIGHT, "Error occurred while trying to open '/proc/PID/status' file for reading");
 			}
 			else {
 				while(fgets(newLine, sizeof(newLine), newFile) != NULL) {
@@ -131,7 +131,7 @@ char *servGetProcesses(struct paramInfo * pi) {
 	newBuffer = NULL;
 
 	if((newDir = opendir(PROC_GENERAL)) == NULL) {
-		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open directory");
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open directory '" PROC_GENERAL "'");
 	}
 	else {
 		k = 0;
@@ -156,7 +156,7 @@ char *servGetProcesses(struct paramInfo * pi) {
 				snprintf(newName, sizeof(newName), "%s/%s/cmdline%c", PROC_GENERAL, newEntry->d_name, 0);
 
 				if((newFile = fopen(newName, "r")) == NULL) {
-					warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+					warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '/proc/PID/cmdline' for reading");
 				}
 				else {
 					i = 0;
@@ -398,7 +398,7 @@ char *servGetServices(struct paramInfo * pi) {
 	newBuffer = NULL;
 
 	if((newDir = opendir(PROC_GENERAL)) == NULL) {
-		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open directory");
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open directory '" PROC_GENERAL "'");
 	}
 	else {
 		k = 0;
@@ -423,7 +423,7 @@ char *servGetServices(struct paramInfo * pi) {
 				snprintf(newName, sizeof(newName), "%s/%s/cmdline%c", PROC_GENERAL, newEntry->d_name, 0);
 
 				if((newFile = fopen(newName, "r")) == NULL) {
-					warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+					warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '/proc/PID/cmdline' for reading");
 				}
 				else {
 					i = 0;

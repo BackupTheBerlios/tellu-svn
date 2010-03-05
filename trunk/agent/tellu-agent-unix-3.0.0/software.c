@@ -57,7 +57,7 @@ char *softGetInstalled(struct paramInfo * pi) {
 			if(stat(newTemp, &newStat) == 0) {
 				if(newStat.st_size > 0) {
 					if((newFile = fopen(newTemp, "r")) == NULL) {
-						warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+						warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '" PACK_TEMP "PID.tmp' for reading");
 
 						break;
 					}

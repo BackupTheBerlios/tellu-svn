@@ -49,7 +49,7 @@ long long memGetThis(char *getThis) {
 	r = 0;
 
 	if((newFile = fopen(MEM_GENERAL, "r")) == NULL) {
-		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '" MEM_GENERAL "' for reading");
 	}
 	else {
 		while(fgets(newLine, sizeof(newLine), newFile) != NULL) {

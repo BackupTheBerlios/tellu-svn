@@ -28,7 +28,7 @@ char *diskGetMounted(struct paramInfo * pi) {
 	struct mntent *newEntry;
 
 	if((newFile = setmntent(DISK_GENERAL, "r")) == NULL) {
-		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '" DISK_GENERAL "' for reading");
 
 		return(NULL);
 	}

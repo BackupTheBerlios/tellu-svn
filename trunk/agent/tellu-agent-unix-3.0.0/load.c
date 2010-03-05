@@ -36,7 +36,7 @@ char *loadGetLoad(struct paramInfo * pi) {
 		}
 
 		if((newFile = fopen(newKeys[i], "r")) == NULL) {
-			warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+			warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '" LOAD_AVERAGE "' for reading");
 		}
 		else {
 			while(fgets(newLine, sizeof(newLine), newFile) != NULL) {

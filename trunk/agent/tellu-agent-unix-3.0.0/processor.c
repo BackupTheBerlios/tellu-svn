@@ -28,7 +28,7 @@ char *cpuGetProcessor(struct paramInfo * pi) {
 	struct cpuStore newStore;
 
 	if((newFile = fopen(CPU_GENERAL, "r")) == NULL) {
-		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '" CPU_GENERAL "' for reading");
 
 		return(NULL);
 	}

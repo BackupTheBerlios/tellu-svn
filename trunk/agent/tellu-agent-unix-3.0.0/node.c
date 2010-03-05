@@ -145,7 +145,7 @@ void nodeInitNames(void) {
 #if defined(__linux__)
 	if(stat(DIST_GENERAL, &newStat) == 0) {
 		if((newFile = fopen(DIST_GENERAL, "r")) == NULL) {
-			warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+			warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '" DIST_GENERAL "' for reading");
 		}
 		else {
 			memset(&newStore, 0, sizeof(newStore));
@@ -205,11 +205,11 @@ void nodeInitNames(void) {
 
 			if(newStat.st_size <= sizeof(newDistname)) {
 				if((newFile = fopen(newDists[i], "r")) == NULL) {
-					warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file for reading");
+					warningMessage(ERROR_SLIGHT, "Error occurred while trying to open file '/etc/DISTRIBUTION' for reading");
 				}
 				else {
 					if(fread(newDistname, newStat.st_size, 1, newFile) < 1) {
-						warningMessage(ERROR_SLIGHT, "Error occurred while trying to read from file");
+						warningMessage(ERROR_SLIGHT, "Error occurred while trying to read from file '/etc/DISTRIBUTION'");
 
 						if(fclose(newFile) == -1) {
 							warningMessage(ERROR_SLIGHT, "Error occurred while trying to close file");
