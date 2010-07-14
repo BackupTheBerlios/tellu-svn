@@ -99,6 +99,120 @@ char *diskGetMounted(struct paramInfo * pi) {
 	newBuffer[k] = 0;
 
 	return(newBuffer);
+#elif defined(__NetBSD__)
+	int i, j, k, l, m;
+	unsigned long f, g;
+	unsigned long sysMultiplier;
+	unsigned long long sysSize, sysFree, sysSerial;
+
+	char *newBuffer, *tmpBuffer;
+	char newOptions[CONFIG_SPACE_SIZE];
+
+	size_t newBuflen, newBufcur, newBuffil;
+
+	struct statvfs *newStat;
+
+	unsigned long newFlags[] = {
+		0x00000001, 0x00000002, 0x00000004, 0x00000008, 0x00000010, 0x00000020, 0x00000040, 0x00008000, 0x00100000, 0x02000000,
+		0x04000000, 0x20000000, 0x40000000, 0x80000000, 0x00000080, 0x00000100, 0x00000200, 0x00000400, 0x00000800, 0x08000000,
+		0x10000000, 0x00001000, 0x00002000, 0x00004000, 0x00010000, 0x00040000, 0x00080000, 0x00400000,
+		-1
+	};
+
+	char *newClags[] = {
+		"read-only", "synchronous", "noexec", "nosuid", "nodev", "union", "asynchronous", "nocoredump", "hidden", "log",
+		"noatime", "symperm", "nodevmtime", "soft dependencies", "exported read-only", "NFS exported", "exported to the world",
+		"anon uid mapping", "kerberos uid mapping", "on-reserved ports", "WebNFS exports", "local", "with quotas", "root file system",
+		"being updated", "reload filesystem data", "force unmount or readonly change", "retrieve mount arguments"
+	};
+
+	newBuffil = 0;
+	newBuflen = DATA_BLOCK_SIZE;
+
+	if((newBuffer = malloc(newBuflen)) == NULL) {
+		warningMessage(ERROR_SLIGHT, "Error occurred while trying to allocate memory for disk info buffer");
+
+		return(NULL);
+	}
+
+	k = 0;
+
+	if((j = getmntinfo(&newStat, ST_NOWAIT)) != 0) {
+		for(i = 0; i < j; i++) {
+			if(newStat[i].f_mntfromname[0] == 0 || newStat[i].f_mntonname[0] == 0 || newStat[i].f_fstypename[0] == 0) {
+				continue;
+			}
+
+			newBufcur = strlen(newStat[i].f_mntfromname) + strlen(newStat[i].f_mntonname) + strlen(newStat[i].f_fstypename) + 64;
+
+			if(newBuflen - newBuffil <= newBufcur) {
+				newBuflen += DATA_BLOCK_SIZE;
+
+				if((tmpBuffer = realloc(newBuffer, newBuflen)) == NULL) {
+					free(newBuffer);
+
+					warningMessage(ERROR_SLIGHT, "Error occurred while trying to allocate memory for disk info buffer");
+
+					return(NULL);
+				}
+
+				newBuffer = tmpBuffer;
+			}
+
+			sysSize = 0;
+			sysFree = 0;
+			sysSerial = 0;
+
+			sysMultiplier = 0;
+
+			if(newStat[i].f_bsize > 0) {
+				sysMultiplier = newStat[i].f_bsize;
+			}
+
+			sysSize = (newStat[i].f_blocks * sysMultiplier) / 10000;
+			sysFree = (newStat[i].f_bfree * sysMultiplier) / 10000;
+			sysSerial = newStat[i].f_fsid;
+
+			memset(newOptions, 0, sizeof(newOptions));
+
+			g = 1;
+
+			for(l = 0; l < sizeof(unsigned long) * 8; l++) {
+				f = newStat[i].f_flag;
+				f &= g;
+
+				for(m = 0; ; m++) {
+					if(newFlags[m] == -1) {
+						break;
+					}
+
+					if(newFlags[m] == f) {
+						snprintf(newOptions + strlen(newOptions), sizeof(newOptions), "%s,%c", newClags[m], 0);
+					}
+				}
+
+				g <<= 1;
+			}
+
+			if(strlen(newOptions) > 0) {
+				if(newOptions[strlen(newOptions) - 1] == ',') {
+					newOptions[strlen(newOptions) - 1] = 0;
+				}
+			}
+
+			k += snprintf(newBuffer + k, newBuflen, "%s%c%s%c%s%c%s%c%llu%c%llu%c%.16llx%c", newStat[i].f_mntfromname, ITEM_SEPARATOR, newStat[i].f_mntonname, ITEM_SEPARATOR, newStat[i].f_fstypename, ITEM_SEPARATOR, newOptions, ITEM_SEPARATOR, sysSize, ITEM_SEPARATOR, sysFree, ITEM_SEPARATOR, sysSerial, ITEM_DELIMITER);
+
+			newBuffil += newBufcur;
+		}
+	}
+
+	if(k > 0) {
+		k--;
+	}
+
+	newBuffer[k] = 0;
+
+	return(newBuffer);
 #else
 	return(NULL);
 #endif
