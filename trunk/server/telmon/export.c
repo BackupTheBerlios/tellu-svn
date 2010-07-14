@@ -27,7 +27,7 @@ void historyExport(Widget w, XtPointer client, XtPointer call) {
 	}
 
 	for(i = 0; i < strlen(newName); i++) {
-		if(isspace(newName[i]) != 0) {
+		if(isspace((int) newName[i]) != 0) {
 			newName[i] = '_';
 		}
 	}
