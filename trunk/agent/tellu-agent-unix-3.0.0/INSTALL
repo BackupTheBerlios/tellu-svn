@@ -4,7 +4,8 @@ Please point your browser there.
 -------------------------------------------------------------------------------
  1. BUILDING THE AGENT
 -------------------------------------------------------------------------------
- These prerequisities are mandatory:
+ These prerequisities are mandatory if you want to gather hardware device
+ information:
 
   * DBus library and header files (version 1.0 or greater),
   * Hal library and header files (version 0.5 or greater).
@@ -17,6 +18,9 @@ Please point your browser there.
   $ make clean
   $ make
   $ make install
+
+ Leave --with-dbus and --with-hal away if you don't want or can't use HAL
+ library. In that case Agent can't collect hardware device information.
 
  If build fails because of missing dependencies (even when configure script
  succeeded), you need to tailor Makefile by hand. Makefile is very simple
