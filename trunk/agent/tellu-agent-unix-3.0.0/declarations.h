@@ -1,6 +1,10 @@
 #include <unistd.h>
+#ifdef TELLU_USE_DBUS
 #include <dbus/dbus.h>
+#endif
+#ifdef TELLU_USE_HAL
 #include <hal/libhal.h>
+#endif
 
 #include "defines.h"
 #include "param.h"
@@ -43,7 +47,11 @@ extern char *memGetMemory(struct paramInfo *);
 extern void memFreeMemory(char *);
 
 // message.c
+#ifdef TELLU_USE_DBUS
 extern void dbusMessage(int, char *, DBusError *);
+#else
+extern void dbusMessage(int, char *, void *);
+#endif
 extern void infoMessage(int, char *);
 extern void warningMessage(int, char *);
 

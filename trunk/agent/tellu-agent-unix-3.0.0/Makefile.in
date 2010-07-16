@@ -3,7 +3,7 @@ LN = @LN@
 RM = @RM@
 
 SRC = application.c config.c disk.c hal.c jip.c load.c machine.c memory.c message.c network.c node.c processor.c services.c software.c system.c tellu.c terminate.c timer.c user.c
-DEP = config.h declarations.h defines.h hal.h jip.h load.h memory.h network.h node.h param.h processor.h services.c software.h structures.h system.h tellu.h
+DEP = Makefile config.h declarations.h defines.h hal.h jip.h load.h memory.h network.h node.h param.h processor.h services.c software.h structures.h system.h tellu.h
 
 ARC = `@UNAME@ -m 2>/dev/null`
 OSV = `@UNAME@ -s 2>/dev/null`

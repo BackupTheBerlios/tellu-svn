@@ -11,7 +11,7 @@
 #include <sys/param.h>
 #include <sys/socket.h>
 
-#if defined(__linux__)
+#if defined(__linux__) || (__FreeBSD__) || (__NetBSD__) || (__OpenBSD__)
 #include <net/if.h>
 #endif
 
@@ -21,7 +21,7 @@
 
 
 char *netGetInterfaceData(struct paramInfo * pi) {
-#if defined(__linux__)
+#if defined(__linux__) || (__FreeBSD__) || (__NetBSD__) || (__OpenBSD__)
 	int i, j, k;
 	int newSocket;
 
@@ -124,7 +124,7 @@ char *netGetInterfaceData(struct paramInfo * pi) {
 			memset(&intReq, 0, sizeof(intReq));
 
 			snprintf(intReq.ifr_name, sizeof(intReq.ifr_name), "%s%c", newName, 0);
-
+#if defined(__linux__)
 			ioctl(newSocket, SIOCGIFHWADDR, (char *) &intReq);
 
 			k += snprintf(intBuffer + k, DATA_STRING_SIZE, "%02x:%02x:%02x:%02x:%02x:%02x%c",
@@ -134,7 +134,9 @@ char *netGetInterfaceData(struct paramInfo * pi) {
 				(int) ((unsigned char *) &intReq.ifr_hwaddr.sa_data)[3],
 				(int) ((unsigned char *) &intReq.ifr_hwaddr.sa_data)[4],
 				(int) ((unsigned char *) &intReq.ifr_hwaddr.sa_data)[5], ITEM_DELIMITER);
-
+#else
+			k += snprintf(intBuffer + k, DATA_STRING_SIZE, "00:00:00:00:00:00%c", ITEM_DELIMITER);
+#endif
 			newBuffil += newBufcur;
 		}
 		else {
@@ -169,7 +171,7 @@ void netFreeInterfaceData(char *intBuffer) {
 }
 
 char *netGetInterfaceList(void) {
-#if defined(__linux__)
+#if defined(__linux__) || (__FreeBSD__) || (__NetBSD__) || (__OpenBSD__)
 	int i, k;
 
 	char *intBuffer, *tmpBuffer;

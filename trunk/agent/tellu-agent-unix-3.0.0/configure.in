@@ -29,12 +29,12 @@ CFLAGS=$CFLAGS" -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/inclu
 
 AC_ARG_WITH(dbus,
 	[  --with-dbus=DIR         where DBus is installed],
-	[CFLAGS=$CFLAGS" -I$withval/include/dbus-1.0 -I$withval/include/dbus-1.0/include -I$withval/lib/dbus-1.0/include"
+	[CFLAGS=$CFLAGS" -DTELLU_USE_DBUS -I$withval/include/dbus-1.0 -I$withval/include/dbus-1.0/include -I$withval/lib/dbus-1.0/include"
 		LDFLAGS=$LDFLAGS" -L$withval/lib"
 		LIBS=$LIBS" -ldbus-1"])
 AC_ARG_WITH(hal,
 	[  --with-hal=DIR          where HAL is installed],
-	[CFLAGS=$CFLAGS" -I$withval/include"
+	[CFLAGS=$CFLAGS" -DTELLU_USE_HAL -I$withval/include"
 		LDFLAGS=$LDFLAGS" -L$withval/lib"
 		LIBS=$LIBS" -lhal"])
 

@@ -4,11 +4,14 @@
 
 #include "declarations.h"
 #include "structures.h"
+#ifdef TELLU_USE_HAL
 #include "hal.h"
+#endif
 
 
 
 int halFetchInit(void) {
+#ifdef TELLU_USE_HAL
 	int i;
 
 	dbus_error_init(&dbusError);
@@ -40,9 +43,13 @@ int halFetchInit(void) {
 	}
 
 	return(i);
+#else
+	return(0);
+#endif
 }
 
 void halFetchFree(void) {
+#ifdef TELLU_USE_HAL
 	if(halDevices != NULL) {
 		libhal_free_string_array(halDevices);
 
@@ -55,9 +62,11 @@ void halFetchFree(void) {
 
 		halContext = NULL;
 	}
+#endif
 }
 
 struct halStore *halFetchItem(int halIteration) {
+#ifdef TELLU_USE_HAL
 	int i, k, l, p;
 
 	unsigned int halElements;
@@ -177,9 +186,13 @@ struct halStore *halFetchItem(int halIteration) {
 	libhal_free_property_set(halProperty);
 
 	return(pHalStore);
+#else
+	return(NULL);
+#endif
 }
 
 char *halGetDevices(struct paramInfo * pi) {
+#ifdef TELLU_USE_HAL
 	int i, k, l;
 
 	char *newBuffer, *tmpBuffer;
@@ -1158,10 +1171,15 @@ char *halGetDevices(struct paramInfo * pi) {
 	newBuffer[l] = 0;
 
 	return(newBuffer);
+#else
+	return(NULL);
+#endif
 }
 
 void halFreeDevices(char *intBuffer) {
+#ifdef TELLU_USE_HAL
 	if(intBuffer != NULL) {
 		free(intBuffer);
 	}
+#endif
 }

@@ -3,11 +3,14 @@
 #include <string.h>
 
 #include "declarations.h"
+#ifdef TELLU_USE_HAL
 #include "system.h"
+#endif
 
 
 
 int sysFetchInit(void) {
+#ifdef TELLU_USE_HAL
 	int i;
 
 	dbus_error_init(&dbusError);
@@ -39,9 +42,13 @@ int sysFetchInit(void) {
 	}
 
 	return(i);
+#else
+	return(0);
+#endif
 }
 
 void sysFetchFree(void) {
+#ifdef TELLU_USE_HAL
 	if(halDevices != NULL) {
 		libhal_free_string_array(halDevices);
 
@@ -54,9 +61,11 @@ void sysFetchFree(void) {
 
 		halContext = NULL;
 	}
+#endif
 }
 
 void sysFetchItem(struct sysInfo * si, int halIteration) {
+#ifdef TELLU_USE_HAL
 	int i, k;
 	unsigned int halElements;
 
@@ -183,9 +192,11 @@ void sysFetchItem(struct sysInfo * si, int halIteration) {
 	}
 
 	libhal_free_property_set(halProperty);
+#endif
 }
 
 char *sysGetSystem(struct paramInfo * pi) {
+#ifdef TELLU_USE_HAL
 	int i, k;
 
 	char *newBuffer;
@@ -215,10 +226,15 @@ char *sysGetSystem(struct paramInfo * pi) {
 	snprintf(newBuffer, newBuflen, "%s%c%s%c%s%c%s%c%s%c%s%c%s%c", newInfo.bbmanufacturer, ITEM_SEPARATOR, newInfo.bbproduct, ITEM_SEPARATOR, newInfo.bbversion, ITEM_SEPARATOR, newInfo.sysfamily, ITEM_SEPARATOR, newInfo.sysmanufacturer, ITEM_SEPARATOR, newInfo.sysproduct, ITEM_SEPARATOR, newInfo.sysversion, 0);
 
 	return(newBuffer);
+#else
+	return(NULL);
+#endif
 }
 
 void sysFreeSystem(char *intBuffer) {
+#ifdef TELLU_USE_HAL
 	if(intBuffer != NULL) {
 		free(intBuffer);
 	}
+#endif
 }

@@ -3040,7 +3040,7 @@ CFLAGS=$CFLAGS" -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/inclu
 
 # Check whether --with-dbus was given.
 if test "${with_dbus+set}" = set; then
-  withval=$with_dbus; CFLAGS=$CFLAGS" -I$withval/include/dbus-1.0 -I$withval/include/dbus-1.0/include -I$withval/lib/dbus-1.0/include"
+  withval=$with_dbus; CFLAGS=$CFLAGS" -DTELLU_USE_DBUS -I$withval/include/dbus-1.0 -I$withval/include/dbus-1.0/include -I$withval/lib/dbus-1.0/include"
 		LDFLAGS=$LDFLAGS" -L$withval/lib"
 		LIBS=$LIBS" -ldbus-1"
 fi
@@ -3048,7 +3048,7 @@ fi
 
 # Check whether --with-hal was given.
 if test "${with_hal+set}" = set; then
-  withval=$with_hal; CFLAGS=$CFLAGS" -I$withval/include"
+  withval=$with_hal; CFLAGS=$CFLAGS" -DTELLU_USE_HAL -I$withval/include"
 		LDFLAGS=$LDFLAGS" -L$withval/lib"
 		LIBS=$LIBS" -lhal"
 fi

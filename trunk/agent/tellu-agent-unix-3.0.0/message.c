@@ -7,6 +7,7 @@
 
 
 
+#ifdef TELLU_USE_DBUS
 void dbusMessage(int fatalError, char *infoMessage, DBusError *dbusError) {
 	char newString[CONFIG_STRING_SIZE];
 
@@ -33,6 +34,11 @@ void dbusMessage(int fatalError, char *infoMessage, DBusError *dbusError) {
 		exit(errno);
 	}
 }
+#else
+void dbusMessage(int fatalError, char *infoMessage, void *dbusError) {
+	warningMessage(fatalError, infoMessage);
+}
+#endif
 
 void infoMessage(int fatalError, char *infoMessage) {
 	char newString[CONFIG_STRING_SIZE];
