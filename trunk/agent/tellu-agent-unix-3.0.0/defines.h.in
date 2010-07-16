@@ -1,5 +1,5 @@
 #define APPLICATION_NAME "tellu"
-#define APPLICATION_VERSION "3.0.1-unix"
+#define APPLICATION_VERSION "3.0.2-unix"
 
 #define CONFIG_DEFAULT_FILE "tellu.conf"
 

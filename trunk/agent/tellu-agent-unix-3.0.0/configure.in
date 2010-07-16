@@ -1,4 +1,4 @@
-AC_INIT(tellu, 3.0.1, jani@lasipalatsi.fi)
+AC_INIT(tellu, 3.0.2, jani@lasipalatsi.fi)
 
 dnl
 dnl Checks for programs.
