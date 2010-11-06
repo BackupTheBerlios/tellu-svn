@@ -177,31 +177,7 @@ sub editMachineNew {
 
 	@pl = sort { uc($a) cmp uc($b) } @pl;
 
-	my @l = ('Create new machine');
-
-	$PAGE .= &htmlFormBegin({ name => "createForm", action => $SELF . "?action=modify&verb=create", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-	$PAGE .= "<p>&nbsp;</p>";
-	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-	$PAGE .= "<tr class=\"middle\">";
-
-	my $s = 0;
-
-	foreach my $l (@l) {
-		if($s == $q->param('leaf')) {
-			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-		}
-		else {
-			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-		}
-
-		$s++;
-	}
-
-	$PAGE .= "</tr>";
-	$PAGE .= "</table>";
-
-	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+	&editMachineCreateHeader({ action => "modify", verb => "create", leaf => $q->param('leaf') });
 
 	$PAGE .= "<tr class=\"top\">";
 	$PAGE .= "<td></td><td></td>";
@@ -340,19 +316,11 @@ sub editMachineNew {
 	$PAGE .= "<td></td><td></td>";
 	$PAGE .= "</tr>";
 
-	$PAGE .= "</table>";
-
-	$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-	$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-	$PAGE .= &htmlHiddenField({ name => "verb", value => "create" });
-
-	$PAGE .= &htmlFormEnd();
+	&editMachineCreateFooter({ action => "modify", verb => "create", leaf => $q->param('leaf') });
 }
 
 sub editMachineNode {
 	my ($arg) = @_;
-
-	my @l = ('Machine info', 'Service info', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments', 'Ping', 'Wake');
 
 	if($q->param('verb')) {
 		@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
@@ -813,6 +781,93 @@ sub editMachineNode {
 						&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 					}
 				}
+				elsif($q->param('verb') eq "clone") {
+					my $er = 0;
+					my $nd = "";
+					my $dn = "";
+
+					if($q->param('node') && $q->param('node') ne "") {
+						$nd = $q->param('node');
+					}
+					else {
+						$PAGE .= "<p class=\"warning\">Clone name cannot be empty.</p>";
+					}
+
+					if($q->param('domain') && $q->param('domain') ne "") {
+						$dn = $q->param('domain');
+					}
+					else {
+						$PAGE .= "<p class=\"warning\">Domain name cannot be empty.</p>";
+					}
+
+					if($nd && $nd ne "" && $dn && $dn ne "") {
+						my @r = &sendCommand({ command => "pullMachine", item => cleanHtml({ string => $nd }), domain => cleanHtml({ string => $dn }), param => "node", option => "" });
+
+						if(checkError({ packet => \@r }) != 0) {
+							$PAGE .= "<p class=\"warning\">Error occurred while trying to clone existing machine.</p>";
+
+							if($SESSION_ERR && $SESSION_ERR ne "") {
+								$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+							}
+
+							$er++;
+						}
+						else {
+							my @s = split(/$ITEM_DELIMITER/, $r[3]);
+
+							if($s[0] && $s[0] ne "") {
+								$PAGE .= "<p class=\"warning\">Machine '" . cleanHtml({ string => $nd }) . "." . cleanHtml({ string => $dn }) . "' already exists. Please pick another name for this machine.</p>";
+
+								$er++;
+							}
+							else {
+								@r = &sendCommand({ command => "cloneMachine", item => $arg->{node}, domain => $arg->{domain}, param => cleanHtml({ string => $nd }), option => cleanHtml({ string => $dn }) });
+
+								if(checkError({ packet => \@r }) != 0) {
+									$PAGE .= "<p class=\"warning\">Error occurred while trying to clone existing machine.</p>";
+
+									if($SESSION_ERR && $SESSION_ERR ne "") {
+										$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+									}
+
+									$er++;
+								}
+								else {
+									@r = &sendCommand({ command => "pullMachine", item => $q->param('node'), domain => $q->param('domain'), param => "node", option => "" });
+
+									if(checkError({ packet => \@r }) == 0) {
+										@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+										my %i = ('dev' => 'Device', 'per' => 'Peripheral', 'ser' => 'Provider', 'fle' => 'File', 'pwd' => 'Password', 'grp' => 'Faction');
+
+										foreach my $s (@s) {
+											my @u = split(/$ITEM_SEPARATOR/, $s);
+
+											while((my $key, $val) = each %i) {
+												if($q->param($key) && $q->param($key) == 1) {
+													@r = &sendCommand({ command => "clone" . $val . "AttachmentsForMachine", item => $arg->{node}, domain => $arg->{domain}, param => $u[0], option => "" });
+												}
+											}
+										}
+									}
+									else {
+										$PAGE .= "<p class=\"warning\">Error occurred while trying to clone existing machine.</p>";
+
+										if($SESSION_ERR && $SESSION_ERR ne "") {
+											$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+										}
+
+										$er++;
+									}
+								}
+							}
+						}
+
+						if($er == 0) {
+							&htmlPage({ redirect => $SELF, title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+						}
+					}
+				}
 				elsif($q->param('verb') eq "ping") {
 					@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
 
@@ -1072,28 +1127,7 @@ sub editMachineNode {
 
 			@dn = sort { uc($a) cmp uc($b) } @dn;
 
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "update", leaf => $q->param('leaf') });
 
 			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
 
@@ -1237,13 +1271,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "update", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 1) {
 			my @es = ();
@@ -1293,28 +1321,7 @@ sub editMachineNode {
 				}
 			}
 
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=service", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "service", leaf => $q->param('leaf') });
 
 			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
 
@@ -1389,37 +1396,10 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "service" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "service", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 2) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attdev", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "attdev", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "listDevice", item => "", domain => "", param => "manufacturer,model,category", option => "" });
 
@@ -1477,13 +1457,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "attdev" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "attdev", leaf => $q->param('leaf') });
 
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remdev", enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -1556,37 +1530,10 @@ sub editMachineNode {
 				}
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "remdev" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "remdev", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 3) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attper", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "attper", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "listPeripheral", item => "", domain => "", param => "manufacturer,model,category", option => "" });
 
@@ -1643,13 +1590,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "attper" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "attper", leaf => $q->param('leaf') });
 
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remper", enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -1722,37 +1663,10 @@ sub editMachineNode {
 				}
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "remper" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "remper", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 4) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attser", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "attser", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
 
@@ -1809,13 +1723,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "attser" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "attser", leaf => $q->param('leaf') });
 
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remser", enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -1888,37 +1796,10 @@ sub editMachineNode {
 				}
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "remser" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "remser", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 5) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attpwd", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "attpwd", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "listPassword", item => "", domain => "", param => "name", option => "" });
 
@@ -1975,13 +1856,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "attpwd" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "attpwd", leaf => $q->param('leaf') });
 
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=rempwd", enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -2054,37 +1929,10 @@ sub editMachineNode {
 				}
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "rempwd" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "rempwd", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 6) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attatt", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			&editMachineModifyHeader({ action => "modify", verb => "attatt", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "listFile", item => "", domain => "", param => "name", option => "" });
 
@@ -2141,13 +1989,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "attatt" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "attatt", leaf => $q->param('leaf') });
 
 			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=rematt", enctype => "application/x-www-form-urlencoded", method => "post" });
 
@@ -2220,37 +2062,128 @@ sub editMachineNode {
 				}
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "rematt" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "rematt", leaf => $q->param('leaf') });
 		}
 		elsif($q->param('leaf') && $q->param('leaf') == 7) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=ping", enctype => "application/x-www-form-urlencoded", method => "post" });
+			my @dn = ();
+			my %dn = ();
 
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
+			my @r = &sendCommand({ command => "listMachine", item => "", domain => "", param => "domain", option => "" });
 
-			my $s = 0;
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				foreach my $s (@s) {
+					my (@p) = split(/$ITEM_SEPARATOR/, $s);
+
+					$p[0] = cleanNull({ string => $p[0] });
+
+					$dn{$p[0]}++ if($p[0] ne "");
 				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
 			}
 
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
+			while((my $key, $val) = each %dn) {
+				push @dn, $key;
+			}
 
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+			@dn = sort { uc($a) cmp uc($b) } @dn;
+
+			&editMachineModifyHeader({ action => "modify", verb => "clone", leaf => $q->param('leaf') });
+
+			@r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Clone&nbsp;name&nbsp;&sup1;:</td>";
+				$PAGE .= "<td width=\"80%\">" . &htmlInputText({ name => "node", value => $arg->{node} . "_CLONE", style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">Join&nbsp;to&nbsp;domain&nbsp;&sup1;:</td>";
+				$PAGE .= "<td>" . &htmlInputText({ name => "domain", value => $arg->{domain}, style => "textreq" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				if(@dn) {
+					my @t = ();
+
+					$t[0] = $q->optgroup( -name => "Pick existing domain name", -values => \@dn, -class => "header" );
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\">&nbsp;</td>";
+					$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "ext_domain", value => \@t, select => $arg->{domain}, onchange => "toggleDomainField('modifyForm'); return true;" }) . "</td>";
+					$PAGE .= "</tr>";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "dev", label => "Clone device attachments?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "per", label => "Clone peripheral attachments?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "ser", label => "Clone service provider attachments?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "fle", label => "Clone file attachments?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "pwd", label => "Clone password attachments?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlSelectTick({ name => "grp", label => "Clone faction memberships?", value => 1, select => $ds, onclick => "toggleServiceFields('modifyForm'); return true;" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td><i>&sup1;&nbsp;denotes required field.</i></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\">&nbsp;</td>";
+				$PAGE .= "<td>" . &htmlButtonSubmit({ name => "submit", value => "Clone" }) . "</td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			&editMachineModifyFooter({ action => "modify", verb => "clone", leaf => $q->param('leaf') });
+		}
+		elsif($q->param('leaf') && $q->param('leaf') == 8) {
+			&editMachineModifyHeader({ action => "modify", verb => "ping", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
 
@@ -2301,37 +2234,10 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "ping" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "ping", leaf => $q->param('leaf') });
 		}
-		elsif($q->param('leaf') && $q->param('leaf') == 8) {
-			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=wake", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-			$PAGE .= "<tr class=\"middle\">";
-
-			my $s = 0;
-
-			foreach my $l (@l) {
-				if($s == $q->param('leaf')) {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-				}
-				else {
-					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-				}
-
-				$s++;
-			}
-
-			$PAGE .= "</tr>";
-			$PAGE .= "</table>";
-
-			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+		elsif($q->param('leaf') && $q->param('leaf') == 9) {
+			&editMachineModifyHeader({ action => "modify", verb => "wake", leaf => $q->param('leaf') });
 
 			my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "nic", option => "" });
 
@@ -2382,13 +2288,7 @@ sub editMachineNode {
 				$PAGE .= "</tr>";
 			}
 
-			$PAGE .= "</table>";
-
-			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
-			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
-			$PAGE .= &htmlHiddenField({ name => "verb", value => "wake" });
-
-			$PAGE .= &htmlFormEnd();
+			&editMachineModifyFooter({ action => "modify", verb => "wake", leaf => $q->param('leaf') });
 		}
 	}
 }
@@ -2396,82 +2296,87 @@ sub editMachineNode {
 sub editMachineNote {
 	my ($arg) = @_;
 
-	my @l = ('Review existing notes', 'Add new note');
-
 	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
 		my $er = 0;
-		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+		my @r = &sendCommand({ command => "noteAddMachine", item => $arg->{node}, domain => $arg->{domain}, param => $q->param('note'), option => "" });
 
-		if(checkError({ packet => \@r }) == 0) {
-			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
 
-			my $w = $s[19] . "<DELIMBEG>" . $SESSION_UID . "<DELIMSEP>" . localtime(time()) . "<DELIMEND>";
-
-			$w .= cleanHtml({ string => $q->param('note') });
-
-			@r = &sendCommand({ command => "pushMachine", item => $arg->{node}, domain => $arg->{domain}, param => "note", option => $w });
-
-			if(checkError({ packet => \@r }) != 0) {
-				$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
-
-				if($SESSION_ERR && $SESSION_ERR ne "") {
-					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
-				}
-
-				$er++;
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 			}
 
-			if($er == 0) {
-				&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
-			}
+			$er++;
+		}
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 		}
 	}
 
 	if(!$q->param('leaf') || $q->param('leaf') == 0) {
-		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-		$PAGE .= "<tr class=\"middle\">";
+		&editMachineNoteHeader({ action => "note", verb => "view", leaf => $q->param('leaf') });
 
-		my $s = 0;
-
-		foreach my $l (@l) {
-			if($s == $q->param('leaf')) {
-				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-			}
-			else {
-				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-			}
-
-			$s++;
-		}
-
-		$PAGE .= "</tr>";
-		$PAGE .= "</table>";
-
-		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
-
-		my @r = &sendCommand({ command => "pullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "node", option => "" });
+		my @r = &sendCommand({ command => "notePullMachine", item => $arg->{node}, domain => $arg->{domain}, param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
-			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+			require "item.lib";
 
-			$s[19] = cleanNull({ string => $s[19] });
-
-			if(!$s[19] || $s[19] eq "") {
-				$s[19] = "No notes are available for this node.";
-			}
-			else {
-				$s[19] =~ s/<DELIMBEG>/<h4>/go;
-				$s[19] =~ s/<DELIMEND>/<\/h4>/go;
-				$s[19] =~ s/<DELIMSEP>/ commented at /go;
-			}
+			my $e = 0;
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td></td><td></td>";
 			$PAGE .= "</tr>";
 
-			$PAGE .= "<tr class=\"top\">";
-			$PAGE .= "<td width=\"100%\">" . $s[19] . "</td>";
-			$PAGE .= "</tr>";
+			foreach my $s (@s) {
+				my @i = split(/$ITEM_SEPARATOR/, $s);
+
+				$i[5] = cleanHtml({ string => cleanNull({ string => $i[5] }) });
+
+				if($i[5] && $i[5] ne "") {
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td width=\"100%\"><h4>Note added by " . $i[2] . " at " . &itemClean({ item => $i[1], flag => 31 });
+
+					if($i[4] && $i[4] ne "") {
+						$PAGE .= ", modified by " . $i[4] . " at " . &itemClean({ item => $i[3], flag => 31 });
+					}
+
+					$PAGE .= "</h4>";
+
+					if($SESSION_UID eq $i[2]) {
+						my @p = ();
+
+						if($SESSION_CACHE{"popup"} && $SESSION_CACHE{"popup"} ne "") {
+							@p = split(/,/, $SESSION_CACHE{"popup"}, 2);
+						}
+						else {
+							@p = split(/,/, &prefsPopup(), 2);
+
+							$SESSION_CACHE{"popup"} = $p[0] . "," . $p[1];
+						}
+
+						$PAGE .= "<p>" . $i[5] . "</p>";
+						$PAGE .= &htmlButtonAction({ name => "modify", style => "button", value => "Modify", function => "machineNote('modify', '" . $i[0] . "', '" . $arg->{node} . "|" . $arg->{domain} . "', '" . $p[0] . "', '" . $p[1] . "'); return true;" });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonAction({ name => "delete", style => "button", value => "Delete", function => "machineNote('delete', '" . $i[0] . "', '" . $arg->{node} . "|" . $arg->{domain} . "', '" . $p[0] . "', '" . $p[1] . "'); return true;" });
+					}
+					else {
+						$PAGE .= "<p>" . $i[5] . "</p>";
+					}
+
+					$PAGE .= "</td></tr>";
+
+					$e++;
+				}
+			}
+
+			if($e == 0) {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td width=\"100%\">No notes are available for this node.</td>";
+				$PAGE .= "</tr>";
+			}
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td></td><td></td>";
@@ -2481,28 +2386,7 @@ sub editMachineNote {
 		$PAGE .= "</table>";
 	}
 	elsif($q->param('leaf') && $q->param('leaf') == 1) {
-		$PAGE .= &htmlFormBegin({ name => "noteForm", action => $SELF . "?action=note&verb=update", enctype => "application/x-www-form-urlencoded", method => "post" });
-
-		$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
-		$PAGE .= "<tr class=\"middle\">";
-
-		my $s = 0;
-
-		foreach my $l (@l) {
-			if($s == $q->param('leaf')) {
-				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
-			}
-			else {
-				$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=note&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
-			}
-
-			$s++;
-		}
-
-		$PAGE .= "</tr>";
-		$PAGE .= "</table>";
-
-		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+		&editMachineNoteHeader({ action => "note", verb => "update", leaf => $q->param('leaf') });
 
 		$PAGE .= "<tr class=\"top\">";
 		$PAGE .= "<td></td><td></td>";
@@ -2526,12 +2410,7 @@ sub editMachineNote {
 		$PAGE .= "<td></td><td></td>";
 		$PAGE .= "</tr>";
 
-		$PAGE .= "</table>";
-
-		$PAGE .= &htmlHiddenField({ name => "action", value => "note" });
-		$PAGE .= &htmlHiddenField({ name => "verb", value => "update" });
-
-		$PAGE .= &htmlFormEnd();
+		&editMachineNoteFooter({ action => "note", verb => "update", leaf => $q->param('leaf') });
 	}
 }
 
@@ -2555,6 +2434,130 @@ sub editMachineAffect {
 	$r .= "</tr>";
 
 	return $r;
+}
+
+sub editMachineCreateHeader {
+	my ($arg) = @_;
+
+	my @l = ('Create new machine');
+
+	my $s = 0;
+
+	$PAGE .= &htmlFormBegin({ name => "createForm", action => $SELF . "?action=" . $arg->{action} . "&verb=" . $arg->{verb}, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<p>&nbsp;</p>";
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	foreach my $l (@l) {
+		if($s == $arg->{leaf}) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=" . $arg->{action} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=" . $arg->{action} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+}
+
+sub editMachineCreateFooter {
+	my ($arg) = @_;
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlHiddenField({ name => "action", value => $arg->{modify} });
+	$PAGE .= &htmlHiddenField({ name => "leaf", value => $arg->{leaf} });
+	$PAGE .= &htmlHiddenField({ name => "verb", value => $arg->{verb} });
+
+	$PAGE .= &htmlFormEnd();
+}
+
+sub editMachineModifyHeader {
+	my ($arg) = @_;
+
+	my @l = ('Machine info', 'Service info', 'Devices', 'Peripherals', 'Services', 'Passwords', 'Attachments', 'Clone', 'Ping', 'Wake');
+
+	my $s = 0;
+
+	$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=" . $arg->{action} . "&verb=" . $arg->{verb}, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	foreach my $l (@l) {
+		if($s == $arg->{leaf}) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=" . $arg->{action} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=" . $arg->{action} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+}
+
+sub editMachineModifyFooter {
+	my ($arg) = @_;
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlHiddenField({ name => "action", value => $arg->{action} });
+	$PAGE .= &htmlHiddenField({ name => "leaf", value => $arg->{leaf} });
+	$PAGE .= &htmlHiddenField({ name => "verb", value => $arg->{verb} });
+
+	$PAGE .= &htmlFormEnd();
+}
+
+sub editMachineNoteHeader {
+	my ($arg) = @_;
+
+	my @l = ('Review existing notes', 'Add new note');
+
+	my $s = 0;
+
+	$PAGE .= &htmlFormBegin({ name => "noteForm", action => $SELF . "?action=" . $arg->{action} . "&verb=" . $arg->{verb}, enctype => "application/x-www-form-urlencoded", method => "post" });
+
+	$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+	$PAGE .= "<tr class=\"middle\">";
+
+	foreach my $l (@l) {
+		if($s == $arg->{leaf}) {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=" . $arg->{action} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+		}
+		else {
+			$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=" . $arg->{action} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+		}
+
+		$s++;
+	}
+
+	$PAGE .= "</tr>";
+	$PAGE .= "</table>";
+
+	$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+}
+
+sub editMachineNoteFooter {
+	my ($arg) = @_;
+
+	$PAGE .= "</table>";
+
+	$PAGE .= &htmlHiddenField({ name => "action", value => $arg->{action} });
+	$PAGE .= &htmlHiddenField({ name => "leaf", value => $arg->{leaf} });
+	$PAGE .= &htmlHiddenField({ name => "verb", value => $arg->{verb} });
+
+	$PAGE .= &htmlFormEnd();
 }
 
 1;

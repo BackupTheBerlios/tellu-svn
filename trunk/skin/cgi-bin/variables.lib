@@ -26,8 +26,8 @@ $CONFIG_SERVER_PASSWORD = "secret";
 $DATA_ARRAYS_COUNT = 11;
 $DATA_POINTER_SIZE = 8;
 
-$DIR_TEMPLATE = "/home/salojan/tellu/trunk/skin/templates";
-$DIR_UPLOAD = "/home/salojan/tellu/trunk/skin/files";
+$DIR_TEMPLATE = "/opt/tellu/skin/templates";
+$DIR_UPLOAD = "/opt/tellu/skin/files";
 
 $ERROR_NOERROR = 1;
 $ERROR_SLIGHT = 2;

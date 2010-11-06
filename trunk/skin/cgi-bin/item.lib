@@ -310,7 +310,7 @@ sub itemClean {
 		}
 		elsif($pr eq "processor") {
 			$r .= "Number:&nbsp;" . $n[0] . "<br />";
-			$r .= "Can&nbsp;throttle:&nbsp;" . $n[1] . "<br />";
+			$r .= "Can&nbsp;throttle:&nbsp;" . &itemClean({ item => $n[1], flag => 35 }) . "<br />";
 		}
 		elsif($pr eq "net80211" || $pr eq "net80211ctrl" || $pr eq "netbridge" || $pr eq "netloopback" || $pr eq "pcmciasocket" || $pr eq "portableaudioplayer" || $pr eq "powermanagement" || $pr eq "printer" || $pr eq "scanner") {
 			$r .= "Address:&nbsp;" . $n[0] . "<br />";
@@ -327,17 +327,17 @@ sub itemClean {
 			$r .= "Model:&nbsp;" . $n[5] . "<br />";
 			$r .= "Bus:&nbsp;" . $n[1] . "<br />";
 			$r .= "Drive&nbsp;type:&nbsp;" . $n[2] . "<br />";
-			$r .= "Size:&nbsp;" . $n[9] . "<br />";
-			$r .= "Hotpluggable:&nbsp;" . $n[3] . "<br />";
-			$r .= "Removable:&nbsp;" . $n[7] . "<br />";
-			$r .= "Automount&nbsp;enabled:&nbsp;" . $n[0] . "<br />";
-			$r .= "Media&nbsp;check&nbsp;enabled:&nbsp;" . $n[4] . "<br />";
-			$r .= "No&nbsp;partitions:&nbsp;" . $n[6] . "<br />";
-			$r .= "Requires&nbsp;eject:&nbsp;" . $n[8] . "<br />";
+			$r .= "Size:&nbsp;" . &itemClean({ item => int($n[9] / $CONFIG_KILOBYTE), flag => 3 }) . "<br />";
+			$r .= "Hotpluggable:&nbsp;" . &itemClean({ item => $n[3], flag => 35 }) . "<br />";
+			$r .= "Removable:&nbsp;" . &itemClean({ item => $n[7], flag => 35 }) . "<br />";
+			$r .= "Automount&nbsp;enabled:&nbsp;" . &itemClean({ item => $n[0], flag => 35 }) . "<br />";
+			$r .= "Media&nbsp;check&nbsp;enabled:&nbsp;" . &itemClean({ item => $n[4], flag => 35 }) . "<br />";
+			$r .= "No&nbsp;partitions:&nbsp;" . &itemClean({ item => $n[6], flag => 35 }) . "<br />";
+			$r .= "Requires&nbsp;eject:&nbsp;" . &itemClean({ item => $n[8], flag => 35 }) . "<br />";
 		}
 		elsif($pr eq "volume") {
 			$r .= "Device:&nbsp;" . $n[0] . "<br />";
-			$r .= "Is&nbsp;volume:&nbsp;" . $n[1] . "<br />";
+			$r .= "Is&nbsp;volume:&nbsp;" . &itemClean({ item => $n[1], flag => 35 }) . "<br />";
 			$r .= "Major:&nbsp;" . $n[2] . "<br />";
 			$r .= "Minor:&nbsp;" . $n[3] . "<br />";
 		}
@@ -432,7 +432,7 @@ sub itemClean {
 			$r = $d . ". ";
 
 			if($SESSION_CACHE{"month" . $n} && $SESSION_CACHE{"month" . $n} ne "") {
-				$r .= $SESSION_CACHE{"month" . $n} . ", ";
+				$r .= $SESSION_CACHE{"month" . $n} . " ";
 			}
 			else {
 				@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
@@ -447,18 +447,18 @@ sub itemClean {
 							$SESSION_CACHE{"month" . $p} = $m;
 
 							if($p eq $n) {
-								$r .= $m . ", ";
+								$r .= $m . " ";
 
 								last;
 							}
 						}
 					}
 					else {
-						$r .= $n . ", ";
+						$r .= $n . " ";
 					}
 				}
 				else {
-					$r .= $n . ", ";
+					$r .= $n . " ";
 				}
 			}
 
@@ -652,7 +652,7 @@ sub itemClean {
 			$r = $d . ". ";
 
 			if($SESSION_CACHE{"month" . $n} && $SESSION_CACHE{"month" . $n} ne "") {
-				$r .= $SESSION_CACHE{"month" . $n} . ", ";
+				$r .= $SESSION_CACHE{"month" . $n} . " ";
 			}
 			else {
 				@r = &sendCommand({ command => "pullMisc", item => "", domain => "", param => "month", option => "" });
@@ -667,18 +667,18 @@ sub itemClean {
 							$SESSION_CACHE{"month" . $p} = $m;
 
 							if($p eq $n) {
-								$r .= $m . ", ";
+								$r .= $m . " ";
 
 								last;
 							}
 						}
 					}
 					else {
-						$r .= $n . ", ";
+						$r .= $n . " ";
 					}
 				}
 				else {
-					$r .= $n . ", ";
+					$r .= $n . " ";
 				}
 			}
 
@@ -710,6 +710,14 @@ sub itemClean {
 	}
 	elsif($arg->{flag} == 34) {
 		$r = $arg->{item} . "%";
+	}
+	elsif($arg->{flag} == 35) {
+		if($arg->{item} eq "1") {
+			$r = "Yes";
+		}
+		else {
+			$r = "No";
+		}
 	}
 
 	return $r;

@@ -54,7 +54,7 @@ $j[$i] = join($ITEM_SEPARATOR, $i, "Waffles", "Steak ciabatta", "Yorkshire puddi
 &tableMachineDetails({ slice => "", sort => $s, order=> $o, data => join($ITEM_DELIMITER, @j), title => $j, modifier => $k });
 &tablePreviewSlice();
 
-&htmlPage({ theme => $h, title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
+&htmlPage({ template => "preview", theme => $h, title => $WINDOW_TITLE . " - " . $t, script => "", header => $t, content => $PAGE, slices => $MENU });
 
 exit(0);
 

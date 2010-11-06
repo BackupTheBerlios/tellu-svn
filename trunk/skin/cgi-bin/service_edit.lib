@@ -980,30 +980,20 @@ sub editProviderNote {
 
 	if($q->param('verb') && $q->param('verb') eq "update" && $q->param('note') ne "") {
 		my $er = 0;
-		my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+		my @r = &sendCommand({ command => "noteAddProvider", item => $arg->{node}, domain => "", param => $q->param('note'), option => "" });
 
-		if(checkError({ packet => \@r }) == 0) {
-			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+		if(checkError({ packet => \@r }) != 0) {
+			$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
 
-			my $w = $s[25] . "<DELIMBEG>" . $SESSION_UID . "<DELIMSEP>" . localtime(time()) . "<DELIMEND>";
-
-			$w .= cleanHtml({ string => $q->param('note') });
-
-			@r = &sendCommand({ command => "pushProvider", item => $arg->{node}, domain => "", param => "note", option => $w });
-
-			if(checkError({ packet => \@r }) != 0) {
-				$PAGE .= "<p class=\"warning\">Error occurred while trying to add new note.</p>";
-
-				if($SESSION_ERR && $SESSION_ERR ne "") {
-					$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
-				}
-
-				$er++;
+			if($SESSION_ERR && $SESSION_ERR ne "") {
+				$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
 			}
 
-			if($er == 0) {
-				&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
-			}
+			$er++;
+		}
+
+		if($er == 0) {
+			&htmlPage({ redirect => $SELF . "?action=note", title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
 		}
 	}
 
@@ -1029,29 +1019,65 @@ sub editProviderNote {
 
 		$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-		my @r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+		my @r = &sendCommand({ command => "notePullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
 
 		if(checkError({ packet => \@r }) == 0) {
-			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+			require "item.lib";
 
-			$s[25] = cleanNull({ string => $s[25] });
-
-			if(!$s[25] || $s[25] eq "") {
-				$s[25] = "No notes are available for this node.";
-			}
-			else {
-				$s[25] =~ s/<DELIMBEG>/<h4>/go;
-				$s[25] =~ s/<DELIMEND>/<\/h4>/go;
-				$s[25] =~ s/<DELIMSEP>/ commented at /go;
-			}
+			my $e = 0;
+			my @s = split(/$ITEM_DELIMITER/, $r[3]);
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td></td><td></td>";
 			$PAGE .= "</tr>";
 
-			$PAGE .= "<tr class=\"top\">";
-			$PAGE .= "<td width=\"100%\">" . $s[25] . "</td>";
-			$PAGE .= "</tr>";
+			foreach my $s (@s) {
+				my @i = split(/$ITEM_SEPARATOR/, $s);
+
+				$i[5] = cleanHtml({ string => cleanNull({ string => $i[5] }) });
+
+				if($i[5] && $i[5] ne "") {
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td width=\"100%\"><h4>Note added by " . $i[2] . " at " . &itemClean({ item => $i[1], flag => 31 });
+
+					if($i[4] && $i[4] ne "") {
+						$PAGE .= ", modified by " . $i[4] . " at " . &itemClean({ item => $i[3], flag => 31 });
+					}
+
+					$PAGE .= "</h4>";
+
+					if($SESSION_UID eq $i[2]) {
+						my @p = ();
+
+						if($SESSION_CACHE{"popup"} && $SESSION_CACHE{"popup"} ne "") {
+							@p = split(/,/, $SESSION_CACHE{"popup"}, 2);
+						}
+						else {
+							@p = split(/,/, &prefsPopup(), 2);
+
+							$SESSION_CACHE{"popup"} = $p[0] . "," . $p[1];
+						}
+
+						$PAGE .= "<p>" . $i[5] . "</p>";
+						$PAGE .= &htmlButtonAction({ name => "modify", style => "button", value => "Modify", function => "serviceNote('modify', '" . $i[0] . "', '" . $arg->{node} . "', '" . $p[0] . "', '" . $p[1] . "'); return true;" });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonAction({ name => "delete", style => "button", value => "Delete", function => "serviceNote('delete', '" . $i[0] . "', '" . $arg->{node} . "', '" . $p[0] . "', '" . $p[1] . "'); return true;" });
+					}
+					else {
+						$PAGE .= "<p>" . $i[5] . "</p>";
+					}
+
+					$PAGE .= "</td></tr>";
+
+					$e++;
+				}
+			}
+
+			if($e == 0) {
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td width=\"100%\">No notes are available for this service provider.</td>";
+				$PAGE .= "</tr>";
+			}
 
 			$PAGE .= "<tr class=\"top\">";
 			$PAGE .= "<td></td><td></td>";
