@@ -12,11 +12,13 @@
 
 
 char *servGetCount(struct paramInfo * pi) {
-#if defined(__linux__)
+#if defined(__linux__) || (__FreeBSD__) || (__NetBSD__) || (__OpenBSD__)
 	int i, k, l;
-
-	char *newArg, *newBuffer;
+#if defined(__linux__)
+	char *newArg;
 	char newLine[DATA_BLOCK_SIZE];
+#endif
+	char *newBuffer;
 	char newName[DATA_STRING_SIZE];
 
 	DIR *newDir;
@@ -47,6 +49,7 @@ char *servGetCount(struct paramInfo * pi) {
 				warningMessage(ERROR_SLIGHT, "Error occurred while trying to open '/proc/PID/status' file for reading");
 			}
 			else {
+#if defined(__linux__)
 				while(fgets(newLine, sizeof(newLine), newFile) != NULL) {
 					if(newLine[0] == '\r' || newLine[0] == '\n' || newLine[0] == '#') {
 						continue;
@@ -66,7 +69,9 @@ char *servGetCount(struct paramInfo * pi) {
 				if(fclose(newFile) == -1) {
 					warningMessage(ERROR_SLIGHT, "Error occurred while trying to close file");
 				}
-
+#else
+				l++;
+#endif
 				k++;
 			}
 		}
