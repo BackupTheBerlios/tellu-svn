@@ -20,6 +20,7 @@ DELETE FROM skin_factions;
 DELETE FROM skin_factions_map;
 DELETE FROM skin_files;
 DELETE FROM skin_files_map;
+DELETE FROM skin_notes;
 DELETE FROM skin_passwords;
 DELETE FROM skin_passwords_map;
 DELETE FROM skin_peripherals;

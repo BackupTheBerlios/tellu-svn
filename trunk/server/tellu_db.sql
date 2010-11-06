@@ -134,11 +134,11 @@ CREATE TABLE IF NOT EXISTS tellu3.node (
 	location	VARCHAR(255),
 	iis		BOOL DEFAULT FALSE,
 	esd		BIGINT UNSIGNED NOT NULL,
-	dosd		TIMESTAMP,
+	dosd		TIMESTAMP DEFAULT 0,
 	mosd		VARCHAR(255),
 	totrepairs	BIGINT UNSIGNED NOT NULL,
-	lastrepair	TIMESTAMP,
-	acquired	TIMESTAMP,
+	lastrepair	TIMESTAMP DEFAULT 0,
+	acquired	TIMESTAMP DEFAULT 0,
 	warranty	BIGINT UNSIGNED NOT NULL,
 	addinfo		TEXT NOT NULL,
 	disposed	TINYINT DEFAULT 0,
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS tellu3.machine (
 	node_id		BIGINT UNSIGNED NOT NULL,				# machine id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# machine creation time
 	creator		VARCHAR(64),						# machine created by
-	modified	TIMESTAMP,						# machine modification time
+	modified	TIMESTAMP DEFAULT 0,					# machine modification time
 	modifier	VARCHAR(64),						# machine modified by
 
 	PRIMARY KEY	(node_id),
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_devices (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# device id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# device creation time
 	creator		VARCHAR(64),						# device created by
-	modified	TIMESTAMP,						# device modification time
+	modified	TIMESTAMP DEFAULT 0,					# device modification time
 	modifier	VARCHAR(64),						# device modified by
 	disposed	TINYINT DEFAULT 0,					# device is disposed
 	model		VARCHAR(64),						# device model
@@ -309,11 +309,11 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_devices (
 	location	VARCHAR(255),						# device location
 	iis		BOOL DEFAULT FALSE,					# device is in service
 	esd		BIGINT UNSIGNED NOT NULL,				# device estimated service duration
-	dosd		TIMESTAMP,						# device date of service delivery
+	dosd		TIMESTAMP DEFAULT 0,					# device date of service delivery
 	mosd		VARCHAR(255),						# device method of service delivery
 	totrepairs	BIGINT UNSIGNED NOT NULL,				# device total repair counter
-	lastrepair	TIMESTAMP,						# device last repaired
-	acquired	TIMESTAMP,						# device acquired
+	lastrepair	TIMESTAMP DEFAULT 0,					# device last repaired
+	acquired	TIMESTAMP DEFAULT 0,					# device acquired
 	warranty	BIGINT UNSIGNED NOT NULL,				# device warranty
 	addinfo		TEXT NOT NULL,						# device additional info
 	descr		TEXT NOT NULL,						# device description
@@ -13763,6 +13763,26 @@ INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '12', '12'
 INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '13', '13', 'Ten years or more');
 INSERT INTO skin_misc (class, value, place, title) VALUES('warranty', '14', '14', 'Lifetime');
 
+CREATE TABLE IF NOT EXISTS tellu3.skin_notes (
+	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# note id
+	node_id		BIGINT UNSIGNED NOT NULL,				# note id to machine table
+	device_id	BIGINT UNSIGNED NOT NULL,				# note id to skin_devices table
+	peripheral_id	BIGINT UNSIGNED NOT NULL,				# note id to skin_peripherals table
+	service_id	BIGINT UNSIGNED NOT NULL,				# note id to skin_services_data table
+	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# note creation time
+	creator		VARCHAR(64),						# note created by
+	modified	TIMESTAMP DEFAULT 0,					# note modification time
+	modifier	VARCHAR(64),						# note modified by
+	note		LONGTEXT NOT NULL,					# note
+
+	PRIMARY KEY	(id),
+	INDEX		(id),
+	INDEX		n_id (node_id), FOREIGN KEY (node_id) REFERENCES machine(node_id) ON DELETE CASCADE,
+	INDEX		d_id (device_id), FOREIGN KEY (device_id) REFERENCES skin_devices(id) ON DELETE CASCADE,
+	INDEX		p_id (peripheral_id), FOREIGN KEY (peripheral_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE,
+	INDEX		s_id (service_id), FOREIGN KEY (service_id) REFERENCES skin_services_data(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS tellu3.skin_passwords (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# password id
 	owner		VARCHAR(64),						# password owner
@@ -13795,7 +13815,7 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_peripherals (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# peripheral id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# peripheral creation time
 	creator		VARCHAR(64),						# peripheral created by
-	modified	TIMESTAMP,						# peripheral modification time
+	modified	TIMESTAMP DEFAULT 0,					# peripheral modification time
 	modifier	VARCHAR(64),						# peripheral modified by
 	disposed	TINYINT DEFAULT 0,					# peripheral is disposed
 	model		VARCHAR(64),						# peripheral model
@@ -13811,11 +13831,11 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_peripherals (
 	location	VARCHAR(255),						# peripheral location
 	iis		BOOL DEFAULT FALSE,					# peripheral is in service
 	esd		BIGINT UNSIGNED NOT NULL,				# peripheral estimated service duration
-	dosd		TIMESTAMP,						# peripheral date of service delivery
+	dosd		TIMESTAMP DEFAULT 0,					# peripheral date of service delivery
 	mosd		VARCHAR(255),						# peripheral method of service delivery
 	totrepairs	BIGINT UNSIGNED NOT NULL,				# peripheral total repair counter
-	lastrepair	TIMESTAMP,						# peripheral last repaired
-	acquired	TIMESTAMP,						# peripheral acquired
+	lastrepair	TIMESTAMP DEFAULT 0,					# peripheral last repaired
+	acquired	TIMESTAMP DEFAULT 0,					# peripheral acquired
 	warranty	BIGINT UNSIGNED NOT NULL,				# peripheral warranty
 	addinfo		TEXT NOT NULL,						# peripheral additional info
 	descr		TEXT NOT NULL,						# peripheral description
@@ -24893,7 +24913,7 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# service id
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# service creation time
 	creator		VARCHAR(64),						# service created by
-	modified	TIMESTAMP,						# service modification time
+	modified	TIMESTAMP DEFAULT 0,					# service modification time
 	modifier	VARCHAR(64),						# service modified by
 	disposed	TINYINT DEFAULT 0,					# service is disposed
 	name		VARCHAR(64),						# service name
@@ -24905,23 +24925,32 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services (
 	INDEX		(name)
 );
 
-INSERT INTO skin_services (name, creator, descr, note) VALUES('1st level support', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('2nd level support', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('3rd level support', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Support, 1st level', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Support, 2nd level', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Support, 3rd level', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Application', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Courier', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Guarding', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Hosting', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Installing', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Maintenance', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Network cell/segment', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Maintenance level', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Owner', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Repair', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, site', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, data center', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, rack', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, rack slot', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Service level', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Service manager', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Systems designer', 'tellud 3.0.2-unix', '', '');
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_services_data (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# service id
 	type_id		BIGINT UNSIGNED DEFAULT 0,				# service type
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# service creation time
 	creator		VARCHAR(64),						# service created by
-	modified	TIMESTAMP,						# service modification time
+	modified	TIMESTAMP DEFAULT 0,					# service modification time
 	modifier	VARCHAR(64),						# service modified by
 	disposed	TINYINT DEFAULT 0,					# service is disposed
 	name		VARCHAR(64),						# service name
@@ -24944,12 +24973,22 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services_data (
 	addinfo		TEXT NOT NULL,						# service additional info
 	descr		TEXT NOT NULL,						# service description
 	note		LONGTEXT NOT NULL,					# notes of this service
+	# fields added to 3.0.2
+	person_role	TEXT NOT NULL,						# service contact person role
+	expiration	TIMESTAMP DEFAULT 0,					# service (contract) expiration date
+	version		VARCHAR(64),						# service (application) version
 
 	PRIMARY KEY	(id),
 	INDEX		(id),
 	INDEX		(name),
 	INDEX		t_id (type_id), FOREIGN KEY (type_id) REFERENCES skin_services(id) ON DELETE CASCADE
 );
+
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Maintenance level, Basic');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Maintenance level, Standard');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Maintenance level, Premium');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Service level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Service level, 24/7');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Service level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Service level, 8/5');
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_services_map (
 	service_id	BIGINT UNSIGNED NOT NULL,				# id to skin_service_data table
@@ -24965,7 +25004,7 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services_map (
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_sessions (
 	created		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			# user first access timestamp
-	access		TIMESTAMP,						# user last access timestamp
+	access		TIMESTAMP DEFAULT 0,					# user last access timestamp
 	count		BIGINT UNSIGNED DEFAULT 0,				# user command count by session
 	name		VARCHAR(64),						# user name
 	cookie		VARCHAR(64),						# user session cookie
@@ -25007,5 +25046,5 @@ INSERT INTO skin_users (name, gecos, password) VALUES('guest', 'System Guest', S
 #
 # Initialize default permissions
 #
-INSERT INTO skin_perm_nodes (user_id,node,domain,grp,perm) VALUES((SELECT skin_users.id FROM skin_users WHERE skin_users.name='admin'), '', '', '', 64);
-INSERT INTO skin_perm_nodes (user_id,node,domain,grp,perm) VALUES((SELECT skin_users.id FROM skin_users WHERE skin_users.name='guest'), '', '', '', 2);
+INSERT INTO skin_perm_nodes (user_id, node, domain, grp, perm) VALUES((SELECT skin_users.id FROM skin_users WHERE skin_users.name='admin'), '', '', '', 64);
+INSERT INTO skin_perm_nodes (user_id, node, domain, grp, perm) VALUES((SELECT skin_users.id FROM skin_users WHERE skin_users.name='guest'), '', '', '', 2);
