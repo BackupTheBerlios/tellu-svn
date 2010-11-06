@@ -64,6 +64,25 @@ char *newFaction(struct threadInfo * ti) {
 	return(fetchFaction(3, QUERY_TYPE_PUSH, ti));
 }
 
+char *cloneFactionAttachmentsForMachine(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Clone faction attachments for machine
+	return(fetchFaction(19, QUERY_TYPE_PUSH, ti));
+}
+
 char *pushFaction(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
@@ -943,6 +962,19 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 				);
 
 				break;
+			case 19:
+				// Clone faction attachments for machine
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_FACTIONS_MAP " (" TABLECOL_FACTIONS_MAP_FACTIONS ") SELECT " TABLECOL_FACTIONS_MAP_FACTION_ID ",'%s','0','0','0','0','0' FROM " TABLE_FACTIONS_MAP " WHERE " TABLECOL_FACTIONS_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc3Buffer,
+					0
+				);
+
+				break;
 			default:
 				replyPrepare(ERROR_SLIGHT, ERROR_CLASS_SERVER, ERROR_CODE_SERVER_INTERNALERROR, ERROR_MESS_SERVER_INTERNALERROR, ti);
 
@@ -980,11 +1012,10 @@ char *fetchFaction(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Faction \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Faction \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}

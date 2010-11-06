@@ -80,6 +80,25 @@ char *newProvider(struct threadInfo * ti) {
 	return(fetchProvider(5, QUERY_TYPE_ROUND, ti));
 }
 
+char *cloneProviderAttachmentsForMachine(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Clone service provider attachments for machine
+	return(fetchProvider(20, QUERY_TYPE_PUSH, ti));
+}
+
 char *pushService(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
@@ -114,6 +133,77 @@ char *pushProvider(struct threadInfo * ti) {
 	fetchProvider(6, QUERY_TYPE_PUSH, ti);
 
 	return(fetchProvider(7, QUERY_TYPE_PUSH, ti));
+}
+
+char *notePullProvider(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Pull notes from requested provider
+	return(fetchProvider(23, QUERY_TYPE_PULL, ti));
+}
+
+char *notePullProviderByID(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Pull note from requested provider by id
+	return(fetchProvider(26, QUERY_TYPE_PULL, ti));
+}
+
+char *noteAddProvider(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Add note to requested provider
+	return(fetchProvider(22, QUERY_TYPE_PUSH, ti));
+}
+
+char *noteModifyProvider(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Update note for requested provider
+	return(fetchProvider(24, QUERY_TYPE_PUSH, ti));
+}
+
+char *noteDeleteProvider(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Delete note for requested provider
+	return(fetchProvider(25, QUERY_TYPE_PUSH, ti));
 }
 
 char *searchService(struct threadInfo * ti) {
@@ -613,11 +703,10 @@ char *fetchService(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Service \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Service \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}
@@ -635,11 +724,10 @@ char *fetchService(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Service \"%s\" created by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Service \"%s\" created by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 
@@ -1277,6 +1365,94 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 				}
 
 				break;
+			case 20:
+				// Clone service provider attachments for machine
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICES ") SELECT " TABLECOL_SERVICE_MAP_SERVICE_ID ",'%s','0','0' FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc3Buffer,
+					0
+				);
+
+				break;
+			case 21:
+				// Clone device attachments for machine
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_DEVICE_MAP " (" TABLECOL_DEVICE_MAP_DEVICES ") SELECT " TABLECOL_DEVICE_MAP_DEVICE_ID ",'%s','0','0' FROM " TABLE_DEVICE_MAP " WHERE " TABLECOL_DEVICE_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc3Buffer,
+					0
+				);
+
+				break;
+			case 22:
+				// Add note to requested service provider
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_NOTES " (" TABLEKEY_NOTES_SERVICE ") VALUES('%s', '%s', '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 23:
+				// Pull notes from requested service provider
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_SERVICE " = '%s' ORDER BY " TABLEORD_NOTES_CREATED "%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 24:
+				// Update note for requested service provider
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_NOTES " SET " TABLECOL_NOTES_MODIFIED " = NOW(), " TABLECOL_NOTES_MODIFIER " = '%s', " TABLECOL_NOTES_NOTE " = '%s' WHERE " TABLECOL_NOTES_ID " = '%s' AND " TABLECOL_NOTES_CREATOR " = '%s'%c",
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 25:
+				// Delete note for requested service provider
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_ID " = '%s' AND " TABLECOL_NOTES_CREATOR " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 26:
+				// Pull note from requested service provider by id
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_SERVICE " = '%s' AND " TABLECOL_NOTES_ID " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
 			default:
 				replyPrepare(ERROR_SLIGHT, ERROR_CLASS_SERVER, ERROR_CODE_SERVER_INTERNALERROR, ERROR_MESS_SERVER_INTERNALERROR, ti);
 
@@ -1314,11 +1490,10 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Provider \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Provider \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}
@@ -1336,11 +1511,10 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Provider \"%s\" created by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Provider \"%s\" created by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 

@@ -223,11 +223,10 @@ char *fetchHelp(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Help \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Help \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}

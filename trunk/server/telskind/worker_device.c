@@ -51,6 +51,25 @@ char *newDevice(struct threadInfo * ti) {
 	return(fetchDevice(5, QUERY_TYPE_ROUND, ti));
 }
 
+char *cloneDeviceAttachmentsForMachine(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Clone device attachments for machine
+	return(fetchDevice(32, QUERY_TYPE_PUSH, ti));
+}
+
 char *pushDevice(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
@@ -67,6 +86,77 @@ char *pushDevice(struct threadInfo * ti) {
 	fetchDevice(6, QUERY_TYPE_PUSH, ti);
 
 	return(fetchDevice(7, QUERY_TYPE_PUSH, ti));
+}
+
+char *notePullDevice(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Pull notes from requested device
+	return(fetchDevice(34, QUERY_TYPE_PULL, ti));
+}
+
+char *notePullDeviceByID(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Pull note from requested device by id
+	return(fetchDevice(37, QUERY_TYPE_PULL, ti));
+}
+
+char *noteAddDevice(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Add note to requested device
+	return(fetchDevice(33, QUERY_TYPE_PUSH, ti));
+}
+
+char *noteModifyDevice(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Update note for requested device
+	return(fetchDevice(35, QUERY_TYPE_PUSH, ti));
+}
+
+char *noteDeleteDevice(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Delete note for requested device
+	return(fetchDevice(36, QUERY_TYPE_PUSH, ti));
 }
 
 char *searchDevice(struct threadInfo * ti) {
@@ -882,6 +972,81 @@ char *fetchDevice(int getThis, int getType, struct threadInfo * ti) {
 				);
 
 				break;
+			case 32:
+				// Clone device attachments for machine
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_DEVICE_MAP " (" TABLECOL_DEVICE_MAP_DEVICES ") SELECT " TABLECOL_DEVICE_MAP_DEVICE_ID ",'%s','0','0' FROM " TABLE_DEVICE_MAP " WHERE " TABLECOL_DEVICE_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc3Buffer,
+					0
+				);
+
+				break;
+			case 33:
+				// Add note to requested device
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_NOTES " (" TABLEKEY_NOTES_DEVICE ") VALUES('%s', '%s', '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 34:
+				// Pull notes from requested device
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_DEVICE " = '%s' ORDER BY " TABLEORD_NOTES_CREATED "%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 35:
+				// Update note for requested device
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_NOTES " SET " TABLECOL_NOTES_MODIFIED " = NOW(), " TABLECOL_NOTES_MODIFIER " = '%s', " TABLECOL_NOTES_NOTE " = '%s' WHERE " TABLECOL_NOTES_ID " = '%s' AND " TABLECOL_NOTES_CREATOR " = '%s'%c",
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 36:
+				// Delete note for requested device
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_ID " = '%s' AND " TABLECOL_NOTES_CREATOR " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 37:
+				// Pull note from requested device by id
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_DEVICE " = '%s' AND " TABLECOL_NOTES_ID " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
 			default:
 				replyPrepare(ERROR_SLIGHT, ERROR_CLASS_SERVER, ERROR_CODE_SERVER_INTERNALERROR, ERROR_MESS_SERVER_INTERNALERROR, ti);
 
@@ -919,11 +1084,10 @@ char *fetchDevice(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Device \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Device \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}
@@ -941,11 +1105,10 @@ char *fetchDevice(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Device \"%s\" created by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Device \"%s\" created by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 

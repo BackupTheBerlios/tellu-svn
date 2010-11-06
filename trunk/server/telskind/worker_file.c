@@ -64,6 +64,25 @@ char *newFile(struct threadInfo * ti) {
 	return(fetchFile(3, QUERY_TYPE_PUSH, ti));
 }
 
+char *cloneFileAttachmentsForMachine(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Clone file attachments for machine
+	return(fetchFile(17, QUERY_TYPE_PUSH, ti));
+}
+
 char *pushFile(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
@@ -758,6 +777,19 @@ char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 				);
 
 				break;
+			case 17:
+				// Clone file attachments for machine
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_FILES_MAP " (" TABLECOL_FILES_MAP_FILES ") SELECT " TABLECOL_FILES_MAP_FILE_ID ",'%s','0','0' FROM " TABLE_FILES_MAP " WHERE " TABLECOL_FILES_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc3Buffer,
+					0
+				);
+
+				break;
 			default:
 				replyPrepare(ERROR_SLIGHT, ERROR_CLASS_SERVER, ERROR_CODE_SERVER_INTERNALERROR, ERROR_MESS_SERVER_INTERNALERROR, ti);
 
@@ -795,11 +827,10 @@ char *fetchFile(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"File \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"File \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}

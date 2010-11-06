@@ -10,11 +10,11 @@ char *listPeripheral(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
-		// List all devices
+		// List all peripherals
 		return(fetchPeripheral(1, QUERY_TYPE_PULL, ti));
 	}
 	else {
-		// List requested devices by category
+		// List requested peripherals by category
 		return(fetchPeripheral(2, QUERY_TYPE_PULL, ti));
 	}
 }
@@ -28,7 +28,7 @@ char *pullPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Get requested device
+	// Get requested peripheral
 	return(fetchPeripheral(3, QUERY_TYPE_PULL, ti));
 }
 
@@ -47,8 +47,27 @@ char *newPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Create new device
+	// Create new peripheral
 	return(fetchPeripheral(5, QUERY_TYPE_ROUND, ti));
+}
+
+char *clonePeripheralAttachmentsForMachine(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_DOMAIN].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Clone peripheral attachments for machine
+	return(fetchPeripheral(32, QUERY_TYPE_PUSH, ti));
 }
 
 char *pushPeripheral(struct threadInfo * ti) {
@@ -63,10 +82,81 @@ char *pushPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Modify existing device
+	// Modify existing peripheral
 	fetchPeripheral(6, QUERY_TYPE_PUSH, ti);
 
 	return(fetchPeripheral(7, QUERY_TYPE_PUSH, ti));
+}
+
+char *notePullPeripheral(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Pull notes from requested peripheral
+	return(fetchPeripheral(34, QUERY_TYPE_PULL, ti));
+}
+
+char *notePullPeripheralByID(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Pull note from requested peripheral by id
+	return(fetchPeripheral(37, QUERY_TYPE_PULL, ti));
+}
+
+char *noteAddPeripheral(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Add note to requested peripheral
+	return(fetchPeripheral(33, QUERY_TYPE_PUSH, ti));
+}
+
+char *noteModifyPeripheral(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_PARAM].size == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Update note for requested peripheral
+	return(fetchPeripheral(35, QUERY_TYPE_PUSH, ti));
+}
+
+char *noteDeletePeripheral(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Delete note for requested peripheral
+	return(fetchPeripheral(36, QUERY_TYPE_PUSH, ti));
 }
 
 char *searchPeripheral(struct threadInfo * ti) {
@@ -78,7 +168,7 @@ char *searchPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Search from devices
+	// Search from peripherals
 	return(fetchPeripheral(4, QUERY_TYPE_PULL, ti));
 }
 
@@ -91,7 +181,7 @@ char *deletePeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Delete existing device
+	// Delete existing peripheral
 	fetchPeripheral(8, QUERY_TYPE_PUSH, ti);
 
 	return(fetchPeripheral(7, QUERY_TYPE_PUSH, ti));
@@ -106,7 +196,7 @@ char *restorePeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Restore disposed device
+	// Restore disposed peripheral
 	fetchPeripheral(9, QUERY_TYPE_PUSH, ti);
 
 	return(fetchPeripheral(7, QUERY_TYPE_PUSH, ti));
@@ -124,7 +214,7 @@ char *attachPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device to requested machine
+	// Attach peripheral to requested machine
 	return(fetchPeripheral(10, QUERY_TYPE_PUSH, ti));
 }
 
@@ -140,7 +230,7 @@ char *attachDomainPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device to requested domain
+	// Attach peripheral to requested domain
 	return(fetchPeripheral(16, QUERY_TYPE_PUSH, ti));
 }
 
@@ -153,7 +243,7 @@ char *attachGlobalPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device globally
+	// Attach peripheral globally
 	return(fetchPeripheral(17, QUERY_TYPE_PUSH, ti));
 }
 
@@ -169,7 +259,7 @@ char *attachPeripheralToDevice(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device to requested device
+	// Attach peripheral to requested device
 	return(fetchPeripheral(20, QUERY_TYPE_PUSH, ti));
 }
 
@@ -182,7 +272,7 @@ char *attachGlobalPeripheralToDevice(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device globally
+	// Attach peripheral globally
 	return(fetchPeripheral(21, QUERY_TYPE_PUSH, ti));
 }
 
@@ -198,7 +288,7 @@ char *attachPeripheralToPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device to requested peripheral
+	// Attach peripheral to requested peripheral
 	return(fetchPeripheral(26, QUERY_TYPE_PUSH, ti));
 }
 
@@ -211,7 +301,7 @@ char *attachGlobalPeripheralToPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Attach device globally
+	// Attach peripheral globally
 	return(fetchPeripheral(27, QUERY_TYPE_PUSH, ti));
 }
 
@@ -227,7 +317,7 @@ char *removePeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device from requested machine
+	// Remove peripheral from requested machine
 	return(fetchPeripheral(11, QUERY_TYPE_PUSH, ti));
 }
 
@@ -243,7 +333,7 @@ char *removeDomainPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device to requested domain
+	// Remove peripheral to requested domain
 	return(fetchPeripheral(18, QUERY_TYPE_PUSH, ti));
 }
 
@@ -256,7 +346,7 @@ char *removeGlobalPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device globally
+	// Remove peripheral globally
 	return(fetchPeripheral(19, QUERY_TYPE_PUSH, ti));
 }
 
@@ -272,7 +362,7 @@ char *removePeripheralFromDevice(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device from requested device
+	// Remove peripheral from requested device
 	return(fetchPeripheral(24, QUERY_TYPE_PUSH, ti));
 }
 
@@ -285,7 +375,7 @@ char *removeGlobalPeripheralFromDevice(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device globally
+	// Remove peripheral globally
 	return(fetchPeripheral(25, QUERY_TYPE_PUSH, ti));
 }
 
@@ -301,7 +391,7 @@ char *removePeripheralFromPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device from requested peripheral
+	// Remove peripheral from requested peripheral
 	return(fetchPeripheral(30, QUERY_TYPE_PUSH, ti));
 }
 
@@ -314,7 +404,7 @@ char *removeGlobalPeripheralFromPeripheral(struct threadInfo * ti) {
 		return(ti->dataBuffer);
 	}
 
-	// Remove device globally
+	// Remove peripheral globally
 	return(fetchPeripheral(31, QUERY_TYPE_PUSH, ti));
 }
 
@@ -331,11 +421,11 @@ char *attachedPeripheral(struct threadInfo * ti) {
 	}
 
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL || ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 || ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
-		// Get devices attached in machine
+		// Get peripherals attached in machine
 		return(fetchPeripheral(12, QUERY_TYPE_PULL, ti));
 	}
 	else {
-		// Get machines attached in device
+		// Get machines attached in peripheral
 		return(fetchPeripheral(13, QUERY_TYPE_PULL, ti));
 	}
 }
@@ -353,11 +443,11 @@ char *attachedPeripheralDevice(struct threadInfo * ti) {
 	}
 
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL || ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 || ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
-		// Get devices attached in device
+		// Get peripherals attached in device
 		return(fetchPeripheral(22, QUERY_TYPE_PULL, ti));
 	}
 	else {
-		// Get peripherals attached in device
+		// Get peripherals attached in peripheral
 		return(fetchPeripheral(23, QUERY_TYPE_PULL, ti));
 	}
 }
@@ -375,11 +465,11 @@ char *attachedPeripheralPeripheral(struct threadInfo * ti) {
 	}
 
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL || ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 || ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
-		// Get devices attached in peripheral
+		// Get peripherals attached in peripheral
 		return(fetchPeripheral(28, QUERY_TYPE_PULL, ti));
 	}
 	else {
-		// Get peripherals attached in device
+		// Get peripherals attached in peripheral
 		return(fetchPeripheral(29, QUERY_TYPE_PULL, ti));
 	}
 }
@@ -388,11 +478,11 @@ char *listDisposedPeripheral(struct threadInfo * ti) {
 	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
 	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
-		// List all disposed devices
+		// List all disposed peripherals
 		return(fetchPeripheral(14, QUERY_TYPE_PULL, ti));
 	}
 	else {
-		// List requested disposed devices by type
+		// List requested disposed peripherals by type
 		return(fetchPeripheral(15, QUERY_TYPE_PULL, ti));
 	}
 }
@@ -882,6 +972,81 @@ char *fetchPeripheral(int getThis, int getType, struct threadInfo * ti) {
 				);
 
 				break;
+			case 32:
+				// Clone peripheral attachments for machine
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_PERIPHERAL_MAP " (" TABLECOL_PERIPHERAL_MAP_PERIPHERALS ") SELECT " TABLECOL_PERIPHERAL_MAP_PERIPHERAL_ID ",'%s','0','0' FROM " TABLE_PERIPHERAL_MAP " WHERE " TABLECOL_PERIPHERAL_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc3Buffer,
+					0
+				);
+
+				break;
+			case 33:
+				// Add note to requested peripheral
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"INSERT INTO " TABLE_NOTES " (" TABLEKEY_NOTES_PERIPHERAL ") VALUES('%s', '%s', '%s')%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 34:
+				// Pull notes from requested peripheral
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_PERIPHERAL " = '%s' ORDER BY " TABLEORD_NOTES_CREATED "%c",
+					ti->commandInfo.esc2Buffer,
+					0
+				);
+
+				break;
+			case 35:
+				// Update note for requested peripheral
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"UPDATE " TABLE_NOTES " SET " TABLECOL_NOTES_MODIFIED " = NOW(), " TABLECOL_NOTES_MODIFIER " = '%s', " TABLECOL_NOTES_NOTE " = '%s' WHERE " TABLECOL_NOTES_ID " = '%s' AND " TABLECOL_NOTES_CREATOR " = '%s'%c",
+					ti->commandInfo.esc1Buffer,
+					ti->commandInfo.esc4Buffer,
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 36:
+				// Delete note for requested peripheral
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"DELETE FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_ID " = '%s' AND " TABLECOL_NOTES_CREATOR " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc1Buffer,
+					0
+				);
+
+				break;
+			case 37:
+				// Pull note from requested peripheral by id
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_PERIPHERAL " = '%s' AND " TABLECOL_NOTES_ID " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
+					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
 			default:
 				replyPrepare(ERROR_SLIGHT, ERROR_CLASS_SERVER, ERROR_CODE_SERVER_INTERNALERROR, ERROR_MESS_SERVER_INTERNALERROR, ti);
 
@@ -919,11 +1084,10 @@ char *fetchPeripheral(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Device \"%s\" modified by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Device \"%s\" modified by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 				}
@@ -941,11 +1105,10 @@ char *fetchPeripheral(int getThis, int getType, struct threadInfo * ti) {
 					snprintf(
 						ti->logSpace,
 						sizeof(ti->logSpace),
-						"Device \"%s\" created by \"%s\" using command \"%s\" with param \"%s\"%c",
+						"Device \"%s\" created by \"%s\" using command \"%s\"%c",
 						ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_UID].buffer,
 						ti->handlerArrays[HANDLER_ARRAY_COMMAND].buffer,
-						ti->handlerArrays[HANDLER_ARRAY_PARAM].buffer,
 						0
 					);
 
