@@ -80,6 +80,9 @@ sub deviceModifyFuncs {
 	$r .= "  document." . $arg->{form} . ".mosd.disabled = 1;" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+	$r .= "function deviceNote(action, note, device, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('device_e.pl?action=' +action+ '&note=' +note+ '&device=' +device+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
 }
@@ -102,6 +105,17 @@ sub deviceModifyDisposedFuncs {
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Update';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
+sub deviceNoteFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "window.opener.location.reload();" . $CONFIG_LINEFEED;
+	$r .= "window.close();" . $CONFIG_LINEFEED;
 
 	return $r;
 }

@@ -80,6 +80,9 @@ sub peripheralModifyFuncs {
 	$r .= "  document." . $arg->{form} . ".mosd.disabled = 1;" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+	$r .= "function peripheralNote(action, note, peripheral, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('peripheral_e.pl?action=' +action+ '&note=' +note+ '&peripheral=' +peripheral+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
 }
@@ -102,6 +105,17 @@ sub peripheralModifyDisposedFuncs {
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Update';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
+sub peripheralNoteFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "window.opener.location.reload();" . $CONFIG_LINEFEED;
+	$r .= "window.close();" . $CONFIG_LINEFEED;
 
 	return $r;
 }

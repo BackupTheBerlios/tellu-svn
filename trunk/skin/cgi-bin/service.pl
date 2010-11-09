@@ -19,6 +19,7 @@ my @r = ();
 
 my $n = &headCookieGet({ name => "tellu_service_node" });
 my $s = &headCookieGet({ name => "tellu_service_slice" });
+my $g = &headCookieGet({ name => "tellu_service_leaf" });
 my $m = &headCookieGet({ name => "tellu_service_action" });
 
 if($q->param('action')) {
@@ -64,20 +65,40 @@ if($q->param('action')) {
 	}
 }
 elsif($q->param('slice')) {
+	my $f = $g;
+
+	if($q->param('leaf') && $q->param('leaf') ne "") {
+		$f = $q->param('leaf');
+	}
+
+	if(!$f || $f eq "") {
+		$f = 1;
+	}
+
 	$s = $q->param('slice');
 
 	if(!$s || $s eq "") {
 		$s = "ser";
 	}
 
-	&serviceThing({ node => $n, domain => "", slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_service_slice", value => $s });
+	&serviceThing({ node => $n, domain => "", slice => $s, leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_service_slice", value => $s });
 }
 elsif($q->param('serviceNode')) {
+	my $f = $g;
+
+	if($q->param('leaf') && $q->param('leaf') ne "") {
+		$f = $q->param('leaf');
+	}
+
+	if(!$f || $f eq "") {
+		$f = 1;
+	}
+
 	if(!$s || $s eq "") {
 		$s = "ser";
 	}
 
-	&serviceThing({ node => $q->param('serviceNode'), domain => "", slice => $s, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_service_node", value => $q->param('serviceNode') });
+	&serviceThing({ node => $q->param('serviceNode'), domain => "", slice => $s, leaf => $f, sort => $q->param('sort'), order => $q->param('order'), cookie => "tellu_service_node", value => $q->param('serviceNode') });
 }
 else {
 	&tableProviderSlice();
@@ -104,7 +125,7 @@ sub serviceThing {
 		if(&menuProvider({ select => $arg->{node} }) == 0) {
 			&tableProviderBriefSlice();
 
-			if(!$arg->{slice} || $arg->{slice} eq "") {
+			if(!$arg->{slice} || $arg->{slice} eq "" || $arg->{slice} eq "incs") {
 				$arg->{slice} = "ser";
 			}
 
@@ -140,7 +161,7 @@ sub serviceThing {
 		if(&menuProvider({ select => $arg->{node} }) == 0) {
 			&tableProviderListingSlice();
 
-			if(!$arg->{slice} || $arg->{slice} eq "") {
+			if(!$arg->{slice} || $arg->{slice} eq "" || $arg->{slice} eq "incs") {
 				$arg->{slice} = "ser";
 			}
 
@@ -181,10 +202,67 @@ sub serviceThing {
 				$arg->{slice} = "ser";
 			}
 
-			@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+			if($arg->{slice} eq "incs") {
+				my @l = ('Services');
+				my @w = ();
 
-			if(checkError({ packet => \@r }) == 0) {
-				&tableProviderDetail({ data => $r[3], slice => $arg->{slice}, sort => $arg->{sort}, order => $arg->{order} });
+				$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+				$PAGE .= "<tr class=\"middle\">";
+
+				my $s = 1;
+
+				foreach my $l (@l) {
+					if($s == $arg->{leaf}) {
+						$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+					}
+					else {
+						$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?slice=" . $arg->{slice} . "&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+					}
+
+					$s++;
+				}
+
+				$PAGE .= "</tr>";
+				$PAGE .= "</table>";
+
+				if(!$arg->{leaf} || $arg->{leaf} == 1) {
+					@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+					if(checkError({ packet => \@r }) == 0) {
+						my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+						@r = &sendCommand({ command => "attachedProviderProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+							foreach my $s (@s) {
+								$s =~ s/$ITEM_SEPARATOR$//;
+
+								@r = &sendCommand({ command => "pullProvider", item => $s, domain => "", param => "", option => "" });
+
+								if(checkError({ packet => \@r }) == 0) {
+									if($r[3] && $r[3] ne "") {
+										my @ss = split(/$ITEM_SEPARATOR/, $r[3]);
+
+										push @w, join($ITEM_SEPARATOR, $s, $ss[0], $ss[6], $ss[7], $ss[8], $ss[9], $ss[10]);
+									}
+								}
+							}
+
+							&tableProviderDetail({ data => join($ITEM_DELIMITER, @w), slice => $arg->{slice}, leaf => $arg->{leaf}, sort => $arg->{sort}, order => $arg->{order} });
+						}
+					}
+				}
+
+				$c[1] = &headCookieSet({ name => "tellu_service_leaf", value => $arg->{leaf} });
+			}
+			else {
+				@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					&tableProviderDetail({ data => $r[3], slice => $arg->{slice}, sort => $arg->{sort}, order => $arg->{order} });
+				}
 			}
 
 			@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });

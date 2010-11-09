@@ -1822,7 +1822,23 @@ sub editDeviceNode {
 
 			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
 
-			my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name", option => "" });
+			my %rr = ();
+
+			my @rr = &sendCommand({ command => "listService", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@rr }) == 0) {
+				@s = split(/$ITEM_DELIMITER/, $rr[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						$rr{$i[0]} = $i[1];
+					}
+				}
+			}
+
+			my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name,type_id", option => "" });
 
 			if(checkError({ packet => \@r }) == 0) {
 				my %l = ();
@@ -1835,7 +1851,13 @@ sub editDeviceNode {
 						my @i = split(/$ITEM_SEPARATOR/, $s);
 
 						push @t, $i[0];
-						$l{$i[0]} = $i[1];
+
+						if($i[2] && $i[2] ne "") {
+							$l{$i[0]} = $rr{$i[2]} . ": " . $i[1];
+						}
+						else {
+							$l{$i[0]} = $i[1];
+						}
 					}
 				}
 				else {
@@ -1911,7 +1933,13 @@ sub editDeviceNode {
 								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
 
 								push @t, $s;
-								$l{$s} = $u[6];
+
+								if($u[0] && $u[0] ne "") {
+									$l{$s} = $rr{$u[0]} . ": " . $u[6];
+								}
+								else {
+									$l{$s} = $u[6];
+								}
 							}
 						}
 					}

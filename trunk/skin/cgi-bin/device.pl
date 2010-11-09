@@ -358,6 +358,8 @@ sub deviceThing {
 							@s = split(/$ITEM_DELIMITER/, $r[3]);
 
 							foreach my $s (@s) {
+								$s =~ s/$ITEM_SEPARATOR$//;
+
 								@r = &sendCommand({ command => "pullProvider", item => $s, domain => "", param => "", option => "" });
 
 								if(checkError({ packet => \@r }) == 0) {

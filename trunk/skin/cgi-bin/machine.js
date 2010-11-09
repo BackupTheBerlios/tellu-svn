@@ -79,6 +79,9 @@ sub machineModifyFuncs {
 	$r .= "  document." . $arg->{form} . ".mosd.disabled = 1;" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+	$r .= "function machineNote(action, note, host, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('machine_e.pl?action=' +action+ '&note=' +note+ '&host=' +host+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
 }
@@ -101,6 +104,17 @@ sub machineModifyDisposedFuncs {
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Update';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
+sub machineNoteFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "window.opener.location.reload();" . $CONFIG_LINEFEED;
+	$r .= "window.close();" . $CONFIG_LINEFEED;
 
 	return $r;
 }

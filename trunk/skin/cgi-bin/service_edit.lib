@@ -257,7 +257,7 @@ sub editProviderNew {
 
 	$PAGE .= "<tr class=\"middle\">";
 	$PAGE .= "<td align=\"right\">Service provider class:</td>";
-	$PAGE .= "<td>" . &htmlSelectMenu({ name => "type_id", value => \@ti, label => \%ti })  . "</td>";
+	$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "type_id", value => \@ti, label => \%ti })  . "</td>";
 	$PAGE .= "</tr>";
 
 	$PAGE .= "<tr class=\"top\">";
@@ -472,7 +472,81 @@ sub editProviderNew {
 sub editProviderNode {
 	my ($arg) = @_;
 
-	my @l = ('Service provider info');
+	my @l = ('Service provider info', 'Services');
+
+	if($q->param('verb')) {
+		@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+		if(checkError({ packet => \@r }) == 0) {
+			my $er = 0;
+			my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+			if($q->param('verb') eq "attser") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "attachGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "service" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						$er++;
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "attachProvider", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "service" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to attach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						$er++;
+					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
+			}
+			elsif($q->param('verb') eq "remser") {
+				if($q->param('where') && $q->param('where') eq "global") {
+					@r = &sendCommand({ command => "removeGlobalProvider", item => $q->param('attr'), domain => "", param => "", option => "service" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						$er++;
+					}
+				}
+				else {
+					@r = &sendCommand({ command => "removeProvider", item => $q->param('attr'), domain => "", param => $arg->{node}, option => "service" });
+
+					if(checkError({ packet => \@r }) != 0) {
+						$PAGE .= "<p class=\"warning\">Error occurred while trying to detach service.</p>";
+
+						if($SESSION_ERR && $SESSION_ERR ne "") {
+							$PAGE .= "<p class=\"warning\">" . $SESSION_ERR . "</p>";
+						}
+
+						$er++;
+					}
+				}
+
+				if($er == 0) {
+					&htmlPage({ redirect => $SELF . "?action=modify&leaf=" . $q->param('leaf'), title => $WINDOW_TITLE, script => "", header => "", content => $PAGE, slices => $MENU });
+				}
+			}
+		}
+	}
 
 	if($q->param('disposed') == 1) {
 		my $er = 0;
@@ -749,7 +823,7 @@ sub editProviderNode {
 
 				$PAGE .= "<tr class=\"middle\">";
 				$PAGE .= "<td align=\"right\">Service provider class:</td>";
-				$PAGE .= "<td>" . &htmlSelectMenu({ name => "type_id", value => \@ti, label => \%ti, select => $s[0] })  . "</td>";
+				$PAGE .= "<td>" . &htmlSelectMenu({ style => "selreq", name => "type_id", value => \@ti, label => \%ti, select => $s[0] })  . "</td>";
 				$PAGE .= "</tr>";
 
 				$PAGE .= "<tr class=\"top\">";
@@ -970,6 +1044,199 @@ sub editProviderNode {
 
 			$PAGE .= &htmlFormEnd();
 		}
+		elsif($q->param('leaf') && $q->param('leaf') == 1) {
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=attser", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
+			$PAGE .= "<tr class=\"middle\">";
+
+			my $s = 0;
+
+			foreach my $l (@l) {
+				if($s == $q->param('leaf')) {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left_s.png\"></td><td class=\"leaf_s\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right_s.png\"></td>";
+				}
+				else {
+					$PAGE .= "<td align=\"right\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_left.png\"></td><td class=\"leaf\"><a href=\"" . $SELF . "?action=modify&leaf=" . $s . "\">" . $l . "</a></td><td align=\"left\" valign=\"bottom\"><img alt=\"\" src=\"/pics/leaf_right.png\"></td>";
+				}
+
+				$s++;
+			}
+
+			$PAGE .= "</tr>";
+			$PAGE .= "</table>";
+
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			my %rr = ();
+
+			my @rr = &sendCommand({ command => "listService", item => "", domain => "", param => "name", option => "" });
+
+			if(checkError({ packet => \@rr }) == 0) {
+				@s = split(/$ITEM_DELIMITER/, $rr[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						$rr{$i[0]} = $i[1];
+					}
+				}
+			}
+
+			my @r = &sendCommand({ command => "listProvider", item => "", domain => "", param => "name,type_id", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my %l = ();
+				my @t = ();
+
+				@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+				if(@s) {
+					foreach my $s (@s) {
+						my @i = split(/$ITEM_SEPARATOR/, $s);
+
+						push @t, $i[0];
+
+						if($i[2] && $i[2] ne "") {
+							$l{$i[0]} = $rr{$i[2]} . ": " . $i[1];
+						}
+						else {
+							$l{$i[0]} = $i[1];
+						}
+					}
+				}
+				else {
+					$t[0] = "0";
+					$l{0} = "No services available";
+				}
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"middle\">";
+				$PAGE .= "<td align=\"right\" width=\"20%\">Attach new service:</td>";
+
+				if($t[0] == 0) {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach", disabled => 1 }) . "</td>";
+				}
+				else {
+					$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+					$PAGE .= "&nbsp;";
+					$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Attach" }) . "</td>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= &editServiceAffect();
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+				}
+
+				$PAGE .= "</tr>";
+
+				$PAGE .= "<tr class=\"top\">";
+				$PAGE .= "<td></td><td></td>";
+				$PAGE .= "</tr>";
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "attser" });
+
+			$PAGE .= &htmlFormEnd();
+
+			$PAGE .= &htmlFormBegin({ name => "modifyForm", action => $SELF . "?action=modify&verb=remser", enctype => "application/x-www-form-urlencoded", method => "post" });
+
+			$PAGE .= "<p>&nbsp;</p>";
+			$PAGE .= "<table class=\"default\" width=\"100%\" cellpadding=\"3\" cellspacing=\"1\">";
+
+			@r = &sendCommand({ command => "pullProvider", item => $arg->{node}, domain => "", param => "", option => "" });
+
+			if(checkError({ packet => \@r }) == 0) {
+				my @s = split(/$ITEM_SEPARATOR/, $r[3]);
+
+				@r = &sendCommand({ command => "attachedProvider", item => "", domain => "", param => $arg->{node}, option => "service" });
+
+				if(checkError({ packet => \@r }) == 0) {
+					my %l = ();
+					my @t = ();
+
+					@s = split(/$ITEM_DELIMITER/, $r[3]);
+
+					foreach my $s (@s) {
+						@r = &sendCommand({ command => "pullProvider", item => $s, domain => "", param => "", option => "" });
+
+						if(checkError({ packet => \@r }) == 0) {
+							if($r[3] && $r[3] ne "") {
+								my @u = split(/$ITEM_SEPARATOR/, $r[3]);
+
+								push @t, $s;
+
+								if($u[0] && $u[0] ne "") {
+									$l{$s} = $rr{$u[0]} . ": " . $u[6];
+								}
+								else {
+									$l{$s} = $u[6];
+								}
+							}
+						}
+					}
+
+					if(!@t) {
+						$t[0] = "0";
+						$l{0} = "No services attached";
+					}
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"middle\">";
+					$PAGE .= "<td align=\"right\" width=\"20%\">Detach attached service:</td>";
+
+					if($t[0] == 0) {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l, disabled => 1 });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach", disabled => 1 }) . "</td>";
+					}
+					else {
+						$PAGE .= "<td width=\"80%\">" . &htmlSelectMenu({ name => "attr", value => \@t, label => \%l });
+						$PAGE .= "&nbsp;";
+						$PAGE .= &htmlButtonSubmit({ name => "submit", value => "Detach" }) . "</td>";
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+						$PAGE .= "</tr>";
+
+						$PAGE .= &editServiceAffect();
+
+						$PAGE .= "<tr class=\"top\">";
+						$PAGE .= "<td></td><td></td>";
+					}
+
+					$PAGE .= "</tr>";
+
+					$PAGE .= "<tr class=\"top\">";
+					$PAGE .= "<td></td><td></td>";
+					$PAGE .= "</tr>";
+				}
+			}
+
+			$PAGE .= "</table>";
+
+			$PAGE .= &htmlHiddenField({ name => "action", value => "modify" });
+			$PAGE .= &htmlHiddenField({ name => "leaf", value => $q->param('leaf') });
+			$PAGE .= &htmlHiddenField({ name => "verb", value => "remser" });
+
+		}
 	}
 }
 
@@ -1139,6 +1406,27 @@ sub editProviderNote {
 
 		$PAGE .= &htmlFormEnd();
 	}
+}
+
+sub editServiceAffect {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	my @t = ('this', 'global');
+
+	my %l = (
+		'this' => 'only on this service provider,',
+		'global' => 'all service providers globally?'
+	);
+
+	$r .= "<tr class=\"middle\">";
+	$r .= "<td align=\"right\">Affect modifications:</td>";
+	$r .= "<td>";
+	$r .= &htmlSelectRadio({ name => "where", value => \@t, label => \%l, select => $t[0] }) . "</td>";
+	$r .= "</tr>";
+
+	return $r;
 }
 
 1;

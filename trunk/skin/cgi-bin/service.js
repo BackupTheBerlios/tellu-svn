@@ -60,6 +60,9 @@ sub serviceModifyFuncs {
 	$r .= "function toggleCountryField(param) {" . $CONFIG_LINEFEED;
 	$r .= " document." . $arg->{form} . ".country.value = document." . $arg->{form} . ".ext_country.value;" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+	$r .= "function serviceNote(action, note, service, width, height) {" . $CONFIG_LINEFEED;
+	$r .= " window.open('service_e.pl?action=' +action+ '&note=' +note+ '&service=' +service+ '', '', 'scrollbars,resizable,height=' +height+ ',width=' +width+ '');" . $CONFIG_LINEFEED;
+	$r .= "}" . $CONFIG_LINEFEED;
 
 	return $r;
 }
@@ -82,6 +85,17 @@ sub serviceModifyDisposedFuncs {
 	$r .= "  document." . $arg->{form} . ".submit.value = 'Update';" . $CONFIG_LINEFEED;
 	$r .= " }" . $CONFIG_LINEFEED;
 	$r .= "}" . $CONFIG_LINEFEED;
+
+	return $r;
+}
+
+sub serviceNoteFuncs {
+	my ($arg) = @_;
+
+	my $r = "";
+
+	$r .= "window.opener.location.reload();" . $CONFIG_LINEFEED;
+	$r .= "window.close();" . $CONFIG_LINEFEED;
 
 	return $r;
 }
