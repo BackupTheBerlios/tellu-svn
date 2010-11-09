@@ -381,6 +381,7 @@ extern char *removeProvider(struct threadInfo *);
 extern char *removeDomainProvider(struct threadInfo *);
 extern char *removeGlobalProvider(struct threadInfo *);
 extern char *attachedProvider(struct threadInfo *);
+extern char *attachedProviderProvider(struct threadInfo *);
 extern char *listDisposedService(struct threadInfo *);
 extern char *listDisposedProvider(struct threadInfo *);
 extern char *fetchService(int, int, struct threadInfo *);

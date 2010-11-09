@@ -165,6 +165,7 @@ struct cmdArray cmdArrays[] = {
 	{ PRIVILEGE_LEVEL_WRITE, "removeDomainProvider", NULL, removeDomainProvider, replyFree },
 	{ PRIVILEGE_LEVEL_WRITE, "removeGlobalProvider", NULL, removeGlobalProvider, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "attachedProvider", NULL, attachedProvider, replyFree },
+	{ PRIVILEGE_LEVEL_READ, "attachedProviderProvider", NULL, attachedProviderProvider, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "listDisposedService", NULL, listDisposedService, replyFree },
 	{ PRIVILEGE_LEVEL_READ, "listDisposedProvider", NULL, listDisposedProvider, replyFree },
 

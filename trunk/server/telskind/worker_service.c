@@ -425,6 +425,19 @@ char *attachedProvider(struct threadInfo * ti) {
 	}
 }
 
+char *attachedProviderProvider(struct threadInfo * ti) {
+	if(ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer == NULL ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].buffer[0] == 0 ||
+	ti->handlerArrays[HANDLER_ARRAY_ITEM].size == 0) {
+		replyPrepare(ERROR_SLIGHT, ERROR_CLASS_GENERAL, ERROR_CODE_GENERAL_PARAMETERNEEDED, ERROR_MESS_GENERAL_PARAMETERNEEDED, ti);
+
+		return(ti->dataBuffer);
+	}
+
+	// Get service providers attached in service provider
+	return(fetchProvider(27, QUERY_TYPE_PULL, ti));
+}
+
 char *listDisposedService(struct threadInfo * ti) {
 	// List all disposed services
 	return(fetchService(9, QUERY_TYPE_PULL, ti));
@@ -1048,6 +1061,16 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICE_ID ", " TABLECOL_SERVICE_MAP_SERVICES_ID ") VALUES('%s', '%s')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -1085,6 +1108,16 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"DELETE FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s' AND " TABLECOL_SERVICE_MAP_DEVICE_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s' AND " TABLECOL_SERVICE_MAP_SERVICES_ID " = '%s'%c",
 						ti->commandInfo.esc2Buffer,
 						ti->commandInfo.esc4Buffer,
 						0
@@ -1129,6 +1162,15 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_SERVICE_MAP_SERVICE_ID " FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICES_ID " = '%s'%c",
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -1164,6 +1206,15 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"SELECT DISTINCT " TABLECOL_SERVICE_MAP_DEVICE_ID " FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s'%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"SELECT DISTINCT " TABLECOL_SERVICE_MAP_SERVICES_ID " FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s'%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
@@ -1235,6 +1286,16 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICE_ID ", " TABLECOL_SERVICE_MAP_SERVICES_ID ") (SELECT '%s', " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -1270,6 +1331,15 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						ti->commandInfo.statBuffer,
 						ti->commandInfo.s,
 						"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICE_ID ", " TABLECOL_SERVICE_MAP_DEVICE_ID ") (SELECT '%s', " TABLECOL_DEVICE_ID " FROM " TABLE_DEVICE " WHERE " TABLECOL_DEVICE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICE_ID ", " TABLECOL_SERVICE_MAP_SERVICES_ID ") (SELECT '%s', " TABLECOL_SERVICE_DATA_ID " FROM " TABLE_SERVICE_DATA " WHERE " TABLECOL_SERVICE_DATA_DISPOSED " = '0')%c",
 						ti->commandInfo.esc2Buffer,
 						0
 					);
@@ -1316,6 +1386,16 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s' AND " TABLECOL_SERVICE_MAP_SERVICES_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						ti->commandInfo.esc4Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -1355,6 +1435,15 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 						0
 					);
 				}
+				else if(strcmp(ti->handlerArrays[HANDLER_ARRAY_OPTION].buffer, TABLECOL_SERVICE_MAP_SERVICE) == 0) {
+					snprintf(
+						ti->commandInfo.statBuffer,
+						ti->commandInfo.s,
+						"DELETE FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICE_ID " = '%s' AND " TABLECOL_SERVICE_MAP_SERVICES_ID " IN (SELECT " TABLECOL_SERVICE_DATA_ID " FROM " TABLE_SERVICE_DATA " WHERE " TABLECOL_SERVICE_DATA_DISPOSED " = '0')%c",
+						ti->commandInfo.esc2Buffer,
+						0
+					);
+				}
 				else {
 					snprintf(
 						ti->commandInfo.statBuffer,
@@ -1370,7 +1459,7 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 				snprintf(
 					ti->commandInfo.statBuffer,
 					ti->commandInfo.s,
-					"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICES ") SELECT " TABLECOL_SERVICE_MAP_SERVICE_ID ",'%s','0','0' FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
+					"INSERT INTO " TABLE_SERVICE_MAP " (" TABLECOL_SERVICE_MAP_SERVICES ") SELECT " TABLECOL_SERVICE_MAP_SERVICE_ID ",'%s','0','0','0' FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_MACHINE_ID " IN (SELECT " TABLECOL_MACHINE_NID " FROM " TABLECOL_MACHINE_NODE " WHERE " TABLECOL_MACHINE_NODE " = '%s' AND " TABLECOL_MACHINE_DOMAIN " = '%s' AND " TABLECOL_MACHINE_DISPOSED " = '0')%c",
 					ti->commandInfo.esc4Buffer,
 					ti->commandInfo.esc2Buffer,
 					ti->commandInfo.esc3Buffer,
@@ -1449,6 +1538,17 @@ char *fetchProvider(int getThis, int getType, struct threadInfo * ti) {
 					"SELECT " TABLEKEY_NOTES_DATA " FROM " TABLE_NOTES " WHERE " TABLECOL_NOTES_SERVICE " = '%s' AND " TABLECOL_NOTES_ID " = '%s'%c",
 					ti->commandInfo.esc2Buffer,
 					ti->commandInfo.esc4Buffer,
+					0
+				);
+
+				break;
+			case 27:
+				// Get service providers attached in service provider
+				snprintf(
+					ti->commandInfo.statBuffer,
+					ti->commandInfo.s,
+					"SELECT DISTINCT " TABLECOL_SERVICE_MAP_SERVICE_ID " FROM " TABLE_SERVICE_MAP " WHERE " TABLECOL_SERVICE_MAP_SERVICES_ID " = '%s'%c",
+					ti->commandInfo.esc2Buffer,
 					0
 				);
 
