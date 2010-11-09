@@ -24928,12 +24928,12 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services (
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Support, 1st level', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Support, 2nd level', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Support, 3rd level', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Application', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Courier', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Guarding', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Hosting', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Installing', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Network cell/segment', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Network category', 'tellud 3.0.2-unix', '', '');
+INSERT INTO skin_services (name, creator, descr, note) VALUES('Network segmentation', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Maintenance level', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Owner', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Repair', 'tellud 3.0.2-unix', '', '');
@@ -24942,8 +24942,6 @@ INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, data
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, rack', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Server room, rack slot', 'tellud 3.0.2-unix', '', '');
 INSERT INTO skin_services (name, creator, descr, note) VALUES('Service level', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Service manager', 'tellud 3.0.2-unix', '', '');
-INSERT INTO skin_services (name, creator, descr, note) VALUES('Systems designer', 'tellud 3.0.2-unix', '', '');
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_services_data (
 	id		BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,		# service id
@@ -24984,22 +24982,24 @@ CREATE TABLE IF NOT EXISTS tellu3.skin_services_data (
 	INDEX		t_id (type_id), FOREIGN KEY (type_id) REFERENCES skin_services(id) ON DELETE CASCADE
 );
 
-INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Maintenance level, Basic');
-INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Maintenance level, Standard');
-INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Maintenance level, Premium');
-INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Service level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Service level, 24/7');
-INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Service level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Service level, 8/5');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Basic');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Standard');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Maintenance level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', 'Premium');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Service level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', '24/7');
+INSERT INTO skin_services_data (type_id, created, creator, modified, modifier, name) VALUES((SELECT skin_services.id FROM skin_services WHERE skin_services.name='Service level'), NOW(), 'tellud 3.0.2-unix', NOW(), 'tellud 3.0.2-unix', '8/5');
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_services_map (
 	service_id	BIGINT UNSIGNED NOT NULL,				# id to skin_service_data table
 	machine_id	BIGINT UNSIGNED NOT NULL,				# id to machine table
 	device_id	BIGINT UNSIGNED NOT NULL,				# id to skin_devices table
 	peripheral_id	BIGINT UNSIGNED NOT NULL,				# id to skin_peripherals table
+	services_id	BIGINT UNSIGNED NOT NULL,				# id to skin_services_data table
 
 	INDEX		s_id (service_id), FOREIGN KEY (service_id) REFERENCES skin_services_data(id) ON DELETE CASCADE,
 	INDEX		m_id (machine_id), FOREIGN KEY (machine_id) REFERENCES machine(node_id) ON DELETE CASCADE,
 	INDEX		d_id (device_id), FOREIGN KEY (device_id) REFERENCES skin_devices(id) ON DELETE CASCADE,
-	INDEX		a_id (peripheral_id), FOREIGN KEY (peripheral_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE
+	INDEX		a_id (peripheral_id), FOREIGN KEY (peripheral_id) REFERENCES skin_peripherals(id) ON DELETE CASCADE,
+	INDEX		r_id (services_id), FOREIGN KEY (services_id) REFERENCES skin_services_data(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tellu3.skin_sessions (
